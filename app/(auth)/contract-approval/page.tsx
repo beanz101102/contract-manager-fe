@@ -1,10 +1,21 @@
 "use client"
 
-import { useState } from "react"
-import { Eye, Filter } from "lucide-react"
+import React, { useState } from "react"
+import { TabsList } from "@radix-ui/react-tabs"
+import { Eye, Filter, Info } from "lucide-react"
+import toast from "react-hot-toast"
 
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -20,6 +31,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs"
+import { Textarea } from "@/components/ui/textarea"
 
 type Contract = {
   id: string
@@ -126,7 +139,9 @@ const contracts: Contract[] = [
 
 export default function ContractApproval() {
   const [searchTerm, setSearchTerm] = useState("")
-
+  const [isOpen, setIsOpen] = useState(false)
+  const [isOpenEditRequest, setIsOpenEditRequest] = useState(false)
+  const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
   const filteredContracts = contracts.filter((contract) =>
     contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -146,12 +161,16 @@ export default function ContractApproval() {
           <Filter className="h-5 w-5 absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
         <div className="flex gap-2">
-          <Button className="bg-teal-500 hover:bg-teal-600">
+          <Button
+            className="bg-teal-500 hover:bg-teal-600"
+            onClick={() => setIsOpen(true)}
+          >
             ✓ Duyệt hợp đồng
           </Button>
           <Button
             variant="outline"
             className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+            onClick={() => setIsOpenEditRequest(true)}
           >
             Yêu cầu sửa
           </Button>
@@ -189,7 +208,11 @@ export default function ContractApproval() {
                 <div>{contract.customerInfo.phone}</div>
               </TableCell>
               <TableCell>
-                <Button variant="outline" size="icon">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setIsOpenContractInfo(true)}
+                >
                   <Eye className="h-4 w-4" />
                 </Button>
               </TableCell>
@@ -240,6 +263,190 @@ export default function ContractApproval() {
           <span>Tổng số bản ghi: 48</span>
         </div>
       </div>
+      <ModalConfirm isOpen={isOpen} onOpenChange={setIsOpen} />
+      <EditRequestModal
+        isOpen={isOpenEditRequest}
+        onOpenChange={setIsOpenEditRequest}
+      />
+      <ContractInfoModal
+        isOpen={isOpenContractInfo}
+        onOpenChange={setIsOpenContractInfo}
+      />
     </div>
+  )
+}
+
+const ModalConfirm = ({
+  isOpen,
+  onOpenChange,
+}: {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+}) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[600px] !rounded-lg">
+        <DialogHeader className="flex flex-col items-center">
+          <div className="bg-teal-500 rounded-full p-2 mb-4">
+            <Info className="text-white h-6 w-6" />
+          </div>
+          <DialogTitle className="text-xl font-semibold">Thông báo</DialogTitle>
+        </DialogHeader>
+        <DialogDescription className="text-center">
+          Bạn chắc chắn muốn duyệt các hợp đồng đã chọn
+        </DialogDescription>
+        <DialogFooter className="sm:justify-center">
+          <Button
+            onClick={() => {
+              onOpenChange(false)
+              toast.success("Duyệt hợp đồng thành công")
+            }}
+            className="bg-teal-500 hover:bg-teal-600 text-white w-full sm:w-auto"
+          >
+            Duyệt hợp đồng
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const EditRequestModal = ({
+  isOpen,
+  onOpenChange,
+}: {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+}) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">
+            Yêu cầu sửa lại
+          </DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="reason" className="font-medium">
+              Lý do yêu cầu <span className="text-red-500">(*)</span>
+            </Label>
+            <Textarea
+              id="reason"
+              placeholder="Nhập lý do yêu cầu sửa lại"
+              className="min-h-[100px] bg-white !rounded-lg !border-1 !border-gray-300"
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="file-upload" className="font-medium">
+              Tệp đính kèm
+            </Label>
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-4">
+              <Button
+                variant="outline"
+                className="w-full bg-teal-500 text-white hover:bg-teal-600"
+              >
+                Tệp đính kèm
+              </Button>
+              <p className="text-sm text-gray-500 mt-2 text-center">
+                (pdf, doc, docx, xlsx, xls, png, jpg, jpeg)
+              </p>
+            </div>
+          </div>
+        </div>
+        <DialogFooter className="sm:justify-end">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="bg-gray-100 hover:bg-gray-200 text-black"
+          >
+            Đóng
+          </Button>
+          <Button className="bg-teal-500 hover:bg-teal-600 text-white">
+            Gửi yêu cầu
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const ContractInfoModal = ({
+  isOpen,
+  onOpenChange,
+}: {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+}) => {
+  const [activeTab, setActiveTab] = useState("info")
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[900px] p-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="w-full">
+            <TabsTrigger value="info" className="flex-1">
+              Thông tin hợp đồng
+            </TabsTrigger>
+            <TabsTrigger value="view" className="flex-1">
+              Xem hợp đồng
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="info" className="p-4">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold">Thông tin chung</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <p>Ngày tạo: 22/05/2024</p>
+                  <p>Người tạo: Nguyễn Trúc Văn</p>
+                  <p>Trạng thái: Đã hoàn thành</p>
+                  <p>Diễn giải: Hợp đồng mua nhà chung cư</p>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold">Thông tin khác</h3>
+                <div>
+                  <p>Nhận xét:</p>
+                  <Button variant="outline" className="mt-2">
+                    Tệp đính kèm
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold">Quá trình xử lý</h3>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>STT</TableHead>
+                      <TableHead>Thao tác</TableHead>
+                      <TableHead>Người thực hiện</TableHead>
+                      <TableHead>Chức vụ</TableHead>
+                      <TableHead>Phòng ban</TableHead>
+                      <TableHead>Trạng thái</TableHead>
+                      <TableHead>Ngày thực hiện</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>{/* Add table rows here */}</TableBody>
+                </Table>
+              </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="view" className="p-4">
+            <div className="bg-gray-100 p-4 h-[500px] flex items-center justify-center">
+              Contract PDF Viewer Placeholder
+            </div>
+          </TabsContent>
+        </Tabs>
+        <div className="p-4 flex justify-end">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="bg-gray-100 hover:bg-gray-200 text-black"
+          >
+            Đóng
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
