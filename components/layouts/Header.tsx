@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { FileText, List, User, UserPlus, Users } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -63,12 +64,24 @@ function DropdownMenu() {
           </AccordionTrigger>
           <AccordionContent>
             <ul className="space-y-2">
-              <li className="pl-6">Tra cứu hợp đồng</li>
-              <li className="pl-6">Cá nhân quản lý</li>
-              <li className="pl-6">Duyệt hợp đồng</li>
-              <li className="pl-6">Ký hợp đồng</li>
-              <li className="pl-6">Lường duyệt hợp đồng</li>
-              <li className="pl-6">Chữ ký cá nhân</li>
+              <Link href="/contract-search">
+                <li className="pl-6">Tra cứu hợp đồng</li>
+              </Link>
+              <Link href="/individual-management">
+                <li className="pl-6">Cá nhân quản lý</li>
+              </Link>
+              <Link href="/contract-approval">
+                <li className="pl-6">Duyệt hợp đồng</li>
+              </Link>
+              <Link href="/contract-signing">
+                <li className="pl-6">Ký hợp đồng</li>
+              </Link>
+              <Link href="/contract-approval-flow">
+                <li className="pl-6">Luồng duyệt hợp đồng</li>
+              </Link>
+              <Link href="/personal-signature">
+                <li className="pl-6">Chữ ký cá nhân</li>
+              </Link>
             </ul>
           </AccordionContent>
         </AccordionItem>
@@ -81,7 +94,9 @@ function DropdownMenu() {
           </AccordionTrigger>
           <AccordionContent>
             <ul className="space-y-2">
-              <li className="pl-6 flex items-center">Danh sách nhân viên</li>
+              <Link href="/employee-list">
+                <li className="pl-6 flex items-center">Danh sách nhân viên</li>
+              </Link>
             </ul>
           </AccordionContent>
         </AccordionItem>
@@ -94,7 +109,9 @@ function DropdownMenu() {
           </AccordionTrigger>
           <AccordionContent>
             <ul className="space-y-2">
-              <li className="pl-6 flex items-center">Danh sách khách hàng</li>
+              <Link href="/customer-list">
+                <li className="pl-6 flex items-center">Danh sách khách hàng</li>
+              </Link>
             </ul>
           </AccordionContent>
         </AccordionItem>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Pencil, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -107,7 +108,11 @@ export default function EmployeeList() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-teal-500 hover:bg-teal-600">+ Thêm mới</Button>
+          <Link href="/employee-registration">
+            <Button className="bg-teal-500 hover:bg-teal-600">
+              + Thêm mới
+            </Button>
+          </Link>
           <Button variant="destructive">X Xóa</Button>
         </div>
       </div>
@@ -144,9 +149,11 @@ export default function EmployeeList() {
               <TableCell>{employee.account}</TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="icon">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  <Link href="/edit-employee-information">
+                    <Button variant="outline" size="icon">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Button variant="outline" size="icon">
                     <Trash2 className="h-4 w-4" />
                   </Button>
