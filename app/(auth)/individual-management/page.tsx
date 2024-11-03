@@ -1,10 +1,21 @@
 "use client"
 
 import { useState } from "react"
-import { Eye, FileText, Filter, Mail, Pencil } from "lucide-react"
+import { Download, Send, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import NextImage from "@/components/ui/next-img"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
@@ -53,129 +64,198 @@ const contracts: Contract[] = [
 export default function IndividualManagement() {
   const [searchTerm, setSearchTerm] = useState("")
 
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
+
   const filteredContracts = contracts.filter((contract) =>
     contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedEmployees(
+        filteredContracts.map((contract, index) => index.toString())
+      )
+    } else {
+      setSelectedEmployees([])
+    }
+  }
+
+  const handleSelectOne = (employeeId: string) => {
+    setSelectedEmployees((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    )
+  }
+
   return (
-    <div className="mx-auto p-6 bg-white rounded-lg">
-      <h1 className="text-2xl font-bold mb-4">Cá nhân quản lý</h1>
-      <div className="flex justify-between mb-4">
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="Mã/ Số hợp đồng"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 pr-8"
-          />
-          <Filter className="h-5 w-5 absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+    <div className="w-full py-6 bg-white rounded-[10px]">
+      <h1 className="text-2xl font-bold mb-4 border-b border-b-[#675D5D] px-6 pb-6">
+        Cá nhân quản lý
+      </h1>
+      <div className="px-6">
+        <div className="flex justify-between mb-4 ">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Mã/ Số hợp đồng"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white rounded"
+              style={{
+                border: "1px solid #D9D9D9",
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]">
+              + Thêm mới
+            </Button>
+            <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+              <Send className="w-4 h-4" />
+              Gửi duyệt
+            </Button>
+            <Button className="bg-[#F3949E] rounded text-white hover:bg-[#a4434d]">
+              <Trash2 className="w-4 h-4" />
+              Xóa
+            </Button>
+            <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+              <Download className="w-4 h-4" />
+              Tải
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button className="bg-teal-500 hover:bg-teal-600">+ Thêm mới</Button>
-          <Button variant="outline">Gửi duyệt</Button>
-          <Button variant="destructive">X Xóa</Button>
-          <Button variant="outline">↓ Tải</Button>
-        </div>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">
-              <Input type="checkbox" className="w-4 h-4" />
-            </TableHead>
-            <TableHead className="w-[50px]">STT</TableHead>
-            <TableHead>Số hợp đồng</TableHead>
-            <TableHead>Ngày tạo hợp đồng</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead>Phòng ban</TableHead>
-            <TableHead>Mã khách</TableHead>
-            <TableHead>Thao tác</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredContracts.map((contract, index) => (
-            <TableRow key={contract.id}>
-              <TableCell>
-                <Input type="checkbox" className="w-4 h-4" />
-              </TableCell>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{contract.contractNumber}</TableCell>
-              <TableCell>{contract.creationDate}</TableCell>
-              <TableCell>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    contract.status === "Hoàn thành"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {contract.status}
-                </span>
-              </TableCell>
-              <TableCell>{contract.department}</TableCell>
-              <TableCell>{contract.clientCode}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Mail className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <FileText className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-[#F5F5F5]">
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={
+                    selectedEmployees.length === filteredContracts.length
+                  }
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead className="w-[50px] text-black text-lg font-semibold">
+                STT
+              </TableHead>
+              <TableHead className="text-black text-lg font-semibold">
+                Số hợp đồng
+              </TableHead>
+              <TableHead className="text-black text-lg font-semibold">
+                Ngày tạo hợp đồng
+              </TableHead>
+              <TableHead className="text-black text-lg">Trạng thái</TableHead>
+              <TableHead className="text-black text-lg font-semibold">
+                Phòng ban
+              </TableHead>
+              <TableHead className="text-black text-lg font-semibold">
+                Mã khách
+              </TableHead>
+              <TableHead className="text-black text-lg font-semibold">
+                Thao tác
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            {"<"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-teal-500 text-white"
-          >
-            1
-          </Button>
-          <Button variant="outline" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
-            4
-          </Button>
-          <Button variant="outline" size="sm">
-            5
-          </Button>
-          <Button variant="outline" size="sm">
-            {">"}
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <span>Chọn số bản ghi trên 1 trang:</span>
-          <Select defaultValue="10">
-            <SelectTrigger className="w-[70px]">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Tổng số bản ghi: 48</span>
+          </TableHeader>
+          <TableBody>
+            {filteredContracts.map((contract, index) => (
+              <TableRow key={contract.id} className="hover:bg-[#F5F5F5]">
+                <TableCell>
+                  <Checkbox
+                    checked={selectedEmployees.includes(index.toString())}
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        handleSelectOne(index.toString())
+                      } else {
+                        handleSelectOne(index.toString())
+                      }
+                    }}
+                  />
+                </TableCell>
+                <TableCell className="text-black text-lg font-semibold">
+                  {index + 1}
+                </TableCell>
+                <TableCell className="text-black text-lg font-semibold">
+                  {contract.contractNumber}
+                </TableCell>
+                <TableCell className="text-black text-lg font-semibold">
+                  {contract.creationDate}
+                </TableCell>
+                <TableCell className="text-black text-lg font-semibold">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      contract.status === "Hoàn thành"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {contract.status}
+                  </span>
+                </TableCell>
+                <TableCell className="text-black text-lg font-semibold">
+                  {contract.department}
+                </TableCell>
+                <TableCell className="text-black text-lg font-semibold">
+                  {contract.clientCode}
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-3 items-center">
+                    <NextImage src="/eye.png" alt="eye" className="w-[24px]" />
+                    <NextImage
+                      src="/mail.png"
+                      alt="mail"
+                      className="w-[24px]"
+                    />
+                    <NextImage
+                      src="/edit.png"
+                      alt="edit"
+                      className="w-[24px]"
+                    />
+                    <NextImage
+                      src="/setting.png"
+                      alt="setting"
+                      className="w-[24px]"
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <div className="flex items-center justify-between mt-4">
+          <div>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious href="#" />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationLink href="#">1</PaginationLink>
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+                <PaginationItem>
+                  <PaginationNext href="#" />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span>Chọn số bản ghi trên 1 trang:</span>
+            <Select defaultValue="10">
+              <SelectTrigger className="w-[70px] rounded">
+                <SelectValue placeholder="10" />
+              </SelectTrigger>
+              <SelectContent className="rounded border none text-black">
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+            <span>Tổng số bản ghi: 48</span>
+          </div>
         </div>
       </div>
     </div>

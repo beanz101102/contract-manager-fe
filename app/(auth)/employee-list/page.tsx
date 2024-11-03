@@ -2,10 +2,21 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Plus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import NextImage from "@/components/ui/next-img"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
@@ -50,12 +61,51 @@ const employees: Employee[] = [
     email: "avd@gmail.com",
     account: "avd@gmail.com",
   },
-  // Add more employee data here...
+  {
+    id: "1",
+    code: "NV001",
+    name: "Nguyễn Thanh Thành",
+    department: "Phòng pháp lý",
+    position: "Phòng pháp lý",
+    dateOfBirth: "02/03/2000",
+    gender: "Nam",
+    idNumber: "0123250124",
+    phoneNumber: "0867352637",
+    email: "avd@gmail.com",
+    account: "avd@gmail.com",
+  },
+  {
+    id: "1",
+    code: "NV001",
+    name: "Nguyễn Thanh Thành",
+    department: "Phòng pháp lý",
+    position: "Phòng pháp lý",
+    dateOfBirth: "02/03/2000",
+    gender: "Nam",
+    idNumber: "0123250124",
+    phoneNumber: "0867352637",
+    email: "avd@gmail.com",
+    account: "avd@gmail.com",
+  },
+  {
+    id: "1",
+    code: "NV001",
+    name: "Nguyễn Thanh Thành",
+    department: "Phòng pháp lý",
+    position: "Phòng pháp lý",
+    dateOfBirth: "02/03/2000",
+    gender: "Nam",
+    idNumber: "0123250124",
+    phoneNumber: "0867352637",
+    email: "avd@gmail.com",
+    account: "avd@gmail.com",
+  },
 ]
 
 export default function EmployeeList() {
   const [searchTerm, setSearchTerm] = useState("")
   const [department, setDepartment] = useState("all")
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
 
   const filteredEmployees = employees.filter(
     (employee) =>
@@ -64,99 +114,199 @@ export default function EmployeeList() {
       (department === "all" || employee.department === department)
   )
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedEmployees(
+        filteredEmployees.map((emp, index) => index.toString())
+      )
+    } else {
+      setSelectedEmployees([])
+    }
+  }
+
+  const handleSelectOne = (employeeId: string) => {
+    setSelectedEmployees((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    )
+  }
+
   return (
     <div className="p-6 bg-white rounded-lg">
       <h1 className="text-2xl font-bold mb-4">Danh sách nhân viên</h1>
       <div className="flex justify-between mb-4">
         <div className="flex gap-2">
-          <Select value={department} onValueChange={setDepartment}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Phòng ban" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả</SelectItem>
-              <SelectItem value="Phòng pháp lý">Phòng pháp lý</SelectItem>
-              <SelectItem value="Phòng nhân sự">Phòng nhân sự</SelectItem>
-              <SelectItem value="Phòng hành chính">Phòng hành chính</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium">Phòng ban</p>
+            <Select value={department} onValueChange={setDepartment}>
+              <SelectTrigger
+                className="w-[180px] rounded"
+                style={{
+                  border: "1px solid #0000004D",
+                }}
+              >
+                <SelectValue placeholder="Phòng ban" />
+              </SelectTrigger>
+              <SelectContent className="rounded border none text-black">
+                <SelectItem value="all">Tất cả</SelectItem>
+                <SelectItem value="Phòng pháp lý">Phòng pháp lý</SelectItem>
+                <SelectItem value="Phòng nhân sự">Phòng nhân sự</SelectItem>
+                <SelectItem value="Phòng hành chính">
+                  Phòng hành chính
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div className="relative">
             <Input
               type="text"
               placeholder="Mã/ Tên nhân viên"
               value={searchTerm}
               style={{
-                border: "1px solid #0000004D",
+                border: "1px solid #4BC5BE",
               }}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
+              className="pl-12 h-[40px] bg-white rounded"
             />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <div className="absolute top-1/2 transform -translate-y-1/2 h-[40px] w-[40px] flex items-center justify-center bg-[#4BC5BE] rounded">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
           </div>
         </div>
         <div className="flex gap-2">
           <Link href="/employee-registration">
-            <Button className="bg-teal-500 hover:bg-teal-600">
-              + Thêm mới
+            <Button className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold">
+              <Plus className="w-4 h-4" /> Thêm mới
             </Button>
           </Link>
-          <Button variant="destructive">X Xóa</Button>
+          <Button className="bg-[#F3949E] hover:bg-[#a4434d] rounded text-white font-semibold">
+            <Trash2 className="w-4 h-4" /> Xóa
+          </Button>
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">STT</TableHead>
-            <TableHead>Mã nhân viên</TableHead>
-            <TableHead>Tên nhân viên</TableHead>
-            <TableHead>Phòng ban</TableHead>
-            <TableHead>Chức vụ</TableHead>
-            <TableHead>Ngày sinh</TableHead>
-            <TableHead>Giới tính</TableHead>
-            <TableHead>Số CCCD</TableHead>
-            <TableHead>Số điện thoại</TableHead>
-            <TableHead>Địa chỉ email</TableHead>
-            <TableHead>Tài khoản và mật khẩu</TableHead>
-            <TableHead>Thao tác</TableHead>
+          <TableRow className="hover:bg-[#F5F5F5]">
+            <TableHead className="w-[50px]">
+              <Checkbox
+                checked={selectedEmployees.length === filteredEmployees.length}
+                onCheckedChange={handleSelectAll}
+              />
+            </TableHead>
+            <TableHead className="w-[50px] text-black font-semibold text-lg">
+              STT
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Mã nhân viên
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Tên nhân viên
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Phòng ban
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Chức vụ
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Ngày sinh
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Giới tính
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Số CCCD
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Số điện thoại
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Địa chỉ email
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Tài khoản và mật khẩu
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Thao tác
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredEmployees.map((employee, index) => (
-            <TableRow key={employee.id}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{employee.code}</TableCell>
-              <TableCell>{employee.name}</TableCell>
-              <TableCell>{employee.department}</TableCell>
-              <TableCell>{employee.position}</TableCell>
-              <TableCell>{employee.dateOfBirth}</TableCell>
-              <TableCell>{employee.gender}</TableCell>
-              <TableCell>{employee.idNumber}</TableCell>
-              <TableCell>{employee.phoneNumber}</TableCell>
-              <TableCell>{employee.email}</TableCell>
-              <TableCell>{employee.account}</TableCell>
+            <TableRow key={employee.id} className="hover:bg-[#F5F5F5]">
+              <TableCell>
+                <Checkbox
+                  checked={selectedEmployees.includes(index.toString())}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleSelectOne(index.toString())
+                    } else {
+                      handleSelectOne(index.toString())
+                    }
+                  }}
+                />
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {index + 1}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.code}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.name}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.department}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.position}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.dateOfBirth}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.gender}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.idNumber}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.phoneNumber}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.email}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {employee.account}
+              </TableCell>
               <TableCell>
                 <div className="flex gap-2">
                   <Link href="/edit-employee-information">
-                    <Button variant="outline" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
+                    <NextImage
+                      src="/edit.png"
+                      alt="edit"
+                      className="w-[26px] h-[26px]"
+                    />
                   </Link>
-                  <Button variant="outline" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <NextImage
+                    src="/trash.png"
+                    alt="trash"
+                    className="w-[26px] h-[26px]"
+                  />
                 </div>
               </TableCell>
             </TableRow>
@@ -164,36 +314,32 @@ export default function EmployeeList() {
         </TableBody>
       </Table>
       <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            {"<"}
-          </Button>
-          <Button variant="outline" size="sm">
-            1
-          </Button>
-          <Button variant="outline" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
-            4
-          </Button>
-          <Button variant="outline" size="sm">
-            5
-          </Button>
-          <Button variant="outline" size="sm">
-            {">"}
-          </Button>
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
+
         <div className="flex items-center gap-2">
           <span>Chọn số bản ghi trên 1 trang:</span>
           <Select defaultValue="10">
-            <SelectTrigger className="w-[70px]">
+            <SelectTrigger className="w-[70px] rounded">
               <SelectValue placeholder="10" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded border none text-black">
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="20">20</SelectItem>
               <SelectItem value="50">50</SelectItem>

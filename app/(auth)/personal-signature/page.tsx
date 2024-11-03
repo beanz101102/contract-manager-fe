@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Eye, Filter, Trash2 } from "lucide-react"
+import { Eye, Filter, Plus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,6 +12,16 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import NextImage from "@/components/ui/next-img"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
@@ -56,39 +66,67 @@ const SignatureManagementInterface = () => {
 
       <div className="flex justify-between items-center mb-4">
         <div className="flex-1 mr-4">
-          <Input placeholder="Mã/ Số hợp đồng" />
+          <Input
+            placeholder="Mã/ Số hợp đồng"
+            style={{
+              border: "1px solid #D9D9D9",
+            }}
+            className="bg-white rounded w-fit"
+          />
         </div>
-        <Button variant="outline" className="mr-2">
-          <Filter className="w-4 h-4 mr-2" />
-        </Button>
+
         <Button
-          className="bg-teal-500 hover:bg-teal-600 text-white"
+          className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
           onClick={() => setIsOpenDigitalSignature(true)}
         >
-          + Thêm mới
+          <Plus className="w-4 h-4" /> Thêm mới
         </Button>
       </div>
 
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>STT</TableHead>
-            <TableHead>Ngày tạo</TableHead>
-            <TableHead>Loại chữ ký</TableHead>
-            <TableHead>Phòng ban</TableHead>
-            <TableHead>Chức vụ</TableHead>
-            <TableHead>Chữ ký</TableHead>
-            <TableHead>Thao tác</TableHead>
+          <TableRow className="hover:bg-[#F5F5F5]">
+            <TableHead className="w-[50px] text-black text-lg font-semibold">
+              STT
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Ngày tạo
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Loại chữ ký
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Phòng ban
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Chức vụ
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Chữ ký
+            </TableHead>
+            <TableHead className="w-[100px] text-black text-lg font-semibold">
+              Thao tác
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {signatures.map((sig, index) => (
             <TableRow key={sig.id}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{sig.date}</TableCell>
-              <TableCell>{sig.type}</TableCell>
-              <TableCell>{sig.department}</TableCell>
-              <TableCell>{sig.position}</TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {index + 1}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {sig.date}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {sig.type}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {sig.department}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {sig.position}
+              </TableCell>
               <TableCell>
                 <img
                   src={`/api/placeholder/100/50`}
@@ -97,13 +135,9 @@ const SignatureManagementInterface = () => {
                 />
               </TableCell>
               <TableCell>
-                <div className="flex space-x-2">
-                  <Button variant="ghost" size="icon">
-                    <Eye className="h-4 w-4 text-teal-500" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
+                <div className="flex space-x-3">
+                  <NextImage src="/eye.png" className="w-6" alt="eye" />
+                  <NextImage className="w-6" src="/trash.png" alt="trash" />
                 </div>
               </TableCell>
             </TableRow>
@@ -111,37 +145,33 @@ const SignatureManagementInterface = () => {
         </TableBody>
       </Table>
 
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex space-x-1">
-          <Button variant="outline" size="icon">
-            &lt;&lt;
-          </Button>
-          <Button variant="outline" size="icon">
-            &lt;
-          </Button>
-          {[1, 2, 3, 4, 5].map((page) => (
-            <Button
-              key={page}
-              variant={page === 1 ? "default" : "outline"}
-              size="icon"
-            >
-              {page}
-            </Button>
-          ))}
-          <Button variant="outline" size="icon">
-            &gt;
-          </Button>
-          <Button variant="outline" size="icon">
-            &gt;&gt;
-          </Button>
+      <div className="flex items-center justify-between mt-4">
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
-        <div className="flex items-center space-x-2">
+
+        <div className="flex items-center gap-2">
           <span>Chọn số bản ghi trên 1 trang:</span>
           <Select defaultValue="10">
-            <SelectTrigger className="w-[70px]">
-              <SelectValue />
+            <SelectTrigger className="w-[70px] rounded">
+              <SelectValue placeholder="10" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded border none text-black">
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="20">20</SelectItem>
               <SelectItem value="50">50</SelectItem>

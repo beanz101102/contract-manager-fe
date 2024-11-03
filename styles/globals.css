@@ -77,5 +77,15 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: "Roboto", sans-serif;
+    color: black;
   }
+}
+
+.bg-red {
+  background-color: #f3949e;
+}
+
+.bg-green {
+  background-color: #4bc5be;
 }

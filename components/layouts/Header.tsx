@@ -13,7 +13,7 @@ import NextImage from "../ui/next-img"
 
 export default function SidebarMenu() {
   return (
-    <div className="flex flex-col h-screen bg-white border-r max-w-[300px]">
+    <div className="flex flex-col h-screen bg-white border-r w-[300px]">
       <div className="p-4 border-b">
         <div className="flex items-center space-x-2">
           <NextImage

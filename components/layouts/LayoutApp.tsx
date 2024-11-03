@@ -21,7 +21,7 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
             CÔNG TY CP PHÁT TRIỂN BĐS PHÁT ĐẠT
           </p>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="p-6 text-black">{children}</div>
       </div>
     </div>
   )

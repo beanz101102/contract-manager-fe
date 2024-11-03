@@ -13,6 +13,16 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import NextImage from "@/components/ui/next-img"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
@@ -59,38 +69,46 @@ export default function ContractApprovalFlow() {
             placeholder="Tên luồng duyệt"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 pr-8"
+            className="bg-white rounded"
+            style={{
+              border: "1px solid #D9D9D9",
+            }}
           />
-          <Filter className="h-5 w-5 absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
         <Button
-          className="bg-teal-500 hover:bg-teal-600"
+          className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
           onClick={() => setIsOpenApprovalWorkflow(true)}
         >
-          + Thêm mới
+          <Plus className="w-4 h-4" /> Thêm mới
         </Button>
       </div>
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-[50px]">STT</TableHead>
-            <TableHead>Tên luồng duyệt</TableHead>
-            <TableHead className="w-[100px]">Thao tác</TableHead>
+          <TableRow className="hover:bg-[#F5F5F5]">
+            <TableHead className="w-[50px] text-black text-lg font-semibold">
+              STT
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Tên luồng duyệt
+            </TableHead>
+            <TableHead className="w-[200px] text-black text-lg font-semibold">
+              Thao tác
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredSteps.map((step, index) => (
-            <TableRow key={step.id}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{step.name}</TableCell>
-              <TableCell>
+            <TableRow key={step.id} className="hover:bg-[#F5F5F5]">
+              <TableCell className="text-black text-lg font-semibold">
+                {index + 1}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {step.name}
+              </TableCell>
+              <TableCell className="w-[200px]">
                 <div className="flex gap-2">
-                  <Button variant="outline" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  <NextImage className="w-6" src="/eye.png" alt="eye" />
+                  <NextImage className="w-6" src="/edit.png" alt="pencil" />
                 </div>
               </TableCell>
             </TableRow>
@@ -98,40 +116,32 @@ export default function ContractApprovalFlow() {
         </TableBody>
       </Table>
       <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            {"<"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-teal-500 text-white"
-          >
-            1
-          </Button>
-          <Button variant="outline" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
-            4
-          </Button>
-          <Button variant="outline" size="sm">
-            5
-          </Button>
-          <Button variant="outline" size="sm">
-            {">"}
-          </Button>
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
+
         <div className="flex items-center gap-2">
           <span>Chọn số bản ghi trên 1 trang:</span>
           <Select defaultValue="10">
-            <SelectTrigger className="w-[70px]">
+            <SelectTrigger className="w-[70px] rounded">
               <SelectValue placeholder="10" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded border none text-black">
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="20">20</SelectItem>
               <SelectItem value="50">50</SelectItem>

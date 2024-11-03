@@ -2,11 +2,21 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Eye, Pencil, Trash2 } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import NextImage from "@/components/ui/next-img"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
@@ -55,11 +65,31 @@ export default function CustomerList() {
   const [currentPage, setCurrentPage] = useState(1)
   const [entriesPerPage, setEntriesPerPage] = useState(10)
 
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
+
   const filteredCustomers = customers.filter(
     (customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.code.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedEmployees(
+        filteredCustomers.map((customer, index) => index.toString())
+      )
+    } else {
+      setSelectedEmployees([])
+    }
+  }
+
+  const handleSelectOne = (customerId: string) => {
+    setSelectedEmployees((prev) =>
+      prev.includes(customerId)
+        ? prev.filter((id) => id !== customerId)
+        : [...prev, customerId]
+    )
+  }
 
   const indexOfLastEntry = currentPage * entriesPerPage
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage
@@ -78,85 +108,140 @@ export default function CustomerList() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="mx-auto p-6 bg-white rounded-[10px]">
       <h1 className="text-2xl font-bold mb-4">Danh sách khách hàng</h1>
       <div className="flex justify-between items-center mb-4">
         <div className="relative">
           <Input
             type="text"
-            placeholder="Mã/ Tên khách hàng"
+            placeholder="Mã/ Tên nhân viên"
             value={searchTerm}
+            style={{
+              border: "1px solid #4BC5BE",
+            }}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 w-64"
+            className="pl-12 h-[40px] bg-white rounded"
           />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          <div className="absolute top-1/2 transform -translate-y-1/2 h-[40px] w-[40px] flex items-center justify-center bg-[#4BC5BE] rounded">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
         </div>
         <div className="space-x-2">
           <Link href="/create-customer-information">
-            <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-              + Thêm mới
+            <Button className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold">
+              <Plus className="w-4 h-4" /> Thêm mới
             </Button>
           </Link>
-          <Button variant="destructive">Xóa</Button>
+          <Button className="bg-[#F3949E] hover:bg-[#a4434d] rounded text-white font-semibold">
+            <Trash2 className="w-4 h-4" /> Xóa
+          </Button>
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-[#F5F5F5]">
             <TableHead className="w-[50px]">
-              <Checkbox />
+              <Checkbox
+                checked={selectedEmployees.length === filteredCustomers.length}
+                onCheckedChange={handleSelectAll}
+              />
             </TableHead>
-            <TableHead>STT</TableHead>
-            <TableHead>Mã khách hàng</TableHead>
-            <TableHead>Tên khách hàng</TableHead>
-            <TableHead>Ngày sinh</TableHead>
-            <TableHead>Giới tính</TableHead>
-            <TableHead>Số CCCD</TableHead>
-            <TableHead>Số điện thoại</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Địa chỉ</TableHead>
-            <TableHead>Thao tác</TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              STT
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Mã khách hàng
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Tên khách hàng
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Ngày sinh
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Giới tính
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Số CCCD
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Số điện thoại
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Email
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Địa chỉ
+            </TableHead>
+            <TableHead className="text-black font-semibold text-lg">
+              Thao tác
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentEntries.map((customer, index) => (
-            <TableRow key={customer.id}>
+            <TableRow key={customer.id} className="hover:bg-[#F5F5F5]">
               <TableCell>
-                <Checkbox />
+                <Checkbox
+                  checked={selectedEmployees.includes(index.toString())}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleSelectOne(index.toString())
+                    } else {
+                      handleSelectOne(index.toString())
+                    }
+                  }}
+                />
               </TableCell>
-              <TableCell>{indexOfFirstEntry + index + 1}</TableCell>
-              <TableCell>{customer.code}</TableCell>
-              <TableCell>{customer.name}</TableCell>
-              <TableCell>{customer.birthDate}</TableCell>
-              <TableCell>{customer.gender}</TableCell>
-              <TableCell>{customer.idNumber}</TableCell>
-              <TableCell>{customer.phone}</TableCell>
-              <TableCell>{customer.email}</TableCell>
-              <TableCell>{customer.address}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button variant="ghost" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+              <TableCell className="text-black font-semibold text-lg">
+                {indexOfFirstEntry + index + 1}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.code}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.name}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.birthDate}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.gender}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.idNumber}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.phone}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.email}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                {customer.address}
+              </TableCell>
+              <TableCell className="text-black font-semibold text-lg">
+                <div className="flex space-x-3 justify-center items-center">
+                  <NextImage src="/eye.png" alt="eye" className="w-[26px] " />
+                  <NextImage src="/edit.png" alt="edit" className="w-[26px]" />
+                  <NextImage
+                    src="/trash.png"
+                    alt="trash"
+                    className="w-[26px]"
+                  />
                 </div>
               </TableCell>
             </TableRow>
@@ -164,50 +249,39 @@ export default function CustomerList() {
         </TableBody>
       </Table>
       <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center space-x-2">
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+
+        <div className="flex items-center gap-2">
           <span>Chọn số bản ghi trên 1 trang:</span>
-          <Select
-            value={entriesPerPage.toString()}
-            onValueChange={(value) => setEntriesPerPage(Number(value))}
-          >
-            <SelectTrigger className="w-[70px]">
+          <Select defaultValue="10">
+            <SelectTrigger className="w-[70px] rounded">
               <SelectValue placeholder="10" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded border none text-black">
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="20">20</SelectItem>
               <SelectItem value="50">50</SelectItem>
             </SelectContent>
           </Select>
+          <span>Tổng số bản ghi: 48</span>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </Button>
-          {pageNumbers.map((number) => (
-            <Button
-              key={number}
-              variant={currentPage === number ? "default" : "outline"}
-              onClick={() => setCurrentPage(number)}
-            >
-              {number}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, pageNumbers.length))
-            }
-            disabled={currentPage === pageNumbers.length}
-          >
-            &gt;
-          </Button>
-        </div>
-        <div>Tổng số bản ghi: {filteredCustomers.length}</div>
       </div>
     </div>
   )

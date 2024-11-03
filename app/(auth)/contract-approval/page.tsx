@@ -2,10 +2,11 @@
 
 import React, { useState } from "react"
 import { TabsList } from "@radix-ui/react-tabs"
-import { Eye, Filter, Info } from "lucide-react"
+import { Check, Download, Eye, Filter, Info, Pencil } from "lucide-react"
 import toast from "react-hot-toast"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,16 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import NextImage from "@/components/ui/next-img"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
@@ -146,6 +157,26 @@ export default function ContractApproval() {
     contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedEmployees(
+        filteredContracts.map((contract, index) => index.toString())
+      )
+    } else {
+      setSelectedEmployees([])
+    }
+  }
+
+  const handleSelectOne = (employeeId: string) => {
+    setSelectedEmployees((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    )
+  }
+
   return (
     <div className="bg-white rounded-lg p-6">
       <h1 className="text-2xl font-bold mb-4">Duyệt hợp đồng</h1>
@@ -156,105 +187,136 @@ export default function ContractApproval() {
             placeholder="Mã/ Số hợp đồng"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8 pr-8"
+            className="bg-white rounded"
+            style={{
+              border: "1px solid #D9D9D9",
+            }}
           />
-          <Filter className="h-5 w-5 absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
         </div>
         <div className="flex gap-2">
           <Button
-            className="bg-teal-500 hover:bg-teal-600"
+            className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
             onClick={() => setIsOpen(true)}
           >
-            ✓ Duyệt hợp đồng
+            <Check className="w-4 h-4" /> Duyệt hợp đồng
           </Button>
           <Button
-            variant="outline"
-            className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+            className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
             onClick={() => setIsOpenEditRequest(true)}
           >
-            Yêu cầu sửa
+            <Pencil className="w-4 h-4" /> Yêu cầu sửa
           </Button>
-          <Button variant="outline">↓ Tải</Button>
+          <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+            <Download className="w-4 h-4" /> Tải
+          </Button>
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-[#F5F5F5]">
             <TableHead className="w-[50px]">
-              <Input type="checkbox" className="w-4 h-4" />
+              <Checkbox
+                checked={selectedEmployees.length === filteredContracts.length}
+                onCheckedChange={handleSelectAll}
+              />{" "}
             </TableHead>
-            <TableHead className="w-[50px]">STT</TableHead>
-            <TableHead>Số hợp đồng</TableHead>
-            <TableHead>Ngày tạo hợp đồng</TableHead>
-            <TableHead>Phòng ban</TableHead>
-            <TableHead>Mã khách hàng</TableHead>
-            <TableHead>Thông tin khách hàng</TableHead>
-            <TableHead>Thao tác</TableHead>
+            <TableHead className="w-[50px] text-black text-lg font-semibold">
+              STT
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Số hợp đồng
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Ngày tạo hợp đồng
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Phòng ban
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Mã khách hàng
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Thông tin khách hàng
+            </TableHead>
+            <TableHead className="text-black text-lg font-semibold">
+              Thao tác
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredContracts.map((contract, index) => (
-            <TableRow key={contract.id}>
+            <TableRow key={contract.id} className="hover:bg-[#F5F5F5]">
               <TableCell>
-                <Input type="checkbox" className="w-4 h-4" />
+                <Checkbox
+                  checked={selectedEmployees.includes(index.toString())}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleSelectOne(index.toString())
+                    } else {
+                      handleSelectOne(index.toString())
+                    }
+                  }}
+                />
               </TableCell>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{contract.contractNumber}</TableCell>
-              <TableCell>{contract.creationDate}</TableCell>
-              <TableCell>{contract.department}</TableCell>
-              <TableCell>{contract.customerCode}</TableCell>
-              <TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {index + 1}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {contract.contractNumber}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {contract.creationDate}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {contract.department}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
+                {contract.customerCode}
+              </TableCell>
+              <TableCell className="text-black text-lg font-semibold">
                 <div>{contract.customerInfo.name}</div>
                 <div>{contract.customerInfo.phone}</div>
               </TableCell>
               <TableCell>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setIsOpenContractInfo(true)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
+                <div onClick={() => setIsOpenContractInfo(true)}>
+                  <NextImage
+                    src="/eye.png"
+                    alt="eye"
+                    className="w-[24px] h-[24px]"
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            {"<"}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-teal-500 text-white"
-          >
-            1
-          </Button>
-          <Button variant="outline" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
-            4
-          </Button>
-          <Button variant="outline" size="sm">
-            5
-          </Button>
-          <Button variant="outline" size="sm">
-            {">"}
-          </Button>
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
+
         <div className="flex items-center gap-2">
           <span>Chọn số bản ghi trên 1 trang:</span>
           <Select defaultValue="10">
-            <SelectTrigger className="w-[70px]">
+            <SelectTrigger className="w-[70px] rounded">
               <SelectValue placeholder="10" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded border none text-black">
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="20">20</SelectItem>
               <SelectItem value="50">50</SelectItem>

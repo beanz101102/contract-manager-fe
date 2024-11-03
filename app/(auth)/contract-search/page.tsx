@@ -1,11 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { Eye, Filter } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import NextImage from "@/components/ui/next-img"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
@@ -137,117 +145,138 @@ export default function ContractSearch() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Tra cứu hợp đồng</h1>
+    <div className="bg-white rounded-[10px] px-6 py-6">
+      <h1 className="text-2xl font-bold border-b border-[#675D5D] pb-6 mb-4">
+        Tra cứu hợp đồng
+      </h1>
       <div className="flex justify-between items-center mb-4">
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative">
           <Input
             type="text"
-            placeholder="Mã/ Số hợp đồng"
+            placeholder="Số hợp đồng"
             value={searchTerm}
+            style={{
+              border: "1px solid #4BC5BE",
+            }}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-10 py-2"
+            className="pl-12 h-[40px] bg-white rounded"
           />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-0 top-0 h-full"
-          >
-            <Filter className="h-4 w-4" />
-          </Button>
+          <div className="absolute top-1/2 transform -translate-y-1/2 h-[40px] w-[40px] flex items-center justify-center bg-[#4BC5BE] rounded">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>STT</TableHead>
-            <TableHead>Số hợp đồng</TableHead>
-            <TableHead>Ngày tạo hợp đồng</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead>Phòng ban</TableHead>
-            <TableHead>Mã khách hàng</TableHead>
-            <TableHead>Thông tin khách hàng</TableHead>
-            <TableHead>Thao tác</TableHead>
+          <TableRow className="hover:bg-[#F5F5F5]">
+            <TableHead className="font-semibold text-lg text-black">
+              STT
+            </TableHead>
+            <TableHead className="font-semibold text-lg text-black">
+              Số hợp đồng
+            </TableHead>
+            <TableHead className="font-semibold text-lg text-black">
+              Ngày tạo hợp đồng
+            </TableHead>
+            <TableHead className="font-semibold text-lg text-black">
+              Trạng thái
+            </TableHead>
+            <TableHead className="font-semibold text-lg text-black">
+              Phòng ban
+            </TableHead>
+            <TableHead className="font-semibold text-lg text-black">
+              Mã khách hàng
+            </TableHead>
+            <TableHead className="font-semibold text-lg text-black">
+              Thông tin khách hàng
+            </TableHead>
+            <TableHead className="font-semibold text-lg text-black">
+              Thao tác
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentEntries.map((contract, index) => (
-            <TableRow key={contract.id}>
-              <TableCell>{indexOfFirstEntry + index + 1}</TableCell>
-              <TableCell>{contract.number}</TableCell>
-              <TableCell>{contract.date}</TableCell>
-              <TableCell>{getStatusBadge(contract.status)}</TableCell>
-              <TableCell>{contract.department}</TableCell>
-              <TableCell>{contract.customerCode}</TableCell>
-              <TableCell>{contract.customerInfo}</TableCell>
-              <TableCell>
-                <Button variant="ghost" size="icon">
-                  <Eye className="h-4 w-4" />
-                </Button>
+            <TableRow key={contract.id} className="hover:bg-[#F5F5F5]">
+              <TableCell className="text-black text-lg">
+                {indexOfFirstEntry + index + 1}
+              </TableCell>
+              <TableCell className="text-black text-lg">
+                {contract.number}
+              </TableCell>
+              <TableCell className="text-black text-lg">
+                {contract.date}
+              </TableCell>
+              <TableCell className="text-black text-lg">
+                {getStatusBadge(contract.status)}
+              </TableCell>
+              <TableCell className="text-black text-lg">
+                {contract.department}
+              </TableCell>
+              <TableCell className="text-black text-lg">
+                {contract.customerCode}
+              </TableCell>
+              <TableCell className="text-black text-lg">
+                {contract.customerInfo}
+              </TableCell>
+              <TableCell className="text-black text-lg">
+                <NextImage
+                  src="/eye.png"
+                  alt="eye"
+                  className="w-[24px] h-[24px]"
+                />
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       <div className="flex items-center justify-between mt-4">
-        <div className="flex items-center space-x-2">
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+
+        <div className="flex items-center gap-2">
           <span>Chọn số bản ghi trên 1 trang:</span>
-          <Select
-            value={entriesPerPage.toString()}
-            onValueChange={(value) => setEntriesPerPage(Number(value))}
-          >
-            <SelectTrigger className="w-[70px]">
+          <Select defaultValue="10">
+            <SelectTrigger className="w-[70px] rounded">
               <SelectValue placeholder="10" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded border none text-black">
               <SelectItem value="10">10</SelectItem>
               <SelectItem value="20">20</SelectItem>
               <SelectItem value="50">50</SelectItem>
             </SelectContent>
           </Select>
+          <span>Tổng số bản ghi: 48</span>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            &lt;
-          </Button>
-          {pageNumbers.map((number) => (
-            <Button
-              key={number}
-              variant={currentPage === number ? "default" : "outline"}
-              onClick={() => setCurrentPage(number)}
-            >
-              {number}
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, pageNumbers.length))
-            }
-            disabled={currentPage === pageNumbers.length}
-          >
-            &gt;
-          </Button>
-        </div>
-        <div>Tổng số bản ghi: {filteredContracts.length}</div>
       </div>
     </div>
   )
