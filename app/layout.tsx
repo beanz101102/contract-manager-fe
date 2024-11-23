@@ -1,5 +1,8 @@
 import "@/styles/globals.css"
 import { Metadata } from "next"
+import { AuthProvider } from "@/contexts/auth-context"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { Toaster } from "react-hot-toast"
 
 import { siteConfig } from "@/config/site"
@@ -29,6 +32,16 @@ interface RootLayoutProps {
   children: React.ReactNode
 }
 
+// Tạo QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+})
+
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
@@ -40,14 +53,22 @@ export default function RootLayout({ children }: RootLayoutProps) {
             fontSans.variable
           )}
         >
-          <Toaster />
-
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="relative flex min-h-screen flex-col">
-              <div className="flex-1">{children}</div>
-            </div>
-            <TailwindIndicator />
-          </ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <Toaster />
+            <AuthProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+              >
+                <div className="relative flex min-h-screen flex-col">
+                  <div className="flex-1">{children}</div>
+                </div>
+                <TailwindIndicator />
+              </ThemeProvider>
+            </AuthProvider>
+            <ReactQueryDevtools />
+          </QueryClientProvider>
         </body>
       </html>
     </>
