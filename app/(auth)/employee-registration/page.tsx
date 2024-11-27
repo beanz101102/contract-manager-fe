@@ -23,21 +23,21 @@ export default function EmployeeRegistrationForm() {
   const { useAddUser } = useUsers()
   const { mutate: addUser } = useAddUser()
 
-  const [code, setCode] = useState("EMP001")
-  const [fullName, setFullName] = useState("Nguyễn Văn A")
-  const [birthPlace, setBirthPlace] = useState("Hà Nội")
-  const [address, setAddress] = useState("123 Đường ABC, Quận XYZ, Hà Nội")
-  const [gender, setGender] = useState<"Nam" | "Nữ" | "Khác">("Nam")
-  const [birthDate, setBirthDate] = useState("1990-01-01")
-  const [idNumber, setIdNumber] = useState("001099123456")
-  const [issueDate, setIssueDate] = useState("2020-01-01")
-  const [issuePlace, setIssuePlace] = useState("Cục Cảnh sát")
-  const [phone, setPhone] = useState("0912345678")
-  const [email, setEmail] = useState("nguyenvana@example.com")
-  const [department, setDepartment] = useState(departmentConfigs[0].label)
-  const [position, setPosition] = useState("Nhân viên")
-  const [account, setAccount] = useState("nguyenvana")
-  const [password, setPassword] = useState("Password123!")
+  const [code, setCode] = useState("")
+  const [fullName, setFullName] = useState("")
+  const [birthPlace, setBirthPlace] = useState("")
+  const [address, setAddress] = useState("")
+  const [gender, setGender] = useState("")
+  const [birthDate, setBirthDate] = useState("")
+  const [idNumber, setIdNumber] = useState("")
+  const [issueDate, setIssueDate] = useState("")
+  const [issuePlace, setIssuePlace] = useState("")
+  const [phone, setPhone] = useState("")
+  const [email, setEmail] = useState("")
+  const [department, setDepartment] = useState("")
+  const [position, setPosition] = useState("")
+  const [account, setAccount] = useState("")
+  const [password, setPassword] = useState("")
   const [active, setActive] = useState(true)
 
   const handleSubmit = () => {
@@ -66,7 +66,7 @@ export default function EmployeeRegistrationForm() {
 
     addUser(payload, {
       onSuccess: () => {
-        router.push("/employees")
+        router.push("/employee-list")
       },
     })
   }

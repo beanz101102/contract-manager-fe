@@ -53,13 +53,13 @@ export interface UserSignature {
 }
 
 export interface ApprovalFlow {
-  id: number
   contract: number
   approver: number
   action: string
   actionSource: "customer" | "internal"
   approvalStatus?: "pending" | "approved" | "rejected"
   comments: string
+  stepNumber: number
 }
 
 export interface ContractSignature {
@@ -190,5 +190,49 @@ export interface SignatureList {
     refreshToken: string | null
     active: boolean
     department: Department
+  }
+}
+
+export interface ApprovalFlowsList {
+  id: number
+  stepNumber: number
+  action: string
+  actionSource: "internal" | "customer"
+  approvalStatus: "pending" | "approved" | "rejected"
+  approvalDate: string
+  comments: string
+  contract: {
+    id: number
+    contractNumber: string
+    contractType: string
+    createdAt: string
+    deletedAt: string | null
+    signersCount: number
+    status: "new" | "pending" | "signed" | "rejected"
+    note: string
+    pdfFilePath: string
+  }
+  approver: {
+    id: number
+    code: string
+    fullName: string
+    gender: Gender
+    dateOfBirth: string | null
+    placeOfBirth: string | null
+    address: string | null
+    idNumber: string
+    idIssueDate: null
+    idIssuePlace: string | null
+    phoneNumber: string | null
+    email: string
+    position: string | null
+    role: "employee" | "admin" | "customer"
+    username: string
+    passwordHash: string
+    createdAt: string
+    updatedAt: string
+    deletedAt: string | null
+    refreshToken: string | null
+    active: boolean
   }
 }

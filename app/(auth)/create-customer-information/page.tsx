@@ -23,17 +23,17 @@ export default function CustomerInformationForm() {
   const { useAddUser } = useUsers()
   const { mutate: addUser } = useAddUser()
 
-  const [code, setCode] = useState("CUS001")
-  const [fullName, setFullName] = useState("Trần Thị B")
-  const [birthPlace, setBirthPlace] = useState("Hồ Chí Minh")
-  const [address, setAddress] = useState("456 Đường XYZ, Quận ABC, Hồ Chí Minh")
-  const [gender, setGender] = useState<"Nam" | "Nữ" | "Khác">("Nữ")
-  const [birthDate, setBirthDate] = useState("1995-05-15")
-  const [idNumber, setIdNumber] = useState("079123456789")
-  const [issueDate, setIssueDate] = useState("2021-03-15")
-  const [issuePlace, setIssuePlace] = useState("Cục Cảnh sát")
-  const [phone, setPhone] = useState("0987654321")
-  const [email, setEmail] = useState("tranthib@example.com")
+  const [code, setCode] = useState("")
+  const [fullName, setFullName] = useState("")
+  const [birthPlace, setBirthPlace] = useState("")
+  const [address, setAddress] = useState("")
+  const [gender, setGender] = useState("")
+  const [birthDate, setBirthDate] = useState("")
+  const [idNumber, setIdNumber] = useState("")
+  const [issueDate, setIssueDate] = useState("")
+  const [issuePlace, setIssuePlace] = useState("")
+  const [phone, setPhone] = useState("")
+  const [email, setEmail] = useState("")
 
   const handleSubmit = () => {
     const payload = {

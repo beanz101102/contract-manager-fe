@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
-import { ApprovalFlow } from "@/types/api"
+import { ApprovalFlow, ApprovalFlowsList } from "@/types/api"
 import { api } from "@/lib/axios"
 
 export const useApprovalFlows = () => {
@@ -11,7 +11,9 @@ export const useApprovalFlows = () => {
     return useQuery({
       queryKey: ["approval-flows"],
       queryFn: async () => {
-        const response = await api.post<ApprovalFlow[]>("/api/approval_flow")
+        const response = await api.post<ApprovalFlowsList[]>(
+          "/api/approval_flow"
+        )
         return response.data
       },
     })
