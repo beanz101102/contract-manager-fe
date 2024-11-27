@@ -1,7 +1,7 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { createContext, use, useContext, useEffect, useState } from "react"
+import { usePathname, useRouter } from "next/navigation"
 
 import { AuthContextType, User } from "@/types/auth"
 import { api } from "@/lib/axios"
@@ -12,35 +12,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    // Kiểm tra localStorage khi component mount
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
+    const user = localStorage.getItem("user")
+    if (user) {
+      setUser(JSON.parse(user))
+      if (pathname === "/login") {
+        router.push("/employee-list")
+      }
     } else {
       router.push("/login")
     }
-    setIsLoading(false)
-  }, [router])
+  }, [])
 
   const login = async (username: string, password: string) => {
     try {
-      const response = await api.post<User>("/api/auth/login", {
+      setIsLoading(true)
+      const response = await api.post<{
+        message: string
+        user: User
+      }>("/api/auth/login", {
         username,
         passwordHash: password,
       })
 
-      const userToStore = {
-        ...response.data,
-        username,
-      }
-
-      localStorage.setItem("user", JSON.stringify(userToStore))
-      setUser(userToStore)
+      localStorage.setItem("user", JSON.stringify(response.data?.user))
+      setUser(response.data?.user)
+      router.push("/employee-list")
     } catch (error) {
       console.error("Login error:", error)
-      throw error
+      // throw error
+    } finally {
+      setIsLoading(false)
     }
   }
 

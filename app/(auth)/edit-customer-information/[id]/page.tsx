@@ -1,8 +1,11 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, CalendarIcon } from "lucide-react"
 
+import { Gender, departmentConfigs } from "@/types/api"
+import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -17,6 +20,97 @@ import {
 
 export default function EditEmployeeInformationForm() {
   const router = useRouter()
+
+  const { id } = useParams()
+  const { useUserDetails } = useUsers()
+  const { data: user } = useUserDetails(Number(id))
+
+  const [formData, setFormData] = useState({
+    code: "",
+    fullName: "",
+    gender: "",
+    dateOfBirth: "",
+    placeOfBirth: "",
+    address: "",
+    idNumber: "",
+    idIssueDate: "",
+    idIssuePlace: "",
+    phoneNumber: "",
+    email: "",
+    position: "",
+    username: "",
+    passwordHash: "",
+    department: "",
+  })
+
+  useEffect(() => {
+    if (user) {
+      console.log("user?.gender", user?.gender)
+      setFormData({
+        code: user.code || "",
+        fullName: user.fullName || "",
+        gender: user?.gender || "",
+        dateOfBirth: user.dateOfBirth || "",
+        placeOfBirth: user.placeOfBirth || "",
+        address: user.address || "",
+        idNumber: user.idNumber || "",
+        idIssueDate: user.idIssueDate || "",
+        idIssuePlace: user.idIssuePlace || "",
+        phoneNumber: user.phoneNumber || "",
+        email: user.email || "",
+        position: user.position || "",
+        username: user.username || "",
+        department: user.department?.departmentName || "",
+        passwordHash: user.passwordHash || "",
+      })
+    }
+  }, [user])
+
+  const handleInputChange =
+    (field: keyof typeof formData) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: e.target.value,
+      }))
+    }
+
+  const handleSelectChange =
+    (field: keyof typeof formData) => (value: string) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }))
+    }
+
+  const { useUpdateUser } = useUsers()
+
+  const { mutate: updateUser } = useUpdateUser()
+
+  const handleUpdateUser = () => {
+    updateUser({
+      code: formData.code,
+      username: formData.username,
+      fullName: formData.fullName,
+      placeOfBirth: formData.placeOfBirth,
+      address: formData.address,
+      gender: formData.gender as Gender,
+      dateOfBirth: formData.dateOfBirth || undefined,
+      idNumber: formData.idNumber,
+      idIssueDate: formData.idIssueDate || undefined,
+      idIssuePlace: formData.idIssuePlace || undefined,
+      phoneNumber: formData.phoneNumber,
+      email: formData.email,
+      department:
+        departmentConfigs.find((config) => config.label === formData.department)
+          ?.value || 0,
+      position: formData.position,
+      passwordHash: formData.passwordHash,
+      role: "employee",
+      id: user?.id,
+    })
+  }
+
   return (
     <Card className="w-full bg-white rounded-[10px] border-none">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-b-[#675D5D]">
@@ -31,7 +125,10 @@ export default function EditEmployeeInformationForm() {
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
           </Button>
-          <Button className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold">
+          <Button
+            onClick={handleUpdateUser}
+            className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold"
+          >
             Lưu thông tin
           </Button>
         </div>
@@ -64,25 +161,14 @@ export default function EditEmployeeInformationForm() {
                     Mã nhân viên (*)
                   </Label>
                   <Input
-                    style={{
-                      border: "1px solid #0000004D",
-                    }}
-                    className="bg-white rounded text-black"
                     id="employeeCode"
-                    placeholder="Mã nhân viên"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-black" htmlFor="customerCode">
-                    Mã khách hàng
-                  </Label>
-                  <Input
+                    value={formData.code}
+                    onChange={handleInputChange("code")}
                     style={{
                       border: "1px solid #0000004D",
                     }}
                     className="bg-white rounded text-black"
-                    id="customerCode"
-                    placeholder="Mã khách hàng"
+                    placeholder="Mã nhân viên"
                   />
                 </div>
               </div>
@@ -92,11 +178,13 @@ export default function EditEmployeeInformationForm() {
                     Họ và tên (*)
                   </Label>
                   <Input
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange("fullName")}
                     style={{
                       border: "1px solid #0000004D",
                     }}
                     className="bg-white rounded text-black"
-                    id="fullName"
                     placeholder="Họ và tên"
                   />
                 </div>
@@ -105,9 +193,8 @@ export default function EditEmployeeInformationForm() {
                     Nơi sinh
                   </Label>
                   <Input
-                    style={{
-                      border: "1px solid #0000004D",
-                    }}
+                    value={formData.placeOfBirth}
+                    onChange={handleInputChange("placeOfBirth")}
                     className="bg-white rounded text-black"
                     id="birthPlace"
                     placeholder="Nơi sinh"
@@ -128,6 +215,8 @@ export default function EditEmployeeInformationForm() {
                 }}
                 className="bg-white rounded text-black"
                 id="address"
+                value={formData.address}
+                onChange={handleInputChange("address")}
                 placeholder="Địa chỉ"
               />
             </div>
@@ -135,14 +224,11 @@ export default function EditEmployeeInformationForm() {
               <Label className="text-black" htmlFor="gender">
                 Giới tính (*)
               </Label>
-              <Select>
-                <SelectTrigger
-                  id="gender"
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
-                  className="rounded text-black"
-                >
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => handleSelectChange("gender")(value)}
+              >
+                <SelectTrigger className="rounded text-black" id="gender">
                   <SelectValue placeholder="Chọn giới tính" />
                 </SelectTrigger>
                 <SelectContent
@@ -151,8 +237,8 @@ export default function EditEmployeeInformationForm() {
                   }}
                   className="rounded text-black"
                 >
-                  <SelectItem value="male">Nam</SelectItem>
-                  <SelectItem value="female">Nữ</SelectItem>
+                  <SelectItem value="Nam">Nam</SelectItem>
+                  <SelectItem value="Nữ">Nữ</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -165,9 +251,8 @@ export default function EditEmployeeInformationForm() {
               </Label>
               <div className="relative">
                 <Input
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
+                  value={formData.dateOfBirth}
+                  onChange={handleInputChange("dateOfBirth")}
                   className="bg-white rounded text-black"
                   id="birthDate"
                   placeholder="dd/mm/yyyy"
@@ -181,9 +266,8 @@ export default function EditEmployeeInformationForm() {
                 Số CCCD (*)
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
+                value={formData.idNumber}
+                onChange={handleInputChange("idNumber")}
                 className="bg-white rounded text-black"
                 id="idNumber"
                 placeholder="Số CCCD"
@@ -198,9 +282,8 @@ export default function EditEmployeeInformationForm() {
               </Label>
               <div className="relative">
                 <Input
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
+                  value={formData.idIssueDate}
+                  onChange={handleInputChange("idIssueDate")}
                   className="bg-white rounded text-black"
                   id="issueDate"
                   placeholder="dd/mm/yyyy"
@@ -214,9 +297,8 @@ export default function EditEmployeeInformationForm() {
                 Nơi cấp
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
+                value={formData.idIssuePlace}
+                onChange={handleInputChange("idIssuePlace")}
                 className="bg-white rounded text-black"
                 id="issuePlace"
                 placeholder="Nơi cấp"
@@ -230,9 +312,8 @@ export default function EditEmployeeInformationForm() {
                 Số điện thoại
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
+                value={formData.phoneNumber}
+                onChange={handleInputChange("phoneNumber")}
                 className="bg-white rounded text-black"
                 id="phone"
                 placeholder="Số điện thoại"
@@ -243,9 +324,8 @@ export default function EditEmployeeInformationForm() {
                 Email (*)
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
+                value={formData.email}
+                onChange={handleInputChange("email")}
                 className="bg-white rounded text-black"
                 id="email"
                 type="email"
@@ -259,14 +339,13 @@ export default function EditEmployeeInformationForm() {
               <Label className="text-black" htmlFor="department">
                 Phòng ban (*)
               </Label>
-              <Select>
-                <SelectTrigger
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
-                  className="rounded text-black"
-                  id="department"
-                >
+              <Select
+                value={formData.department}
+                onValueChange={(value) =>
+                  handleSelectChange("department")(value)
+                }
+              >
+                <SelectTrigger className="rounded text-black" id="department">
                   <SelectValue placeholder="Chọn phòng ban" />
                 </SelectTrigger>
                 <SelectContent
@@ -275,9 +354,11 @@ export default function EditEmployeeInformationForm() {
                   }}
                   className="rounded text-black"
                 >
-                  <SelectItem value="hr">Nhân sự</SelectItem>
-                  <SelectItem value="it">IT</SelectItem>
-                  <SelectItem value="finance">Tài chính</SelectItem>
+                  {departmentConfigs?.map((department) => (
+                    <SelectItem value={department.label.toString()}>
+                      {department.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -286,9 +367,8 @@ export default function EditEmployeeInformationForm() {
                 Chức vụ (*)
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
+                value={formData.position}
+                onChange={handleInputChange("position")}
                 className="bg-white rounded text-black"
                 id="position"
                 placeholder="Chức vụ"
@@ -302,9 +382,8 @@ export default function EditEmployeeInformationForm() {
                 Tài khoản (*)
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
+                value={formData.username}
+                onChange={handleInputChange("username")}
                 className="bg-white rounded text-black"
                 id="account"
                 placeholder="Tài khoản"
@@ -315,9 +394,8 @@ export default function EditEmployeeInformationForm() {
                 Mật khẩu (*)
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
+                value={formData.passwordHash}
+                onChange={handleInputChange("passwordHash")}
                 className="bg-white rounded text-black"
                 id="password"
                 type="password"

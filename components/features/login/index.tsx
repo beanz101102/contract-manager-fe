@@ -1,12 +1,23 @@
-import React from "react"
+"use client"
+
+import React, { useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import NextImage from "@/components/ui/next-img"
 
 const LoginPage = () => {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const { login } = useAuth()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await login(username, password)
+  }
+
   return (
     <div className="flex h-screen bg-blue-100 relative">
       {/* Left side */}
@@ -36,7 +47,7 @@ const LoginPage = () => {
           >
             Đăng nhập
           </p>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="mb-6">
               <Label
                 htmlFor="username"
@@ -49,6 +60,8 @@ const LoginPage = () => {
                 className="bg-[#F5F5F5] p-4 border-none h-[85px] rounded-[25px] mt-2"
                 type="text"
                 placeholder="Nhập tên đăng nhập"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
 
@@ -60,10 +73,12 @@ const LoginPage = () => {
                 Mật khẩu
               </Label>
               <Input
-                id="username"
+                id="password"
                 className="bg-[#F5F5F5] p-4 border-none h-[85px] rounded-[25px] mt-2"
                 type="password"
                 placeholder="Nhập mật khẩu"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
@@ -73,7 +88,11 @@ const LoginPage = () => {
               </p>
             </div>
             <div className="flex justify-center">
-              <Button type="submit" className="max-w-[256px] w-full text-white">
+              <Button
+                // type="submit"
+                className="max-w-[256px] w-full bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
+                onClick={handleSubmit}
+              >
                 Đăng nhập
               </Button>
             </div>

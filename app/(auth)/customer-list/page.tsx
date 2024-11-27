@@ -1,29 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { atom, useAtom } from "jotai"
 import { Plus, Trash2 } from "lucide-react"
+import InfiniteScroll from "react-infinite-scroll-component"
 
+import { departmentConfigs } from "@/types/api"
+import { User } from "@/types/auth"
+import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import NextImage from "@/components/ui/next-img"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -33,78 +23,58 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-// Mock data for demonstration
-const customers = [
-  {
-    id: 1,
-    code: "NV001",
-    name: "Nguyễn Thanh Thành",
-    birthDate: "02/03/2000",
-    gender: "Nam",
-    idNumber: "01232501245",
-    phone: "0867352637",
-    email: "avd@gmail.com",
-    address: "203, Giải Phóng, Bắc Từ Liêm, Hà Nội",
-  },
-  {
-    id: 2,
-    code: "NV005",
-    name: "Phạm Nguyên Thanh",
-    birthDate: "02/03/2000",
-    gender: "Nữ",
-    idNumber: "01232501245",
-    phone: "0973647283",
-    email: "avd@gmail.com",
-    address: "203, Giải Phóng, Bắc Từ Liêm, Hà Nội",
-  },
-  // Add more mock data as needed
-]
+const listUsersCustomersAtom = atom<User[]>([])
 
 export default function CustomerList() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [entriesPerPage, setEntriesPerPage] = useState(10)
+  const [department, setDepartment] = useState("all")
+  const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
+  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
+  const router = useRouter()
 
-  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
-
-  const filteredCustomers = customers.filter(
-    (customer) =>
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.code.toLowerCase().includes(searchTerm.toLowerCase())
+  const { useListUsers, useDeleteUser } = useUsers()
+  const { data: employees } = useListUsers(
+    "customer",
+    1,
+    10,
+    searchTerm,
+    departmentConfigs?.find((d) => d.label === department)?.value || null
   )
+  const { mutate: deleteUser } = useDeleteUser(() => {
+    setSelectedEmployees([])
+    setPage(1)
+  })
+
+  const [listUsersCustomers, setListUsersCustomers] = useAtom(
+    listUsersCustomersAtom
+  )
+
+  const filteredEmployees = employees?.users || []
+
+  useEffect(() => {
+    setHasMore(filteredEmployees?.length >= 10)
+    if (page === 1) {
+      setListUsersCustomers(filteredEmployees)
+    } else {
+      setListUsersCustomers([...listUsersCustomers, ...filteredEmployees])
+    }
+  }, [filteredEmployees])
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedEmployees(
-        filteredCustomers.map((customer, index) => index.toString())
-      )
+      setSelectedEmployees(filteredEmployees.map((emp, index) => emp.id))
     } else {
       setSelectedEmployees([])
     }
   }
 
-  const handleSelectOne = (customerId: string) => {
+  const handleSelectOne = (employeeId: number) => {
     setSelectedEmployees((prev) =>
-      prev.includes(customerId)
-        ? prev.filter((id) => id !== customerId)
-        : [...prev, customerId]
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
     )
-  }
-
-  const indexOfLastEntry = currentPage * entriesPerPage
-  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage
-  const currentEntries = filteredCustomers.slice(
-    indexOfFirstEntry,
-    indexOfLastEntry
-  )
-
-  const pageNumbers = []
-  for (
-    let i = 1;
-    i <= Math.ceil(filteredCustomers.length / entriesPerPage);
-    i++
-  ) {
-    pageNumbers.push(i)
   }
 
   return (
@@ -114,7 +84,7 @@ export default function CustomerList() {
         <div className="relative">
           <Input
             type="text"
-            placeholder="Mã/ Tên nhân viên"
+            placeholder="Mã/ Tên khách hàng"
             value={searchTerm}
             style={{
               border: "1px solid #4BC5BE",
@@ -145,144 +115,158 @@ export default function CustomerList() {
               <Plus className="w-4 h-4" /> Thêm mới
             </Button>
           </Link>
-          <Button className="bg-[#F3949E] hover:bg-[#a4434d] rounded text-white font-semibold">
+          <Button
+            onClick={() => deleteUser(selectedEmployees)}
+            className="bg-[#F3949E] hover:bg-[#a4434d] rounded text-white font-semibold"
+          >
             <Trash2 className="w-4 h-4" /> Xóa
           </Button>
         </div>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-[#F5F5F5]">
-            <TableHead className="w-[50px]">
-              <Checkbox
-                checked={selectedEmployees.length === filteredCustomers.length}
-                onCheckedChange={handleSelectAll}
-              />
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              STT
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Mã khách hàng
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Tên khách hàng
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Ngày sinh
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Giới tính
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Số CCCD
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Số điện thoại
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Email
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Địa chỉ
-            </TableHead>
-            <TableHead className="text-black font-semibold text-lg">
-              Thao tác
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentEntries.map((customer, index) => (
-            <TableRow key={customer.id} className="hover:bg-[#F5F5F5]">
-              <TableCell>
+      <InfiniteScroll
+        dataLength={listUsersCustomers?.length}
+        next={() => setPage(page + 1)}
+        hasMore={hasMore}
+        loader={null}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-[#F5F5F5]">
+              <TableHead className="w-[50px]">
                 <Checkbox
-                  checked={selectedEmployees.includes(index.toString())}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      handleSelectOne(index.toString())
-                    } else {
-                      handleSelectOne(index.toString())
-                    }
-                  }}
+                  checked={
+                    selectedEmployees.length === listUsersCustomers.length
+                  }
+                  onCheckedChange={handleSelectAll}
                 />
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {indexOfFirstEntry + index + 1}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.code}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.name}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.birthDate}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.gender}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.idNumber}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.phone}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.email}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                {customer.address}
-              </TableCell>
-              <TableCell className="text-black font-semibold text-lg">
-                <div className="flex space-x-3 justify-center items-center">
-                  <NextImage src="/eye.png" alt="eye" className="w-[26px] " />
-                  <NextImage src="/edit.png" alt="edit" className="w-[26px]" />
-                  <NextImage
-                    src="/trash.png"
-                    alt="trash"
-                    className="w-[26px]"
-                  />
-                </div>
-              </TableCell>
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                STT
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Mã khách hàng
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Tên khách hàng
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Ngày sinh
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Giới tính
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Số CCCD
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Số điện thoại
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Email
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Địa chỉ
+              </TableHead>
+              <TableHead className="text-black font-semibold text-lg">
+                Thao tác
+              </TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span>Chọn số bản ghi trên 1 trang:</span>
-          <Select defaultValue="10">
-            <SelectTrigger className="w-[70px] rounded">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent className="rounded border none text-black">
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Tổng số bản ghi: 48</span>
-        </div>
-      </div>
+          </TableHeader>
+          <TableBody>
+            {listUsersCustomers.length === 0 ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell
+                  colSpan={12}
+                  className="text-center py-10 hover:bg-transparent"
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <NextImage
+                      src="/empty-state.png"
+                      alt="No data"
+                      className="w-[200px] h-[200px] opacity-50"
+                    />
+                    <p className="text-gray-500 text-lg">
+                      Không có dữ liệu khách hàng
+                    </p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              listUsersCustomers.map((customer, index) => (
+                <TableRow key={customer.id} className="hover:bg-[#F5F5F5]">
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedEmployees.includes(customer.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          handleSelectOne(customer.id)
+                        } else {
+                          handleSelectOne(customer.id)
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.code}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.fullName}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.dateOfBirth}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.gender}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.idNumber}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.phoneNumber}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.email}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    {customer.address}
+                  </TableCell>
+                  <TableCell className="text-black font-semibold text-lg">
+                    <div className="flex space-x-3 justify-center items-center">
+                      <div
+                        className="cursor-pointer"
+                        onClick={() =>
+                          router.push(
+                            `/edit-customer-information/${customer.id}`
+                          )
+                        }
+                      >
+                        <NextImage
+                          src="/edit.png"
+                          alt="edit"
+                          className="w-[26px]"
+                        />
+                      </div>
+                      <div
+                        onClick={() => deleteUser([customer.id])}
+                        className="cursor-pointer"
+                      >
+                        <NextImage
+                          src="/trash.png"
+                          alt="trash"
+                          className="w-[26px]"
+                        />
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </InfiniteScroll>
     </div>
   )
 }

@@ -1,28 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import dayjs from "dayjs"
+import { atom, useAtom } from "jotai"
 import { Download, Send, Trash2 } from "lucide-react"
+import InfiniteScroll from "react-infinite-scroll-component"
 
+import { ContractList } from "@/types/api"
+import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import NextImage from "@/components/ui/next-img"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -32,60 +22,53 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-type Contract = {
-  id: string
-  contractNumber: string
-  creationDate: string
-  status: "Hoàn thành" | "Tạo mới"
-  department: string
-  clientCode: string
-}
-
-const contracts: Contract[] = [
-  {
-    id: "1",
-    contractNumber: "22/07/2023/HD-BE/BN",
-    creationDate: "22/07/2023",
-    status: "Hoàn thành",
-    department: "Phòng pháp lý",
-    clientCode: "KH000",
-  },
-  {
-    id: "2",
-    contractNumber: "22/07/2023/HD-NA/MN",
-    creationDate: "22/07/2023",
-    status: "Tạo mới",
-    department: "Phòng nhân sự",
-    clientCode: "KH000",
-  },
-  // Add more contract data here...
-]
+const contractListAtom = atom<ContractList[]>([])
 
 export default function IndividualManagement() {
   const [searchTerm, setSearchTerm] = useState("")
+  const router = useRouter()
+  const { useAllContracts, useBulkDeleteContracts } = useContracts()
+  const [page, setPage] = useState(1)
+  const { data: contracts } = useAllContracts(searchTerm, page, 10)
 
-  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
+  const [contractList, setContractList] = useAtom(contractListAtom)
+  const [hasMore, setHasMore] = useState(true)
 
-  const filteredContracts = contracts.filter((contract) =>
-    contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  useEffect(() => {
+    if (contracts) {
+      setHasMore(contracts.length >= 10)
+      if (page === 1) {
+        setContractList(contracts)
+      } else {
+        setContractList((prev) => [...prev, ...contracts])
+      }
+    }
+  }, [contracts, page])
+
+  const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedEmployees(
-        filteredContracts.map((contract, index) => index.toString())
+        contractList?.map((contract, index) => contract?.id) || []
       )
     } else {
       setSelectedEmployees([])
     }
   }
 
-  const handleSelectOne = (employeeId: string) => {
+  const handleSelectOne = (employeeId: number) => {
     setSelectedEmployees((prev) =>
       prev.includes(employeeId)
         ? prev.filter((id) => id !== employeeId)
         : [...prev, employeeId]
     )
+  }
+
+  const { mutate: bulkDeleteContracts } = useBulkDeleteContracts()
+
+  const handleBulkDelete = () => {
+    bulkDeleteContracts(selectedEmployees)
   }
 
   return (
@@ -98,7 +81,7 @@ export default function IndividualManagement() {
           <div className="relative">
             <Input
               type="text"
-              placeholder="Mã/ Số hợp đồng"
+              placeholder="Mã/Số hợp đồng"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-white rounded"
@@ -108,14 +91,20 @@ export default function IndividualManagement() {
             />
           </div>
           <div className="flex gap-2">
-            <Button className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]">
+            <Button
+              className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
+              onClick={() => router.push("/add-contract")}
+            >
               + Thêm mới
             </Button>
             <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
               <Send className="w-4 h-4" />
               Gửi duyệt
             </Button>
-            <Button className="bg-[#F3949E] rounded text-white hover:bg-[#a4434d]">
+            <Button
+              className="bg-[#F3949E] rounded text-white hover:bg-[#a4434d]"
+              onClick={handleBulkDelete}
+            >
               <Trash2 className="w-4 h-4" />
               Xóa
             </Button>
@@ -125,138 +114,132 @@ export default function IndividualManagement() {
             </Button>
           </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-[#F5F5F5]">
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={
-                    selectedEmployees.length === filteredContracts.length
-                  }
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              <TableHead className="w-[50px] text-black text-lg font-semibold">
-                STT
-              </TableHead>
-              <TableHead className="text-black text-lg font-semibold">
-                Số hợp đồng
-              </TableHead>
-              <TableHead className="text-black text-lg font-semibold">
-                Ngày tạo hợp đồng
-              </TableHead>
-              <TableHead className="text-black text-lg">Trạng thái</TableHead>
-              <TableHead className="text-black text-lg font-semibold">
-                Phòng ban
-              </TableHead>
-              <TableHead className="text-black text-lg font-semibold">
-                Mã khách
-              </TableHead>
-              <TableHead className="text-black text-lg font-semibold">
-                Thao tác
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredContracts.map((contract, index) => (
-              <TableRow key={contract.id} className="hover:bg-[#F5F5F5]">
-                <TableCell>
+        <InfiniteScroll
+          dataLength={contractList?.length || 0}
+          next={() => setPage(page + 1)}
+          hasMore={hasMore}
+          loader={null}
+        >
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-[#F5F5F5]">
+                <TableHead className="w-[50px]">
                   <Checkbox
-                    checked={selectedEmployees.includes(index.toString())}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        handleSelectOne(index.toString())
-                      } else {
-                        handleSelectOne(index.toString())
-                      }
-                    }}
+                    checked={selectedEmployees.length === contracts?.length}
+                    onCheckedChange={handleSelectAll}
                   />
-                </TableCell>
-                <TableCell className="text-black text-lg font-semibold">
-                  {index + 1}
-                </TableCell>
-                <TableCell className="text-black text-lg font-semibold">
-                  {contract.contractNumber}
-                </TableCell>
-                <TableCell className="text-black text-lg font-semibold">
-                  {contract.creationDate}
-                </TableCell>
-                <TableCell className="text-black text-lg font-semibold">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      contract.status === "Hoàn thành"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {contract.status}
-                  </span>
-                </TableCell>
-                <TableCell className="text-black text-lg font-semibold">
-                  {contract.department}
-                </TableCell>
-                <TableCell className="text-black text-lg font-semibold">
-                  {contract.clientCode}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-3 items-center">
-                    <NextImage src="/eye.png" alt="eye" className="w-[24px]" />
-                    <NextImage
-                      src="/mail.png"
-                      alt="mail"
-                      className="w-[24px]"
-                    />
-                    <NextImage
-                      src="/edit.png"
-                      alt="edit"
-                      className="w-[24px]"
-                    />
-                    <NextImage
-                      src="/setting.png"
-                      alt="setting"
-                      className="w-[24px]"
-                    />
-                  </div>
-                </TableCell>
+                </TableHead>
+                <TableHead className="w-[50px] text-black text-lg font-semibold">
+                  STT
+                </TableHead>
+                <TableHead className="text-black text-lg font-semibold">
+                  Số hợp đồng
+                </TableHead>
+                <TableHead className="text-black text-lg font-semibold">
+                  Ngày tạo hợp đồng
+                </TableHead>
+                <TableHead className="text-black text-lg">Trạng thái</TableHead>
+                <TableHead className="text-black text-lg font-semibold">
+                  Phòng ban
+                </TableHead>
+                <TableHead className="text-black text-lg font-semibold">
+                  Mã khách
+                </TableHead>
+                <TableHead className="text-black text-lg font-semibold">
+                  Thao tác
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <div className="flex items-center justify-between mt-4">
-          <div>
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="#" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span>Chọn số bản ghi trên 1 trang:</span>
-            <Select defaultValue="10">
-              <SelectTrigger className="w-[70px] rounded">
-                <SelectValue placeholder="10" />
-              </SelectTrigger>
-              <SelectContent className="rounded border none text-black">
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-            <span>Tổng số bản ghi: 48</span>
-          </div>
-        </div>
+            </TableHeader>
+            <TableBody>
+              {contractList?.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell
+                    colSpan={8}
+                    className="text-center py-10 hover:bg-transparent"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <NextImage
+                        src="/empty-state.png"
+                        alt="No data"
+                        className="w-[200px] h-[200px] opacity-50"
+                      />
+                      <p className="text-gray-500 text-lg">
+                        Không có dữ liệu hợp đồng
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                contractList?.map((contract, index) => (
+                  <TableRow key={contract.id} className="hover:bg-[#F5F5F5]">
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedEmployees.includes(contract.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            handleSelectOne(contract.id)
+                          } else {
+                            handleSelectOne(contract.id)
+                          }
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="text-black text-lg font-semibold">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="text-black text-lg font-semibold">
+                      {contract.contractNumber}
+                    </TableCell>
+                    <TableCell className="text-black text-lg font-semibold">
+                      {dayjs(contract.createdAt).format("DD/MM/YYYY")}
+                    </TableCell>
+                    <TableCell className="text-black text-lg font-semibold">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          contract.status === "new"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {contract.status}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-black text-lg font-semibold">
+                      {contract.createdBy.fullName}
+                    </TableCell>
+                    <TableCell className="text-black text-lg font-semibold">
+                      {contract.customer.code}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-3 items-center">
+                        <NextImage
+                          src="/eye.png"
+                          alt="eye"
+                          className="w-[24px]"
+                        />
+                        <NextImage
+                          src="/mail.png"
+                          alt="mail"
+                          className="w-[24px]"
+                        />
+                        <NextImage
+                          src="/edit.png"
+                          alt="edit"
+                          className="w-[24px]"
+                        />
+                        <NextImage
+                          src="/setting.png"
+                          alt="setting"
+                          className="w-[24px]"
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </InfiniteScroll>
       </div>
     </div>
   )
