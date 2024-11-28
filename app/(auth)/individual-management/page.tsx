@@ -12,6 +12,13 @@ import { ContractList, mapiContractStatus } from "@/types/api"
 import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Loading } from "@/components/ui/loading"
 import NextImage from "@/components/ui/next-img"
@@ -23,16 +30,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import DetailContract from "@/components/DetailContract"
 
 const contractListAtom = atom<ContractList[]>([])
 
 export default function IndividualManagement() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [contract, setContract] = useState<ContractList | null>(null)
   const router = useRouter()
   const {
     useAllContracts,
     useBulkDeleteContracts,
     useSubmitContractForApproval,
+    useCancelContract,
   } = useContracts()
   const [page, setPage] = useState(1)
   const { user } = useAuth()
@@ -59,6 +69,8 @@ export default function IndividualManagement() {
   }, [contracts, page])
 
   const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelReason, setCancelReason] = useState("")
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -80,10 +92,22 @@ export default function IndividualManagement() {
 
   const { mutate: bulkDeleteContracts } = useBulkDeleteContracts()
   const { mutate: submitContractForApproval } = useSubmitContractForApproval()
+  const { mutate: cancelContract } = useCancelContract()
 
   const handleBulkDelete = () => {
     bulkDeleteContracts(selectedEmployees)
   }
+
+  const handleCancelContract = () => {
+    cancelContract({
+      contractIds: selectedEmployees,
+      reason: cancelReason,
+      userId: user?.id ?? 0,
+    })
+    setShowCancelModal(false)
+    setCancelReason("")
+  }
+  const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
 
   return (
     <div className="p-8 bg-white rounded-xl shadow-sm">
@@ -136,9 +160,9 @@ export default function IndividualManagement() {
           </Button>
           <Button
             className="bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
-            onClick={handleBulkDelete}
+            onClick={() => setShowCancelModal(true)}
           >
-            <Trash2 className="w-4 h-4 mr-2" /> Xóa
+            <Trash2 className="w-4 h-4 mr-2" /> Hủy
           </Button>
           <Button className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
             <Download className="w-4 h-4 mr-2" /> Tải
@@ -253,11 +277,19 @@ export default function IndividualManagement() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-3 items-center">
-                        <NextImage
-                          src="/eye.png"
-                          alt="eye"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        />
+                        <div
+                          onClick={() => {
+                            setContract(contract)
+                            setIsOpenContractInfo(true)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <NextImage
+                            src="/eye.png"
+                            alt="eye"
+                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          />
+                        </div>
                         {/* <NextImage
                           src="/mail.png"
                           alt="mail"
@@ -282,6 +314,49 @@ export default function IndividualManagement() {
           </Table>
         </InfiniteScroll>
       </div>
+
+      <DetailContract
+        id={contract?.id ?? 0}
+        isOpen={isOpenContractInfo}
+        onOpenChange={setIsOpenContractInfo}
+      />
+
+      <Dialog open={showCancelModal} onOpenChange={setShowCancelModal}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900">
+              Xác nhận hủy hợp đồng
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Lý do hủy
+            </label>
+            <Input
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Nhập lý do hủy hợp đồng"
+              className="w-full bg-white border-gray-300 focus:border-gray-400 focus:ring-gray-300"
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelModal(false)}
+              className="mr-2 bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+            >
+              Hủy bỏ
+            </Button>
+            <Button
+              onClick={handleCancelContract}
+              className="bg-[#F3949E] hover:bg-[#E07983] text-white"
+              disabled={!cancelReason.trim()}
+            >
+              Xác nhận
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

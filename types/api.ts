@@ -293,4 +293,85 @@ export const mapiContractStatus = {
       color: "#92400E",
     },
   },
+  cancelled: {
+    label: "Đã hủy",
+    value: "cancelled",
+    color: {
+      backgroundColor: "#FEE2E2",
+      color: "#991B1B",
+    },
+  },
+  approved: {
+    label: "Đã duyệt",
+    value: "approved",
+    color: {
+      backgroundColor: "#DCFCE7",
+      color: "#166534",
+    },
+  },
+  signed: {
+    label: "Đã ký",
+    value: "signed",
+    color: {
+      backgroundColor: "#DCFCE7",
+      color: "#166534",
+    },
+  },
+}
+
+export interface ApprovalTemplate {
+  id: number
+  name: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Approver {
+  id: number
+  name: string
+  email: string
+}
+
+export interface Approval {
+  approver: Approver
+  status: string
+  comments: string
+  approvedAt: string
+  stepOrder: number
+}
+
+export interface Signer {
+  signer: {
+    id: number
+    name: string
+    email: string
+  }
+  status: string
+  signOrder: number
+  signedAt: string
+}
+
+export interface DetailContract {
+  id: number
+  contractNumber: string
+  contractType: string
+  createdAt: string
+  deletedAt: string | null
+  status: string
+  note: string
+  pdfFilePath: string
+  updatedAt: string
+  cancelReason: string | null
+  customer: User
+  createdBy: User
+  approvalTemplate: ApprovalTemplate
+  approvals: Approval[]
+  signers: Signer[]
+}
+
+export const mappingRole = {
+  admin: "Admin",
+  employee: "Nhân viên",
+  customer: "Khách hàng",
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import AppPDF from "@/src/App"
 import { atom, useAtom } from "jotai"
 import { Plus, Trash2 } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
@@ -85,6 +86,7 @@ export default function EmployeeList() {
 
   return (
     <div className="p-8 bg-white rounded-xl shadow-sm">
+      {/* <AppPDF /> */}
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         Danh sách nhân viên
       </h1>

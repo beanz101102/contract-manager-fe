@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import DetailContract from "@/components/DetailContract"
 
 const contractListAtom = atom<ContractList[]>([])
 
@@ -202,6 +203,11 @@ export default function ContractApproval() {
                     key={contract.id}
                     className="hover:bg-gray-50 transition-colors"
                   >
+                    <DetailContract
+                      id={contract.id}
+                      isOpen={isOpenContractInfo}
+                      onOpenChange={setIsOpenContractInfo}
+                    />
                     <TableCell>
                       <Checkbox
                         checked={selectedEmployees.includes(contract.id)}
@@ -271,10 +277,6 @@ export default function ContractApproval() {
         isOpen={isOpenEditRequest}
         onOpenChange={setIsOpenEditRequest}
         selectedEmployees={selectedEmployees}
-      />
-      <ContractInfoModal
-        isOpen={isOpenContractInfo}
-        onOpenChange={setIsOpenContractInfo}
       />
     </div>
   )

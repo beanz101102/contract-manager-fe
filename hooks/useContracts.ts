@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
-import { Contract, ContractList } from "@/types/api"
+import { Contract, ContractList, DetailContract } from "@/types/api"
 import { api } from "@/lib/axios"
 
 interface AddContractPayload {
@@ -63,7 +63,7 @@ export const useContracts = () => {
     return useQuery({
       queryKey: ["contract", id],
       queryFn: async () => {
-        const response = await api.post<Contract>("/api/contract/detail", {
+        const response = await api.post<DetailContract>("/api/contract/detail", {
           id,
         })
         return response.data
@@ -239,6 +239,26 @@ export const useContracts = () => {
     })
   }
 
+  const useCancelContract = () => {
+    return useMutation({
+      mutationFn: async (payload: {
+        contractIds: number[]
+        reason: string
+        userId: number
+      }) => {
+        const response = await api.post("/api/contract/cancel", payload)
+        return response.data
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["contracts"] })
+        toast.success("Hủy hợp đồng thành công")
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -250,5 +270,6 @@ export const useContracts = () => {
     useSubmitContractForApproval,
     useApproveContract,
     useSignContract,
+    useCancelContract,
   }
 }
