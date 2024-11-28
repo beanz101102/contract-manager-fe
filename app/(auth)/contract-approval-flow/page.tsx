@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Loading } from "@/components/ui/loading"
 import NextImage from "@/components/ui/next-img"
 import {
   Pagination,
@@ -76,7 +77,7 @@ export default function ContractApprovalFlow() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isOpenApprovalWorkflow, setIsOpenApprovalWorkflow] = useState(false)
   const { useListApprovalFlows } = useApprovalFlows()
-  const { data } = useListApprovalFlows()
+  const { data, isLoading } = useListApprovalFlows(searchTerm)
 
   const [approvalFlows, setApprovalFlows] = useAtom(listApprovalFlows)
 
@@ -84,101 +85,121 @@ export default function ContractApprovalFlow() {
     setApprovalFlows(data || [])
   }, [data])
 
-  // const filteredSteps = approvalFlows.filter((step) =>
-  //   step.name.toLowerCase().includes(searchTerm.toLowerCase())
-  // )
-
   return (
-    <div className="bg-white rounded-lg p-6">
-      <h1 className="text-2xl font-bold mb-4">Luồng duyệt hợp đồng</h1>
-      <div className="flex justify-between mb-4">
-        <div className="relative">
+    <div className="p-8 bg-white rounded-xl shadow-sm">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">
+        Luồng duyệt hợp đồng
+      </h1>
+
+      <div className="flex justify-between mb-6">
+        <div className="relative w-[280px]">
           <Input
             type="text"
             placeholder="Tên luồng duyệt"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-white rounded"
-            style={{
-              border: "1px solid #D9D9D9",
-            }}
+            className="pl-12 h-[42px] w-full rounded-md bg-white border-[#4BC5BE] focus:ring-2 focus:ring-[#4BC5BE]/20"
           />
-        </div>
-        <Button
-          className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
-          onClick={() => setIsOpenApprovalWorkflow(true)}
-        >
-          <Plus className="w-4 h-4" /> Thêm mới
-        </Button>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-[#F5F5F5]">
-            <TableHead className="w-[50px] text-black text-lg font-semibold">
-              STT
-            </TableHead>
-            <TableHead className="text-black text-lg font-semibold">
-              Tên luồng duyệt
-            </TableHead>
-            <TableHead className="w-[200px] text-black text-lg font-semibold">
-              Thao tác
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {approvalFlows?.map((step, index) => (
-            <TableRow key={step.id} className="hover:bg-[#F5F5F5]">
-              <TableCell className="text-black text-lg font-semibold">
-                {index + 1}
-              </TableCell>
-              <TableCell className="text-black text-lg font-semibold">
-                {step.action}
-              </TableCell>
-              <TableCell className="w-[200px]">
-                <div className="flex gap-2">
-                  <NextImage className="w-6" src="/eye.png" alt="eye" />
-                  <NextImage className="w-6" src="/edit.png" alt="pencil" />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 h-[42px] w-[42px] flex items-center justify-center bg-[#4BC5BE] rounded-l-md">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span>Chọn số bản ghi trên 1 trang:</span>
-          <Select defaultValue="10">
-            <SelectTrigger className="w-[70px] rounded">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent className="rounded border none text-black">
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Tổng số bản ghi: 48</span>
-        </div>
+        <Button
+          className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
+          onClick={() => setIsOpenApprovalWorkflow(true)}
+        >
+          <Plus className="w-4 h-4 mr-2" /> Thêm mới
+        </Button>
       </div>
+
+      <div className="overflow-x-auto">
+        <Table className="min-w-[800px] w-full">
+          <TableHeader>
+            <TableRow className="hover:bg-gray-50 bg-gray-100">
+              <TableHead className="w-[80px] text-gray-700 font-semibold">
+                STT
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Tên luồng duyệt
+              </TableHead>
+              <TableHead className="w-[200px] text-gray-700 font-semibold">
+                Thao tác
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {approvalFlows?.length === 0 ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={3} className="text-center py-16">
+                  <div className="flex flex-col items-center gap-4">
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      <>
+                        <NextImage
+                          src="/empty-state.png"
+                          alt="No data"
+                          className="w-[240px] h-[240px] opacity-40"
+                        />
+                        <p className="text-gray-500 text-base">
+                          Không có dữ liệu luồng duyệt
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              approvalFlows?.map((step, index) => (
+                <TableRow
+                  key={step.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <TableCell className="text-gray-700 text-base">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-base">
+                    {step.name}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-3">
+                      <div className="cursor-pointer">
+                        <NextImage
+                          src="/eye.png"
+                          alt="eye"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                      </div>
+                      <div className="cursor-pointer">
+                        <NextImage
+                          src="/edit.png"
+                          alt="edit"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
       <ApprovalWorkflowModal
         isOpen={isOpenApprovalWorkflow}
         onOpenChange={setIsOpenApprovalWorkflow}

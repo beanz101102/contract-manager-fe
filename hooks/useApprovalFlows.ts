@@ -7,12 +7,16 @@ import { api } from "@/lib/axios"
 export const useApprovalFlows = () => {
   const queryClient = useQueryClient()
 
-  const useListApprovalFlows = () => {
+  const useListApprovalFlows = (name?: string) => {
     return useQuery({
-      queryKey: ["approval-flows"],
+      queryKey: ["approval-flows", name],
       queryFn: async () => {
+        const params = new URLSearchParams()
+        if (name) {
+          params.append("name", name)
+        }
         const response = await api.post<ApprovalFlowsList[]>(
-          "/api/approval_flow"
+          `/api/approval_flow?${params}`
         )
         return response.data
       },

@@ -78,21 +78,21 @@ export default function CustomerList() {
   }
 
   return (
-    <div className="mx-auto p-6 bg-white rounded-[10px]">
-      <h1 className="text-2xl font-bold mb-4">Danh sách khách hàng</h1>
-      <div className="flex justify-between items-center mb-4">
-        <div className="relative">
+    <div className="p-8 bg-white rounded-xl shadow-sm">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">
+        Danh sách khách hàng
+      </h1>
+
+      <div className="flex justify-between mb-6">
+        <div className="relative w-[280px]">
           <Input
             type="text"
             placeholder="Mã/ Tên khách hàng"
             value={searchTerm}
-            style={{
-              border: "1px solid #4BC5BE",
-            }}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-12 h-[40px] bg-white rounded"
+            className="pl-12 h-[42px] w-full rounded-md bg-white border-[#4BC5BE] focus:ring-2 focus:ring-[#4BC5BE]/20"
           />
-          <div className="absolute top-1/2 transform -translate-y-1/2 h-[40px] w-[40px] flex items-center justify-center bg-[#4BC5BE] rounded">
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 h-[42px] w-[42px] flex items-center justify-center bg-[#4BC5BE] rounded-l-md">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-white"
@@ -109,164 +109,164 @@ export default function CustomerList() {
             </svg>
           </div>
         </div>
-        <div className="space-x-2">
+
+        <div className="flex gap-3">
           <Link href="/create-customer-information">
-            <Button className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold">
-              <Plus className="w-4 h-4" /> Thêm mới
+            <Button className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
+              <Plus className="w-4 h-4 mr-2" /> Thêm mới
             </Button>
           </Link>
           <Button
+            className="bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            disabled={selectedEmployees.length === 0}
             onClick={() => deleteUser(selectedEmployees)}
-            className="bg-[#F3949E] hover:bg-[#a4434d] rounded text-white font-semibold"
           >
-            <Trash2 className="w-4 h-4" /> Xóa
+            <Trash2 className="w-4 h-4 mr-2" /> Xóa
           </Button>
         </div>
       </div>
-      <InfiniteScroll
-        dataLength={listUsersCustomers?.length}
-        next={() => setPage(page + 1)}
-        hasMore={hasMore}
-        loader={null}
-      >
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-[#F5F5F5]">
-              <TableHead className="w-[50px]">
-                <Checkbox
-                  checked={
-                    selectedEmployees.length === listUsersCustomers.length
-                  }
-                  onCheckedChange={handleSelectAll}
-                />
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                STT
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Mã khách hàng
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Tên khách hàng
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Ngày sinh
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Giới tính
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Số CCCD
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Số điện thoại
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Email
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Địa chỉ
-              </TableHead>
-              <TableHead className="text-black font-semibold text-lg">
-                Thao tác
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {listUsersCustomers.length === 0 ? (
-              <TableRow className="hover:bg-transparent">
-                <TableCell
-                  colSpan={12}
-                  className="text-center py-10 hover:bg-transparent"
-                >
-                  <div className="flex flex-col items-center gap-3">
-                    <NextImage
-                      src="/empty-state.png"
-                      alt="No data"
-                      className="w-[200px] h-[200px] opacity-50"
-                    />
-                    <p className="text-gray-500 text-lg">
-                      Không có dữ liệu khách hàng
-                    </p>
-                  </div>
-                </TableCell>
+
+      <div className="overflow-x-auto">
+        <InfiniteScroll
+          dataLength={listUsersCustomers?.length}
+          next={() => setPage(page + 1)}
+          hasMore={hasMore}
+          loader={null}
+          className="min-w-full"
+        >
+          <Table className="min-w-[1200px] w-full">
+            <TableHeader>
+              <TableRow className="hover:bg-gray-50 bg-gray-100">
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={
+                      selectedEmployees.length === listUsersCustomers.length
+                    }
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  STT
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Mã khách hàng
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Tên khách hàng
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Ngày sinh
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Giới tính
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Số CCCD
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Số điện thoại
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Email
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Địa chỉ
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Thao tác
+                </TableHead>
               </TableRow>
-            ) : (
-              listUsersCustomers.map((customer, index) => (
-                <TableRow key={customer.id} className="hover:bg-[#F5F5F5]">
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedEmployees.includes(customer.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          handleSelectOne(customer.id)
-                        } else {
-                          handleSelectOne(customer.id)
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {index + 1}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.code}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.fullName}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.dateOfBirth}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.gender}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.idNumber}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.phoneNumber}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.email}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    {customer.address}
-                  </TableCell>
-                  <TableCell className="text-black font-semibold text-lg">
-                    <div className="flex space-x-3 justify-center items-center">
-                      <div
-                        className="cursor-pointer"
-                        onClick={() =>
-                          router.push(
-                            `/edit-customer-information/${customer.id}`
-                          )
-                        }
-                      >
-                        <NextImage
-                          src="/edit.png"
-                          alt="edit"
-                          className="w-[26px]"
-                        />
-                      </div>
-                      <div
-                        onClick={() => deleteUser([customer.id])}
-                        className="cursor-pointer"
-                      >
-                        <NextImage
-                          src="/trash.png"
-                          alt="trash"
-                          className="w-[26px]"
-                        />
-                      </div>
+            </TableHeader>
+            <TableBody>
+              {listUsersCustomers.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={11} className="text-center py-16">
+                    <div className="flex flex-col items-center gap-4">
+                      <NextImage
+                        src="/empty-state.png"
+                        alt="No data"
+                        className="w-[240px] h-[240px] opacity-40"
+                      />
+                      <p className="text-gray-500 text-base">
+                        Không có dữ liệu khách hàng
+                      </p>
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </InfiniteScroll>
+              ) : (
+                listUsersCustomers.map((customer, index) => (
+                  <TableRow
+                    key={customer.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedEmployees.includes(customer.id)}
+                        onCheckedChange={() => handleSelectOne(customer.id)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.code}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.fullName}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.dateOfBirth}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.gender}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.idNumber}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.phoneNumber}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.email}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {customer.address}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-3 justify-center">
+                        <div
+                          className="cursor-pointer"
+                          onClick={() =>
+                            router.push(
+                              `/edit-customer-information/${customer.id}`
+                            )
+                          }
+                        >
+                          <NextImage
+                            src="/edit.png"
+                            alt="edit"
+                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                          />
+                        </div>
+                        <div
+                          onClick={() => deleteUser([customer.id])}
+                          className="cursor-pointer"
+                        >
+                          <NextImage
+                            src="/trash.png"
+                            alt="trash"
+                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </InfiniteScroll>
+      </div>
     </div>
   )
 }

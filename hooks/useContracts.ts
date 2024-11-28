@@ -21,7 +21,15 @@ export const useContracts = () => {
   const useAllContracts = (
     contractNumber?: string,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    customerId?: number | null,
+    createdById?: number | null,
+    status?:
+      | "draft"
+      | "pending_approval"
+      | "rejected"
+      | "ready_to_sign"
+      | "completed"
   ) => {
     return useQuery({
       queryKey: ["contracts", contractNumber, page, limit],
@@ -30,13 +38,22 @@ export const useContracts = () => {
         if (contractNumber) {
           params.append("contractNumber", contractNumber)
         }
+        if (customerId) {
+          params.append("customerId", customerId.toString())
+        }
+        if (createdById) {
+          params.append("createdById", createdById.toString())
+        }
+        if (status) {
+          params.append("status", status)
+        }
         params.append("page", page.toString())
         params.append("limit", limit.toString())
 
-        const response = await api.post<ContractList[]>(
-          `/api/contract?${params}`
-        )
-        return response.data
+        const response = await api.post<{
+          data: ContractList[]
+        }>(`/api/contract?${params}`)
+        return response.data?.data
       },
     })
   }
@@ -158,6 +175,63 @@ export const useContracts = () => {
     })
   }
 
+  const useSubmitContractForApproval = () => {
+    return useMutation({
+      mutationFn: async (payload: {
+        contractIds: number[]
+        userId: number
+      }) => {
+        const response = await api.post("/api/contract/submit", {
+          contractIds: payload.contractIds,
+          userId: payload.userId,
+        })
+        return response.data
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["contracts"] })
+        toast.success("Gửi duyệt hợp đồng thành công")
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
+    })
+  }
+
+  const useApproveContract = () => {
+    return useMutation({
+      mutationFn: async (payload: {
+        contracts: Array<{
+          contractId: number
+          comments?: string
+        }>
+        status: "approved" | "rejected"
+        approverId: number
+      }) => {
+        const response = await api.post("/api/contract/approve", payload)
+        return response.data
+      },
+    })
+  }
+
+  const useSignContract = () => {
+    return useMutation({
+      mutationFn: async (payload: {
+        contracts: number[]
+        signerId: number
+      }) => {
+        const response = await api.post("/api/contract/sign", payload)
+        return response.data
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["contracts"] })
+        toast.success("Ký hợp đồng thành công")
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -166,5 +240,8 @@ export const useContracts = () => {
     useContractCount,
     useContractSignatures,
     useBulkDeleteContracts,
+    useSubmitContractForApproval,
+    useApproveContract,
+    useSignContract,
   }
 }

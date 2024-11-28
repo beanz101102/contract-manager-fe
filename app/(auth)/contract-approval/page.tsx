@@ -1,39 +1,30 @@
 "use client"
 
-import React, { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/dist/client/router"
+import { useAuth } from "@/contexts/auth-context"
 import { TabsList } from "@radix-ui/react-tabs"
-import { Check, Download, Eye, Filter, Info, Pencil } from "lucide-react"
+import dayjs from "dayjs"
+import { atom, useAtom } from "jotai"
+import { Check, Download, Info, Pencil } from "lucide-react"
 import toast from "react-hot-toast"
+import InfiniteScroll from "react-infinite-scroll-component"
 
+import { ContractList, mapiContractStatus } from "@/types/api"
+import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Loading } from "@/components/ui/loading"
 import NextImage from "@/components/ui/next-img"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -45,137 +36,59 @@ import {
 import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 
-type Contract = {
-  id: string
-  contractNumber: string
-  creationDate: string
-  department: string
-  customerCode: string
-  customerInfo: {
-    name: string
-    phone: string
-  }
-}
-
-const contracts: Contract[] = [
-  {
-    id: "1",
-    contractNumber: "22/07/2023/HD-BE/BN",
-    creationDate: "22/07/2023",
-    department: "Phòng pháp lý",
-    customerCode: "KH0005",
-    customerInfo: {
-      name: "Nguyễn Thanh Thành",
-      phone: "0867352637",
-    },
-  },
-  {
-    id: "2",
-    contractNumber: "22/07/2023/HD-NA/MN",
-    creationDate: "22/07/2023",
-    department: "Phòng nhân sự",
-    customerCode: "KH0007",
-    customerInfo: {
-      name: "Phạm Nguyễn Thanh",
-      phone: "0973647283",
-    },
-  },
-  {
-    id: "3",
-    contractNumber: "22/07/2023/HD-HM/MN",
-    creationDate: "22/07/2023",
-    department: "Phòng pháp lý",
-    customerCode: "KH0034",
-    customerInfo: {
-      name: "Nguyễn Thanh Thành",
-      phone: "0867352637",
-    },
-  },
-  {
-    id: "4",
-    contractNumber: "22/07/2023/HD-KA/MN",
-    creationDate: "22/07/2023",
-    department: "Phòng hành chính",
-    customerCode: "KH0015",
-    customerInfo: {
-      name: "Phạm Nguyễn Thanh",
-      phone: "0973647283",
-    },
-  },
-  {
-    id: "5",
-    contractNumber: "22/07/2023/HD-DH/BN",
-    creationDate: "22/07/2023",
-    department: "Phòng hành chính",
-    customerCode: "KH0047",
-    customerInfo: {
-      name: "Nguyễn Thanh Thành",
-      phone: "0867352637",
-    },
-  },
-  {
-    id: "6",
-    contractNumber: "22/07/2023/HD-NH/MN",
-    creationDate: "22/07/2023",
-    department: "Phòng pháp lý",
-    customerCode: "KH0014",
-    customerInfo: {
-      name: "Phạm Nguyễn Thanh",
-      phone: "0973647283",
-    },
-  },
-  {
-    id: "7",
-    contractNumber: "22/07/2023/HD-KC/BN",
-    creationDate: "22/07/2023",
-    department: "Phòng pháp lý",
-    customerCode: "KH0305",
-    customerInfo: {
-      name: "Nguyễn Thanh Thành",
-      phone: "0867352637",
-    },
-  },
-  {
-    id: "8",
-    contractNumber: "22/07/2023/HD-PH/MN",
-    creationDate: "22/07/2023",
-    department: "Phòng hành chính",
-    customerCode: "KH0107",
-    customerInfo: {
-      name: "Phạm Nguyễn Thanh",
-      phone: "0973647283",
-    },
-  },
-]
+const contractListAtom = atom<ContractList[]>([])
 
 export default function ContractApproval() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [isOpen, setIsOpen] = useState(false)
-  const [isOpenEditRequest, setIsOpenEditRequest] = useState(false)
-  const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
-  const filteredContracts = contracts.filter((contract) =>
-    contract.contractNumber.toLowerCase().includes(searchTerm.toLowerCase())
+  const { useAllContracts } = useContracts()
+  const [page, setPage] = useState(1)
+  const { user } = useAuth()
+  const { data: contracts, isLoading } = useAllContracts(
+    searchTerm,
+    page,
+    10,
+    null,
+    user?.id,
+    "pending_approval"
   )
 
-  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([])
+  const [contractList, setContractList] = useAtom(contractListAtom)
+  const [hasMore, setHasMore] = useState(true)
+
+  useEffect(() => {
+    if (contracts) {
+      setHasMore(contracts.length >= 10)
+      if (page === 1) {
+        setContractList(contracts)
+      } else {
+        setContractList((prev) => [...prev, ...contracts])
+      }
+    }
+  }, [contracts, page])
+
+  const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedEmployees(
-        filteredContracts.map((contract, index) => index.toString())
+        contractList?.map((contract, index) => contract?.id) || []
       )
     } else {
       setSelectedEmployees([])
     }
   }
 
-  const handleSelectOne = (employeeId: string) => {
+  const handleSelectOne = (employeeId: number) => {
     setSelectedEmployees((prev) =>
       prev.includes(employeeId)
         ? prev.filter((id) => id !== employeeId)
         : [...prev, employeeId]
     )
   }
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [isOpenEditRequest, setIsOpenEditRequest] = useState(false)
+  const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
 
   return (
     <div className="bg-white rounded-lg p-6">
@@ -211,124 +124,136 @@ export default function ContractApproval() {
           </Button>
         </div>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-[#F5F5F5]">
-            <TableHead className="w-[50px]">
-              <Checkbox
-                checked={selectedEmployees.length === filteredContracts.length}
-                onCheckedChange={handleSelectAll}
-              />{" "}
-            </TableHead>
-            <TableHead className="w-[50px] text-black text-lg font-semibold">
-              STT
-            </TableHead>
-            <TableHead className="text-black text-lg font-semibold">
-              Số hợp đồng
-            </TableHead>
-            <TableHead className="text-black text-lg font-semibold">
-              Ngày tạo hợp đồng
-            </TableHead>
-            <TableHead className="text-black text-lg font-semibold">
-              Phòng ban
-            </TableHead>
-            <TableHead className="text-black text-lg font-semibold">
-              Mã khách hàng
-            </TableHead>
-            <TableHead className="text-black text-lg font-semibold">
-              Thông tin khách hàng
-            </TableHead>
-            <TableHead className="text-black text-lg font-semibold">
-              Thao tác
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredContracts.map((contract, index) => (
-            <TableRow key={contract.id} className="hover:bg-[#F5F5F5]">
-              <TableCell>
-                <Checkbox
-                  checked={selectedEmployees.includes(index.toString())}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      handleSelectOne(index.toString())
-                    } else {
-                      handleSelectOne(index.toString())
-                    }
-                  }}
-                />
-              </TableCell>
-              <TableCell className="text-black text-lg font-semibold">
-                {index + 1}
-              </TableCell>
-              <TableCell className="text-black text-lg font-semibold">
-                {contract.contractNumber}
-              </TableCell>
-              <TableCell className="text-black text-lg font-semibold">
-                {contract.creationDate}
-              </TableCell>
-              <TableCell className="text-black text-lg font-semibold">
-                {contract.department}
-              </TableCell>
-              <TableCell className="text-black text-lg font-semibold">
-                {contract.customerCode}
-              </TableCell>
-              <TableCell className="text-black text-lg font-semibold">
-                <div>{contract.customerInfo.name}</div>
-                <div>{contract.customerInfo.phone}</div>
-              </TableCell>
-              <TableCell>
-                <div onClick={() => setIsOpenContractInfo(true)}>
-                  <NextImage
-                    src="/eye.png"
-                    alt="eye"
-                    className="w-[24px] h-[24px]"
+      <div className="overflow-x-auto">
+        <InfiniteScroll
+          dataLength={contractList?.length || 0}
+          next={() => setPage(page + 1)}
+          hasMore={hasMore}
+          loader={null}
+          className="min-w-full"
+        >
+          <Table className="min-w-[1200px] w-full">
+            <TableHeader>
+              <TableRow className="hover:bg-gray-50 bg-gray-100">
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={selectedEmployees.length === contracts?.length}
+                    onCheckedChange={handleSelectAll}
                   />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span>Chọn số bản ghi trên 1 trang:</span>
-          <Select defaultValue="10">
-            <SelectTrigger className="w-[70px] rounded">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent className="rounded border none text-black">
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Tổng số bản ghi: 48</span>
-        </div>
+                </TableHead>
+                <TableHead className="w-[60px] text-gray-700 font-semibold">
+                  STT
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Số hợp đồng
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Ngày tạo hợp đồng
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Trạng thái
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Phòng ban
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Mã khách
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Thao tác
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {contractList?.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={8} className="text-center py-16">
+                    <div className="flex flex-col items-center gap-3">
+                      {isLoading ? (
+                        <Loading />
+                      ) : (
+                        <>
+                          <NextImage
+                            src="/empty-state.png"
+                            alt="No data"
+                            className="w-[200px] h-[200px] opacity-50"
+                          />
+                          <p className="text-gray-500 text-lg">
+                            Không có dữ liệu hợp đồng
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                contractList?.map((contract, index) => (
+                  <TableRow
+                    key={contract.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedEmployees.includes(contract.id)}
+                        onCheckedChange={() => handleSelectOne(contract.id)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {contract.contractNumber}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {dayjs(contract.createdAt).format("DD/MM/YYYY")}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className="px-3 py-1 rounded-full text-sm font-medium"
+                        style={{
+                          ...mapiContractStatus[
+                            contract.status as keyof typeof mapiContractStatus
+                          ].color,
+                        }}
+                      >
+                        {
+                          mapiContractStatus[
+                            contract.status as keyof typeof mapiContractStatus
+                          ].label
+                        }
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {contract.createdBy?.department?.departmentName}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {contract.customer.code}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-3 items-center">
+                        <NextImage
+                          src="/eye.png"
+                          alt="eye"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </InfiniteScroll>
       </div>
-      <ModalConfirm isOpen={isOpen} onOpenChange={setIsOpen} />
+      <ModalConfirm
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        selectedEmployees={selectedEmployees}
+      />
       <EditRequestModal
         isOpen={isOpenEditRequest}
         onOpenChange={setIsOpenEditRequest}
+        selectedEmployees={selectedEmployees}
       />
       <ContractInfoModal
         isOpen={isOpenContractInfo}
@@ -341,31 +266,113 @@ export default function ContractApproval() {
 const ModalConfirm = ({
   isOpen,
   onOpenChange,
+  selectedEmployees,
 }: {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  selectedEmployees: number[]
 }) => {
+  const { user } = useAuth()
+  const { useApproveContract } = useContracts()
+  const { mutate: approveContract } = useApproveContract()
+  const [contractComments, setContractComments] = useState<{
+    [key: number]: string
+  }>({})
+  const [contractList] = useAtom(contractListAtom)
+
+  const selectedContracts = contractList.filter((contract) =>
+    selectedEmployees.includes(contract.id)
+  )
+
+  const handleApprove = () => {
+    approveContract({
+      contracts: selectedEmployees.map((id) => ({
+        contractId: id,
+        comments: contractComments[id] || "",
+      })),
+      status: "approved",
+      approverId: user?.id || 0,
+    })
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] !rounded-lg">
-        <DialogHeader className="flex flex-col items-center">
-          <div className="bg-teal-500 rounded-full p-2 mb-4">
-            <Info className="text-white h-6 w-6" />
+      <DialogContent className="sm:max-w-[700px] !rounded-xl bg-white shadow-lg">
+        <DialogHeader className="flex flex-col items-center pb-6 border-b">
+          <div className="bg-emerald-100 rounded-full p-3 mb-4">
+            <Info className="text-emerald-600 h-7 w-7" />
           </div>
-          <DialogTitle className="text-xl font-semibold">Thông báo</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold text-gray-900">
+            Xác nhận duyệt hợp đồng
+          </DialogTitle>
+          <p className="text-gray-500 mt-2 text-center">
+            Vui lòng kiểm tra và nhập nhận xét cho các hợp đồng được chọn
+          </p>
         </DialogHeader>
-        <DialogDescription className="text-center">
-          Bạn chắc chắn muốn duyệt các hợp đồng đã chọn
-        </DialogDescription>
-        <DialogFooter className="sm:justify-center">
+
+        <div className="max-h-[400px] overflow-y-auto my-6">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                <TableHead className="text-gray-700 font-medium">STT</TableHead>
+                <TableHead className="text-gray-700 font-medium">
+                  Số hợp đồng
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
+                  Mã khách
+                </TableHead>
+                <TableHead className="text-gray-700 font-medium">
+                  Nhận xét
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {selectedContracts.map((contract, index) => (
+                <TableRow key={contract.id} className="hover:bg-gray-50">
+                  <TableCell className="font-medium text-gray-700">
+                    {index + 1}
+                  </TableCell>
+                  <TableCell className="text-gray-600">
+                    {contract.contractNumber}
+                  </TableCell>
+                  <TableCell className="text-gray-600">
+                    {contract.customer.code}
+                  </TableCell>
+                  <TableCell className="w-[300px]">
+                    <Input
+                      placeholder="Nhập nhận xét cho hợp đồng này"
+                      value={contractComments[contract.id] || ""}
+                      onChange={(e) =>
+                        setContractComments((prev) => ({
+                          ...prev,
+                          [contract.id]: e.target.value,
+                        }))
+                      }
+                      className="bg-white border-gray-200 focus:border-emerald-500 focus:ring-emerald-200"
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        <DialogFooter className="flex justify-center gap-3 pt-6 border-t">
+          <Button
+            onClick={() => onOpenChange(false)}
+            variant="outline"
+            className="min-w-[120px] bg-white hover:bg-gray-50 border-gray-200"
+          >
+            Hủy bỏ
+          </Button>
           <Button
             onClick={() => {
+              handleApprove()
               onOpenChange(false)
-              toast.success("Duyệt hợp đồng thành công")
             }}
-            className="bg-teal-500 hover:bg-teal-600 text-white w-full sm:w-auto"
+            className="min-w-[120px] bg-emerald-500 hover:bg-emerald-600 text-white"
           >
-            Duyệt hợp đồng
+            Xác nhận duyệt
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -376,10 +383,30 @@ const ModalConfirm = ({
 const EditRequestModal = ({
   isOpen,
   onOpenChange,
+  selectedEmployees,
 }: {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  selectedEmployees: number[]
 }) => {
+  const { user } = useAuth()
+  const { useApproveContract } = useContracts()
+  const { mutate: rejectContract } = useApproveContract()
+  const [reason, setReason] = useState("")
+  const [contractList] = useAtom(contractListAtom)
+
+  const handleReject = () => {
+    rejectContract({
+      contracts: selectedEmployees.map((id) => ({
+        contractId: id,
+        comments: reason,
+      })),
+      status: "rejected",
+      approverId: user?.id || 0,
+    })
+    onOpenChange(false)
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
@@ -397,6 +424,8 @@ const EditRequestModal = ({
               id="reason"
               placeholder="Nhập lý do yêu cầu sửa lại"
               className="min-h-[100px] bg-white !rounded-lg !border-1 !border-gray-300"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
@@ -424,7 +453,11 @@ const EditRequestModal = ({
           >
             Đóng
           </Button>
-          <Button className="bg-teal-500 hover:bg-teal-600 text-white">
+          <Button
+            className="bg-teal-500 hover:bg-teal-600 text-white"
+            onClick={handleReject}
+            disabled={!reason.trim()}
+          >
             Gửi yêu cầu
           </Button>
         </DialogFooter>

@@ -1,3 +1,5 @@
+import { User } from "./auth"
+
 export interface UserDetail {
   id: number
   code: string
@@ -136,10 +138,11 @@ export interface ContractList {
     deletedAt: string | null
     refreshToken: string | null
     active: boolean
+    department: Department
   }
   createdBy: {
-    id: 1
-    code: "11"
+    id: number
+    code: string
     fullName: string
     gender: Gender
     dateOfBirth: string | null
@@ -159,7 +162,10 @@ export interface ContractList {
     deletedAt: string | null
     refreshToken: string | null
     active: boolean
+    department: Department
   }
+  signedUserIds: number[]
+  approvedUserIds: number[]
 }
 
 export interface SignatureList {
@@ -193,46 +199,82 @@ export interface SignatureList {
   }
 }
 
+export interface ApprovalStep {
+  approver: User
+  approverId: number
+  department: Department
+  createdAt: string
+  departmentId: number
+  id: number
+  stepOrder: number
+  templateId: number
+  updatedAt: string
+}
+
 export interface ApprovalFlowsList {
   id: number
-  stepNumber: number
-  action: string
-  actionSource: "internal" | "customer"
-  approvalStatus: "pending" | "approved" | "rejected"
-  approvalDate: string
-  comments: string
-  contract: {
-    id: number
-    contractNumber: string
-    contractType: string
-    createdAt: string
-    deletedAt: string | null
-    signersCount: number
-    status: "new" | "pending" | "signed" | "rejected"
-    note: string
-    pdfFilePath: string
-  }
-  approver: {
-    id: number
-    code: string
-    fullName: string
-    gender: Gender
-    dateOfBirth: string | null
-    placeOfBirth: string | null
-    address: string | null
-    idNumber: string
-    idIssueDate: null
-    idIssuePlace: string | null
-    phoneNumber: string | null
-    email: string
-    position: string | null
-    role: "employee" | "admin" | "customer"
-    username: string
-    passwordHash: string
-    createdAt: string
-    updatedAt: string
-    deletedAt: string | null
-    refreshToken: string | null
-    active: boolean
-  }
+  name: string
+  isActive: boolean
+  createdAt: string
+  steps: ApprovalStep[]
+  updatedAt: string
+}
+
+export const mapiContractStatus = {
+  draft: {
+    label: "Mới",
+    value: "new",
+    color: {
+      backgroundColor: "#DBEAFE",
+      color: "#1E40AF",
+    },
+  },
+  pending_approval: {
+    label: "Chờ duyệt",
+    value: "pending",
+    color: {
+      backgroundColor: "#FEF3C7",
+      color: "#92400E",
+    },
+  },
+  rejected: {
+    label: "Từ chối",
+    value: "rejected",
+    color: {
+      backgroundColor: "#FEE2E2",
+      color: "#991B1B",
+    },
+  },
+  ready_to_sign: {
+    label: "Đã ký",
+    value: "signed",
+    color: {
+      backgroundColor: "#DCFCE7",
+      color: "#166534",
+    },
+  },
+  completed: {
+    label: "Hoàn thành",
+    value: "completed",
+    color: {
+      backgroundColor: "#F3E8FF",
+      color: "#6B21A8",
+    },
+  },
+  signed_by_me: {
+    label: "Đã ký",
+    value: "signed_by_me",
+    color: {
+      backgroundColor: "#DCFCE7",
+      color: "#166534",
+    },
+  },
+  waiting_for_sign: {
+    label: "Chờ ký",
+    value: "waiting_for_sign",
+    color: {
+      backgroundColor: "#FEF3C7",
+      color: "#92400E",
+    },
+  },
 }

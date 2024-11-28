@@ -1,26 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
+import dayjs from "dayjs"
+import { atom, useAtom } from "jotai"
+import { Download, Plus, Send, Trash2 } from "lucide-react"
+import InfiniteScroll from "react-infinite-scroll-component"
 
-import { Badge } from "@/components/ui/badge"
+import { ContractList, mapiContractStatus } from "@/types/api"
+import { useContracts } from "@/hooks/useContracts"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { Loading } from "@/components/ui/loading"
 import NextImage from "@/components/ui/next-img"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -30,138 +24,77 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-// Mock data for demonstration
-const contracts = [
-  {
-    id: 1,
-    number: "22/07/2023/HD-BE/BN",
-    date: "22/07/2023",
-    status: "Hoàn thành",
-    department: "Phòng pháp lý",
-    customerCode: "KH0005",
-    customerInfo: "Nguyễn Thanh Thành 0867352637",
-  },
-  {
-    id: 2,
-    number: "22/07/2023/HD-NA/MN",
-    date: "22/07/2023",
-    status: "Đã ký",
-    department: "Phòng nhân sự",
-    customerCode: "KH0007",
-    customerInfo: "Phạm Nguyên Thanh 0973647283",
-  },
-  {
-    id: 3,
-    number: "22/07/2023/HD-HM/MN",
-    date: "22/07/2023",
-    status: "Đã hủy",
-    department: "Phòng pháp lý",
-    customerCode: "KH0034",
-    customerInfo: "Nguyễn Thanh Thành 0867352637",
-  },
-  {
-    id: 4,
-    number: "22/07/2023/HD-KA/MN",
-    date: "22/07/2023",
-    status: "Hoàn thành",
-    department: "Phòng hành chính",
-    customerCode: "KH0015",
-    customerInfo: "Phạm Nguyên Thanh 0973647283",
-  },
-  {
-    id: 5,
-    number: "22/07/2023/HD-DH/BN",
-    date: "22/07/2023",
-    status: "Hoàn thành",
-    department: "Phòng hành chính",
-    customerCode: "KH0047",
-    customerInfo: "Nguyễn Thanh Thành 0867352637",
-  },
-  {
-    id: 6,
-    number: "22/07/2023/HD-NH/MN",
-    date: "22/07/2023",
-    status: "Đã ký",
-    department: "Phòng pháp lý",
-    customerCode: "KH0014",
-    customerInfo: "Phạm Nguyên Thanh 0973647283",
-  },
-  {
-    id: 7,
-    number: "22/07/2023/HD-KC/BN",
-    date: "22/07/2023",
-    status: "Hoàn thành",
-    department: "Phòng pháp lý",
-    customerCode: "KH0305",
-    customerInfo: "Nguyễn Thanh Thành 0867352637",
-  },
-  {
-    id: 8,
-    number: "22/07/2023/HD-PH/MN",
-    date: "22/07/2023",
-    status: "Đã ký",
-    department: "Phòng hành chính",
-    customerCode: "KH0107",
-    customerInfo: "Phạm Nguyên Thanh 0973647283",
-  },
-]
+const contractListAtom = atom<ContractList[]>([])
 
 export default function ContractSearch() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [entriesPerPage, setEntriesPerPage] = useState(10)
-
-  const filteredContracts = contracts.filter((contract) =>
-    contract.number.toLowerCase().includes(searchTerm.toLowerCase())
+  const router = useRouter()
+  const { useAllContracts, useBulkDeleteContracts } = useContracts()
+  const [page, setPage] = useState(1)
+  const { user } = useAuth()
+  const { data: contracts, isLoading } = useAllContracts(
+    searchTerm,
+    page,
+    10,
+    null,
+    user?.id,
+    "completed"
   )
 
-  const indexOfLastEntry = currentPage * entriesPerPage
-  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage
-  const currentEntries = filteredContracts.slice(
-    indexOfFirstEntry,
-    indexOfLastEntry
-  )
+  const [contractList, setContractList] = useAtom(contractListAtom)
+  const [hasMore, setHasMore] = useState(true)
 
-  const pageNumbers = []
-  for (
-    let i = 1;
-    i <= Math.ceil(filteredContracts.length / entriesPerPage);
-    i++
-  ) {
-    pageNumbers.push(i)
-  }
+  useEffect(() => {
+    if (contracts) {
+      setHasMore(contracts.length >= 10)
+      if (page === 1) {
+        setContractList(contracts)
+      } else {
+        setContractList((prev) => [...prev, ...contracts])
+      }
+    }
+  }, [contracts, page])
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "Hoàn thành":
-        return <Badge className="bg-teal-100 text-teal-800">Hoàn thành</Badge>
-      case "Đã ký":
-        return <Badge className="bg-blue-100 text-blue-800">Đã ký</Badge>
-      case "Đã hủy":
-        return <Badge className="bg-red-100 text-red-800">Đã hủy</Badge>
-      default:
-        return <Badge>{status}</Badge>
+  const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedEmployees(
+        contractList?.map((contract, index) => contract?.id) || []
+      )
+    } else {
+      setSelectedEmployees([])
     }
   }
 
+  const handleSelectOne = (employeeId: number) => {
+    setSelectedEmployees((prev) =>
+      prev.includes(employeeId)
+        ? prev.filter((id) => id !== employeeId)
+        : [...prev, employeeId]
+    )
+  }
+
+  const { mutate: bulkDeleteContracts } = useBulkDeleteContracts()
+
+  const handleBulkDelete = () => {
+    bulkDeleteContracts(selectedEmployees)
+  }
+
   return (
-    <div className="bg-white rounded-[10px] px-6 py-6">
-      <h1 className="text-2xl font-bold border-b border-[#675D5D] pb-6 mb-4">
-        Tra cứu hợp đồng
-      </h1>
-      <div className="flex justify-between items-center mb-4">
-        <div className="relative">
+    <div className="p-8 bg-white rounded-xl shadow-sm">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Cá nhân quản lý</h1>
+
+      <div className="flex justify-between mb-6">
+        <div className="relative w-[280px]">
           <Input
             type="text"
-            placeholder="Số hợp đồng"
+            placeholder="Mã/Số hợp đồng"
             value={searchTerm}
-            style={{
-              border: "1px solid #4BC5BE",
-            }}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-12 h-[40px] bg-white rounded"
+            className="pl-12 h-[42px] w-full rounded-md bg-white border-[#4BC5BE] focus:ring-2 focus:ring-[#4BC5BE]/20"
           />
-          <div className="absolute top-1/2 transform -translate-y-1/2 h-[40px] w-[40px] flex items-center justify-center bg-[#4BC5BE] rounded">
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 h-[42px] w-[42px] flex items-center justify-center bg-[#4BC5BE] rounded-l-md">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5 text-white"
@@ -179,104 +112,142 @@ export default function ContractSearch() {
           </div>
         </div>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-[#F5F5F5]">
-            <TableHead className="font-semibold text-lg text-black">
-              STT
-            </TableHead>
-            <TableHead className="font-semibold text-lg text-black">
-              Số hợp đồng
-            </TableHead>
-            <TableHead className="font-semibold text-lg text-black">
-              Ngày tạo hợp đồng
-            </TableHead>
-            <TableHead className="font-semibold text-lg text-black">
-              Trạng thái
-            </TableHead>
-            <TableHead className="font-semibold text-lg text-black">
-              Phòng ban
-            </TableHead>
-            <TableHead className="font-semibold text-lg text-black">
-              Mã khách hàng
-            </TableHead>
-            <TableHead className="font-semibold text-lg text-black">
-              Thông tin khách hàng
-            </TableHead>
-            <TableHead className="font-semibold text-lg text-black">
-              Thao tác
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {currentEntries.map((contract, index) => (
-            <TableRow key={contract.id} className="hover:bg-[#F5F5F5]">
-              <TableCell className="text-black text-lg">
-                {indexOfFirstEntry + index + 1}
-              </TableCell>
-              <TableCell className="text-black text-lg">
-                {contract.number}
-              </TableCell>
-              <TableCell className="text-black text-lg">
-                {contract.date}
-              </TableCell>
-              <TableCell className="text-black text-lg">
-                {getStatusBadge(contract.status)}
-              </TableCell>
-              <TableCell className="text-black text-lg">
-                {contract.department}
-              </TableCell>
-              <TableCell className="text-black text-lg">
-                {contract.customerCode}
-              </TableCell>
-              <TableCell className="text-black text-lg">
-                {contract.customerInfo}
-              </TableCell>
-              <TableCell className="text-black text-lg">
-                <NextImage
-                  src="/eye.png"
-                  alt="eye"
-                  className="w-[24px] h-[24px]"
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">1</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
 
-        <div className="flex items-center gap-2">
-          <span>Chọn số bản ghi trên 1 trang:</span>
-          <Select defaultValue="10">
-            <SelectTrigger className="w-[70px] rounded">
-              <SelectValue placeholder="10" />
-            </SelectTrigger>
-            <SelectContent className="rounded border none text-black">
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>Tổng số bản ghi: 48</span>
-        </div>
+      <div className="overflow-x-auto">
+        <InfiniteScroll
+          dataLength={contractList?.length || 0}
+          next={() => setPage(page + 1)}
+          hasMore={hasMore}
+          loader={null}
+          className="min-w-full"
+        >
+          <Table className="min-w-[1200px] w-full">
+            <TableHeader>
+              <TableRow className="hover:bg-gray-50 bg-gray-100">
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={selectedEmployees.length === contracts?.length}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
+                <TableHead className="w-[60px] text-gray-700 font-semibold">
+                  STT
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Số hợp đồng
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Ngày tạo hợp đồng
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Trạng thái
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Phòng ban
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Mã khách
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Thao tác
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {contractList?.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={8} className="text-center py-16">
+                    <div className="flex flex-col items-center gap-3">
+                      {isLoading ? (
+                        <Loading />
+                      ) : (
+                        <>
+                          <NextImage
+                            src="/empty-state.png"
+                            alt="No data"
+                            className="w-[200px] h-[200px] opacity-50"
+                          />
+                          <p className="text-gray-500 text-lg">
+                            Không có dữ liệu hợp đồng
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                contractList?.map((contract, index) => (
+                  <TableRow
+                    key={contract.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedEmployees.includes(contract.id)}
+                        onCheckedChange={() => handleSelectOne(contract.id)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {index + 1}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {contract.contractNumber}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {dayjs(contract.createdAt).format("DD/MM/YYYY")}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className="px-3 py-1 rounded-full text-sm font-medium"
+                        style={{
+                          ...mapiContractStatus[
+                            contract.status as keyof typeof mapiContractStatus
+                          ].color,
+                        }}
+                      >
+                        {
+                          mapiContractStatus[
+                            contract.status as keyof typeof mapiContractStatus
+                          ].label
+                        }
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {contract.createdBy?.department?.departmentName}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {contract.customer.code}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-3 items-center">
+                        <NextImage
+                          src="/eye.png"
+                          alt="eye"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                        />
+                        {/* <NextImage
+                          src="/mail.png"
+                          alt="mail"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                        /> */}
+                        <NextImage
+                          src="/edit.png"
+                          alt="edit"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                        />
+                        {/* <NextImage
+                          src="/setting.png"
+                          alt="setting"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                        /> */}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </InfiniteScroll>
       </div>
     </div>
   )

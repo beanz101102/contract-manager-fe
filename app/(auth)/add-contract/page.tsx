@@ -4,12 +4,13 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeft, Search, Upload } from "lucide-react"
+import { ChevronLeft, Plus, Search, Upload, X } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { Document, Page } from "react-pdf"
 import * as z from "zod"
 
 import { User } from "@/types/auth"
+import { useApprovalFlows } from "@/hooks/useApprovalFlows"
 import { useContracts } from "@/hooks/useContracts"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
@@ -23,6 +24,14 @@ import {
   CommandList,
 } from "@/components/ui/command"
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   Form,
   FormControl,
   FormField,
@@ -31,6 +40,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Popover,
   PopoverContent,
@@ -43,6 +53,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 
 // Create new plugin instance
@@ -59,7 +77,23 @@ const formSchema = z.object({
   phone: z.string().min(10, "Số điện thoại không hợp lệ"),
   signerCount: z.string().min(1, "Vui lòng chọn số lượng người ký"),
   notes: z.string(),
+  approvalFlow: z.string().min(1, "Vui lòng chọn luồng duyệt"),
 })
+
+interface ApprovalFlow {
+  approvalSteps: Array<{
+    step: number
+    approvalType: string
+    department: string
+    approverId: number | null
+  }>
+  signSteps: Array<{
+    step: number
+    signType: string
+    department: string
+    signerId: number | null
+  }>
+}
 
 export default function ContractForm() {
   const { user } = useAuth()
@@ -70,11 +104,33 @@ export default function ContractForm() {
   const [fileName, setFileName] = useState<string>("")
   const [currentCustomer, setCurrentCustomer] = useState<User | null>(null)
   const router = useRouter()
+  const [openFlowDialog, setOpenFlowDialog] = useState(false)
+  const [searchFlowTerm, setSearchFlowTerm] = useState("")
+  const [openSignerSelect, setOpenSignerSelect] = useState<{
+    [key: number]: boolean
+  }>({})
+  const [searchSignerTerm, setSearchSignerTerm] = useState("")
+  const [selectedSigners, setSelectedSigners] = useState<User[]>([])
 
   const { useListUsers } = useUsers()
   const { data, isLoading } = useListUsers("customer", 1, 10, searchTerm, null)
 
   const customers = data?.users || []
+
+  const { useListUsers: useListEmployees } = useUsers()
+  const { data: employeesData, isLoading: isLoadingEmployees } =
+    useListEmployees("employee", 1, 10, searchTerm, null)
+  const users = employeesData?.users || []
+
+  const { useListUsers: useListSigners } = useUsers()
+  const { data: signersData, isLoading: isLoadingSigners } = useListSigners(
+    "employee",
+    1,
+    10,
+    searchSignerTerm,
+    null
+  )
+  const potentialSigners = signersData?.users || []
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,6 +146,7 @@ export default function ContractForm() {
       phone: "",
       signerCount: "",
       notes: "",
+      approvalFlow: "",
     },
   })
 
@@ -100,7 +157,23 @@ export default function ContractForm() {
   }, [user?.fullName])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("submit", values)
+    const payload = {
+      contractNumber: values.contractNumber,
+      customerId: currentCustomer?.id || 0,
+      contractType: "purchase",
+      createdById: user?.id || 0,
+      signers: selectedSigners.map((signer) => signer?.id),
+      approvalTemplateId: parseInt(values.approvalFlow),
+      note: values.notes,
+      file: pdfFile,
+    }
+
+    console.log("payload", payload)
+
+    // addContract({
+    //   ...payload,
+    //   file: pdfFile,
+    // })
   }
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -131,6 +204,11 @@ export default function ContractForm() {
     router.back()
   })
 
+  const { useListApprovalFlows } = useApprovalFlows()
+  const { data: approvalFlowsData, isLoading: isLoadingFlows } =
+    useListApprovalFlows(searchFlowTerm)
+  const approvalFlows = approvalFlowsData || []
+
   return (
     <div className="container mx-auto py-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -150,19 +228,23 @@ export default function ContractForm() {
               onClick={() => {
                 const payload = {
                   contractNumber: form.getValues("contractNumber"),
-                  customer: currentCustomer?.id || 0,
-                  contractType: "abc",
-                  createdBy: user?.id || 0,
-                  signersCount: parseInt(form.getValues("signerCount")),
+                  customerId: currentCustomer?.id || 0,
+                  contractType: "purchase",
+                  createdById: user?.id || 0,
+                  signers: JSON.stringify(
+                    selectedSigners.map((signer, idx) => ({
+                      userId: signer?.id,
+                      order: idx + 1,
+                    }))
+                  ),
+                  approvalTemplateId: parseInt(form.getValues("approvalFlow")),
                   note: form.getValues("notes"),
+                  file: pdfFile,
                 }
 
                 console.log("payload", payload)
 
-                addContract({
-                  ...payload,
-                  file: pdfFile,
-                })
+                addContract(payload as any)
               }}
             >
               Lưu hợp đồng
@@ -423,6 +505,214 @@ export default function ContractForm() {
                           <SelectItem value="3">3 người</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="approvalFlow"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">
+                        Luồng duyệt và ký *
+                      </FormLabel>
+                      <Dialog
+                        open={openFlowDialog}
+                        onOpenChange={setOpenFlowDialog}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between bg-white hover:bg-gray-50 border-gray-200 text-gray-700"
+                            type="button"
+                          >
+                            <span className="text-gray-600">
+                              {field.value
+                                ? approvalFlows.find(
+                                    (flow) => flow.id.toString() === field.value
+                                  )?.name
+                                : "Chọn luồng duyệt và ký"}
+                            </span>
+                            <Search className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[800px] p-6 bg-white">
+                          <DialogHeader className="border-b border-gray-200 pb-4">
+                            <DialogTitle className="text-xl font-semibold text-gray-900">
+                              Chọn luồng duyệt và ký
+                            </DialogTitle>
+                          </DialogHeader>
+
+                          <div className="py-4 space-y-6">
+                            <div>
+                              <Label className="text-sm font-medium text-gray-700">
+                                Luồng duyệt
+                              </Label>
+                              <Command className="border border-gray-200 rounded-md mt-2 bg-white">
+                                <CommandInput
+                                  placeholder="Tìm kiếm luồng duyệt..."
+                                  value={searchFlowTerm}
+                                  onValueChange={setSearchFlowTerm}
+                                  className="border-none focus:ring-0 text-gray-700"
+                                />
+                                <CommandEmpty className="py-4 text-sm text-gray-500 text-center">
+                                  {isLoadingFlows
+                                    ? "Đang tải..."
+                                    : "Không tìm thấy luồng duyệt"}
+                                </CommandEmpty>
+                                <CommandList>
+                                  <CommandGroup
+                                    heading="Danh sách luồng duyệt"
+                                    className="text-sm text-gray-500"
+                                  >
+                                    {approvalFlows?.map((flow) => (
+                                      <CommandItem
+                                        key={flow.id}
+                                        value={flow.name}
+                                        className="hover:bg-gray-50 cursor-pointer py-3 px-4"
+                                        onSelect={() => {
+                                          form.setValue(
+                                            "approvalFlow",
+                                            flow.id.toString()
+                                          )
+                                        }}
+                                      >
+                                        <div className="flex flex-col gap-1">
+                                          <span className="font-medium text-gray-700">
+                                            {flow.name}
+                                          </span>
+                                        </div>
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </div>
+
+                            <div className="space-y-4">
+                              <Label className="text-sm font-medium">
+                                Danh sách người ký
+                              </Label>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-between bg-white hover:bg-gray-50 border-gray-200"
+                                  >
+                                    Thêm người ký
+                                    <Plus className="ml-2 h-4 w-4 shrink-0 text-gray-500" />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[400px] p-0 shadow-lg border border-gray-200">
+                                  <Command>
+                                    <CommandInput
+                                      placeholder="Tìm kiếm người ký..."
+                                      value={searchSignerTerm}
+                                      onValueChange={setSearchSignerTerm}
+                                      className="border-none focus:ring-0"
+                                    />
+                                    <CommandEmpty className="py-4 text-sm text-gray-500 text-center">
+                                      {isLoadingSigners
+                                        ? "Đang tải..."
+                                        : "Không tìm thấy người ký"}
+                                    </CommandEmpty>
+                                    <CommandList>
+                                      <CommandGroup
+                                        heading="Danh sách người ký"
+                                        className="text-sm text-gray-700"
+                                      >
+                                        {potentialSigners
+                                          ?.filter(
+                                            (user) =>
+                                              !selectedSigners.some(
+                                                (selected) =>
+                                                  selected.id === user.id
+                                              )
+                                          )
+                                          .map((user: User) => (
+                                            <CommandItem
+                                              key={user.id}
+                                              value={user.fullName}
+                                              className="hover:bg-gray-50 cursor-pointer"
+                                              onSelect={() => {
+                                                setSelectedSigners((prev) => [
+                                                  ...prev,
+                                                  user,
+                                                ])
+                                              }}
+                                            >
+                                              {user.fullName}
+                                            </CommandItem>
+                                          ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+
+                              <div className="space-y-2">
+                                {selectedSigners.map((signer, index) => (
+                                  <div
+                                    key={signer.id}
+                                    className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-100"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-sm font-medium text-gray-700">
+                                        Người ký {index + 1}:
+                                      </span>
+                                      <span className="text-sm text-gray-600">
+                                        {signer.fullName}
+                                      </span>
+                                    </div>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        setSelectedSigners((prev) =>
+                                          prev.filter((s) => s.id !== signer.id)
+                                        )
+                                      }
+                                      className="hover:bg-gray-100 h-8 w-8 p-0"
+                                    >
+                                      <X className="h-4 w-4 text-gray-500" />
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          <DialogFooter className="border-t border-gray-200 pt-4 gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => setOpenFlowDialog(false)}
+                              className="bg-white border-gray-200 hover:bg-gray-50 text-gray-700"
+                            >
+                              Hủy
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                if (!form.getValues("approvalFlow")) {
+                                  alert("Vui lòng chọn luồng duyệt")
+                                  return
+                                }
+                                if (
+                                  selectedSigners.length !==
+                                  parseInt(form.getValues("signerCount"))
+                                ) {
+                                  alert("Vui lòng chọn đủ số lượng người ký")
+                                  return
+                                }
+                                setOpenFlowDialog(false)
+                              }}
+                            >
+                              Xác nhận
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                       <FormMessage />
                     </FormItem>
                   )}
