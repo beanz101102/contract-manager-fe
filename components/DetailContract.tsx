@@ -91,7 +91,7 @@ const DetailContract = ({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {listProcess.map((process: any, index) => (
+                    {listProcess?.map((process: any, index) => (
                       <TableRow key={`item-${index}`}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>
@@ -114,12 +114,13 @@ const DetailContract = ({
                             process?.signer?.department?.departmentName}
                         </TableCell>
                         <TableCell>
-                          {
-                            mapiContractStatus[
-                              (process?.status ??
-                                process?.status) as keyof typeof mapiContractStatus
-                            ]?.label
-                          }
+                          {process?.status === "pending"
+                            ? process?.approver
+                              ? "Chưa duyệt"
+                              : "Chưa ký"
+                            : mapiContractStatus[
+                                process?.status as keyof typeof mapiContractStatus
+                              ]?.label}
                         </TableCell>
                         <TableCell>
                           {dayjs(
