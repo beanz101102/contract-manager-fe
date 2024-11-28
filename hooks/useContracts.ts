@@ -210,6 +210,13 @@ export const useContracts = () => {
         const response = await api.post("/api/contract/approve", payload)
         return response.data
       },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["contracts"] })
+        toast.success("Duyệt hợp đồng thành công")
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
     })
   }
 
