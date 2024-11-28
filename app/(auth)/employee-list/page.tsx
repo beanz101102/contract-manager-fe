@@ -52,8 +52,6 @@ export default function EmployeeList() {
     setPage(1)
   })
 
-  console.log("isLoading", isLoading)
-
   const [listUsersEmployees, setListUsersEmployees] = useAtom(
     listUsersEmployeesAtom
   )

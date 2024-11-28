@@ -71,7 +71,11 @@ export default function ContractApproval() {
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedEmployees(
-        contractList?.map((contract, index) => contract?.id) || []
+        contractList
+          ?.filter(
+            (contract) => !contract.approvedUserIds.includes(user?.id || 0)
+          )
+          .map((contract) => contract.id) || []
       )
     } else {
       setSelectedEmployees([])
@@ -137,7 +141,13 @@ export default function ContractApproval() {
               <TableRow className="hover:bg-gray-50 bg-gray-100">
                 <TableHead className="w-[50px]">
                   <Checkbox
-                    checked={selectedEmployees.length === contracts?.length}
+                    checked={
+                      selectedEmployees.length ===
+                      contractList?.filter(
+                        (contract) =>
+                          !contract.approvedUserIds.includes(user?.id || 0)
+                      ).length
+                    }
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
@@ -196,6 +206,9 @@ export default function ContractApproval() {
                       <Checkbox
                         checked={selectedEmployees.includes(contract.id)}
                         onCheckedChange={() => handleSelectOne(contract.id)}
+                        disabled={contract.approvedUserIds.includes(
+                          user?.id || 0
+                        )}
                       />
                     </TableCell>
                     <TableCell className="text-gray-700 text-base">
@@ -212,13 +225,17 @@ export default function ContractApproval() {
                         className="px-3 py-1 rounded-full text-sm font-medium"
                         style={{
                           ...mapiContractStatus[
-                            contract.status as keyof typeof mapiContractStatus
+                            contract.approvedUserIds.includes(user?.id || 0)
+                              ? "approved_by_me"
+                              : "waiting_for_approval"
                           ].color,
                         }}
                       >
                         {
                           mapiContractStatus[
-                            contract.status as keyof typeof mapiContractStatus
+                            contract.approvedUserIds.includes(user?.id || 0)
+                              ? "approved_by_me"
+                              : "waiting_for_approval"
                           ].label
                         }
                       </span>

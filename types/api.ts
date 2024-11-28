@@ -277,4 +277,20 @@ export const mapiContractStatus = {
       color: "#92400E",
     },
   },
+  approved_by_me: {
+    label: "Đã duyệt",
+    value: "approved_by_me",
+    color: {
+      backgroundColor: "#DCFCE7",
+      color: "#166534",
+    },
+  },
+  waiting_for_approval: {
+    label: "Chờ duyệt",
+    value: "waiting_for_approval",
+    color: {
+      backgroundColor: "#FEF3C7",
+      color: "#92400E",
+    },
+  },
 }
