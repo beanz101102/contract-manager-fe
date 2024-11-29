@@ -1,37 +1,40 @@
-import React from 'react';
-import { Menu, Dropdown, Icon } from 'semantic-ui-react';
+import React from "react"
+import { Button, Dropdown, Icon, Menu } from "semantic-ui-react"
 
-interface Props {
-  openHelp: () => void;
-  uploadNewPdf: () => void;
-  addText: () => void;
-  addImage: () => void;
-  addDrawing: () => void;
-  isPdfLoaded: boolean;
-  savingPdfStatus: boolean;
-  savePdf: () => void;
+interface MenuBarProps {
+  openHelp: () => void
+  saveToServer: () => void
+  downloadPdf: () => void
+  addText: () => void
+  addImage: () => void
+  addDrawing: () => void
+  savingPdfStatus: boolean
+  uploadNewPdf: () => void
+  isPdfLoaded: boolean
 }
 
-export const MenuBar: React.FC<Props> = ({
+export const MenuBar: React.FC<MenuBarProps> = ({
   openHelp,
-  uploadNewPdf,
-  addDrawing,
+  saveToServer,
+  downloadPdf,
   addText,
   addImage,
-  isPdfLoaded,
+  addDrawing,
   savingPdfStatus,
-  savePdf,
+  uploadNewPdf,
+  isPdfLoaded,
 }) => (
   <Menu pointing>
     <Menu.Item header>PDF Editor</Menu.Item>
     <Menu.Menu position="right">
       {isPdfLoaded && (
         <>
-          <Dropdown 
-            data-testid='edit-menu-dropdown'
-            item 
-            closeOnBlur 
-            icon="edit outline" simple
+          <Dropdown
+            data-testid="edit-menu-dropdown"
+            item
+            closeOnBlur
+            icon="edit outline"
+            simple
           >
             <Dropdown.Menu>
               <Dropdown.Item onClick={addText}>Add Text</Dropdown.Item>
@@ -39,16 +42,17 @@ export const MenuBar: React.FC<Props> = ({
               <Dropdown.Item onClick={addDrawing}>Add Drawing</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
+          <Button onClick={saveToServer} disabled={savingPdfStatus}>
+            Save to Server
+          </Button>
+
+          <Button onClick={downloadPdf} disabled={savingPdfStatus}>
+            Download PDF
+          </Button>
           <Menu.Item
-            data-testid='save-menu-item'
-            name={savingPdfStatus ? 'Saving...' : 'Save'}
-            disabled={savingPdfStatus}
-            onClick={savePdf}
-          />
-          <Menu.Item
-            data-testid='upload-menu-item' 
-            name="Upload New" 
-            onClick={uploadNewPdf} 
+            data-testid="upload-menu-item"
+            name="Upload New"
+            onClick={uploadNewPdf}
           />
         </>
       )}
@@ -57,4 +61,4 @@ export const MenuBar: React.FC<Props> = ({
       </Menu.Item>
     </Menu.Menu>
   </Menu>
-);
+)

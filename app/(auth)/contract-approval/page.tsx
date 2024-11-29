@@ -44,6 +44,7 @@ export default function ContractApproval() {
   const { useAllContracts } = useContracts()
   const [page, setPage] = useState(1)
   const { user } = useAuth()
+  const [contractId, setContractId] = useState(0)
   const { data: contracts, isLoading } = useAllContracts(
     searchTerm,
     page,
@@ -96,189 +97,204 @@ export default function ContractApproval() {
   const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
 
   return (
-    <div className="bg-white rounded-lg p-6">
-      <h1 className="text-2xl font-bold mb-4">Duyệt hợp đồng</h1>
-      <div className="flex justify-between mb-4">
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="Mã/ Số hợp đồng"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-white rounded"
-            style={{
-              border: "1px solid #D9D9D9",
-            }}
-          />
+    <>
+      <div className="bg-white rounded-lg p-6">
+        <h1 className="text-2xl font-bold mb-4">Duyệt hợp đồng</h1>
+        <div className="flex justify-between mb-4">
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Mã/ Số hợp đồng"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white rounded"
+              style={{
+                border: "1px solid #D9D9D9",
+              }}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button
+              className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
+              onClick={() => setIsOpen(true)}
+            >
+              <Check className="w-4 h-4" /> Duyệt hợp đồng
+            </Button>
+            <Button
+              className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
+              onClick={() => setIsOpenEditRequest(true)}
+            >
+              <Pencil className="w-4 h-4" /> Yêu cầu sửa
+            </Button>
+            <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+              <Download className="w-4 h-4" /> Tải
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button
-            className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
-            onClick={() => setIsOpen(true)}
+        <div className="overflow-x-auto">
+          <InfiniteScroll
+            dataLength={contractList?.length || 0}
+            next={() => setPage(page + 1)}
+            hasMore={hasMore}
+            loader={null}
+            className="min-w-full"
           >
-            <Check className="w-4 h-4" /> Duyệt hợp đồng
-          </Button>
-          <Button
-            className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
-            onClick={() => setIsOpenEditRequest(true)}
-          >
-            <Pencil className="w-4 h-4" /> Yêu cầu sửa
-          </Button>
-          <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
-            <Download className="w-4 h-4" /> Tải
-          </Button>
-        </div>
-      </div>
-      <div className="overflow-x-auto">
-        <InfiniteScroll
-          dataLength={contractList?.length || 0}
-          next={() => setPage(page + 1)}
-          hasMore={hasMore}
-          loader={null}
-          className="min-w-full"
-        >
-          <Table className="min-w-[1200px] w-full">
-            <TableHeader>
-              <TableRow className="hover:bg-gray-50 bg-gray-100">
-                <TableHead className="w-[50px]">
-                  <Checkbox
-                    checked={
-                      selectedEmployees.length ===
-                      contractList?.filter(
-                        (contract) =>
-                          !contract.approvedUserIds.includes(user?.id || 0)
-                      ).length
-                    }
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
-                <TableHead className="w-[60px] text-gray-700 font-semibold">
-                  STT
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Số hợp đồng
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Ngày tạo hợp đồng
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Phòng ban
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Mã khách
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Thao tác
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contractList?.length === 0 ? (
-                <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={8} className="text-center py-16">
-                    <div className="flex flex-col items-center gap-3">
-                      {isLoading ? (
-                        <Loading />
-                      ) : (
-                        <>
-                          <NextImage
-                            src="/empty-state.png"
-                            alt="No data"
-                            className="w-[200px] h-[200px] opacity-50"
-                          />
-                          <p className="text-gray-500 text-lg">
-                            Không có dữ liệu hợp đồng
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                contractList?.map((contract, index) => (
-                  <TableRow
-                    key={contract.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <DetailContract
-                      id={contract.id}
-                      isOpen={isOpenContractInfo}
-                      onOpenChange={setIsOpenContractInfo}
+            <Table className="min-w-[1200px] w-full">
+              <TableHeader>
+                <TableRow className="hover:bg-gray-50 bg-gray-100">
+                  <TableHead className="w-[50px]">
+                    <Checkbox
+                      checked={
+                        selectedEmployees.length ===
+                        contractList?.filter(
+                          (contract) =>
+                            !contract.approvedUserIds.includes(user?.id || 0)
+                        ).length
+                      }
+                      onCheckedChange={handleSelectAll}
                     />
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedEmployees.includes(contract.id)}
-                        onCheckedChange={() => handleSelectOne(contract.id)}
-                        disabled={contract.approvedUserIds.includes(
-                          user?.id || 0
+                  </TableHead>
+                  <TableHead className="w-[60px] text-gray-700 font-semibold">
+                    STT
+                  </TableHead>
+                  <TableHead className="text-gray-700 font-semibold">
+                    Số hợp đồng
+                  </TableHead>
+                  <TableHead className="text-gray-700 font-semibold">
+                    Ngày tạo hợp đồng
+                  </TableHead>
+                  <TableHead className="text-gray-700 font-semibold">
+                    Trạng thái
+                  </TableHead>
+                  <TableHead className="text-gray-700 font-semibold">
+                    Phòng ban
+                  </TableHead>
+                  <TableHead className="text-gray-700 font-semibold">
+                    Mã khách
+                  </TableHead>
+                  <TableHead className="text-gray-700 font-semibold">
+                    Thao tác
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {contractList?.length === 0 ? (
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={8} className="text-center py-16">
+                      <div className="flex flex-col items-center gap-3">
+                        {isLoading ? (
+                          <Loading />
+                        ) : (
+                          <>
+                            <NextImage
+                              src="/empty-state.png"
+                              alt="No data"
+                              className="w-[200px] h-[200px] opacity-50"
+                            />
+                            <p className="text-gray-500 text-lg">
+                              Không có dữ liệu hợp đồng
+                            </p>
+                          </>
                         )}
-                      />
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {index + 1}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {contract.contractNumber}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {dayjs(contract.createdAt).format("DD/MM/YYYY")}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className="px-3 py-1 rounded-full text-sm font-medium"
-                        style={{
-                          ...mapiContractStatus[
-                            contract.approvedUserIds.includes(user?.id || 0)
-                              ? "approved_by_me"
-                              : "waiting_for_approval"
-                          ].color,
-                        }}
-                      >
-                        {
-                          mapiContractStatus[
-                            contract.approvedUserIds.includes(user?.id || 0)
-                              ? "approved_by_me"
-                              : "waiting_for_approval"
-                          ].label
-                        }
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {contract.createdBy?.department?.departmentName}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {contract.customer.code}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-3 items-center">
-                        <NextImage
-                          src="/eye.png"
-                          alt="eye"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        />
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </InfiniteScroll>
+                ) : (
+                  contractList?.map((contract, index) => (
+                    <TableRow
+                      key={contract.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <DetailContract
+                        id={contract.id}
+                        isOpen={isOpenContractInfo}
+                        onOpenChange={setIsOpenContractInfo}
+                      />
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedEmployees.includes(contract.id)}
+                          onCheckedChange={() => handleSelectOne(contract.id)}
+                          disabled={contract.approvedUserIds.includes(
+                            user?.id || 0
+                          )}
+                        />
+                      </TableCell>
+                      <TableCell className="text-gray-700 text-base">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="text-gray-700 text-base">
+                        {contract.contractNumber}
+                      </TableCell>
+                      <TableCell className="text-gray-700 text-base">
+                        {dayjs(contract.createdAt).format("DD/MM/YYYY")}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className="px-3 py-1 rounded-full text-sm font-medium"
+                          style={{
+                            ...mapiContractStatus[
+                              contract.approvedUserIds.includes(user?.id || 0)
+                                ? "approved_by_me"
+                                : "waiting_for_approval"
+                            ].color,
+                          }}
+                        >
+                          {
+                            mapiContractStatus[
+                              contract.approvedUserIds.includes(user?.id || 0)
+                                ? "approved_by_me"
+                                : "waiting_for_approval"
+                            ].label
+                          }
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-gray-700 text-base">
+                        {contract.createdBy?.department?.departmentName}
+                      </TableCell>
+                      <TableCell className="text-gray-700 text-base">
+                        {contract.customer.code}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-3 items-center">
+                          <div
+                            onClick={() => {
+                              setContractId(contract.id)
+                              setIsOpenContractInfo(true)
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <NextImage
+                              src="/eye.png"
+                              alt="eye"
+                              className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                            />
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </InfiniteScroll>
+        </div>
+        <ModalConfirm
+          isOpen={isOpen}
+          onOpenChange={setIsOpen}
+          selectedEmployees={selectedEmployees}
+        />
+        <EditRequestModal
+          isOpen={isOpenEditRequest}
+          onOpenChange={setIsOpenEditRequest}
+          selectedEmployees={selectedEmployees}
+        />
       </div>
-      <ModalConfirm
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-        selectedEmployees={selectedEmployees}
+      <DetailContract
+        isOpen={isOpenContractInfo}
+        onOpenChange={setIsOpenContractInfo}
+        id={contractId}
       />
-      <EditRequestModal
-        isOpen={isOpenEditRequest}
-        onOpenChange={setIsOpenEditRequest}
-        selectedEmployees={selectedEmployees}
-      />
-    </div>
+    </>
   )
 }
 
@@ -480,86 +496,6 @@ const EditRequestModal = ({
             Gửi yêu cầu
           </Button>
         </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-const ContractInfoModal = ({
-  isOpen,
-  onOpenChange,
-}: {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-}) => {
-  const [activeTab, setActiveTab] = useState("info")
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] p-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full">
-            <TabsTrigger value="info" className="flex-1">
-              Thông tin hợp đồng
-            </TabsTrigger>
-            <TabsTrigger value="view" className="flex-1">
-              Xem hợp đồng
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="info" className="p-4">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold">Thông tin chung</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <p>Ngày tạo: 22/05/2024</p>
-                  <p>Người tạo: Nguyễn Trúc Văn</p>
-                  <p>Trạng thái: Đã hoàn thành</p>
-                  <p>Diễn giải: Hợp đồng mua nhà chung cư</p>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold">Thông tin khác</h3>
-                <div>
-                  <p>Nhận xét:</p>
-                  <Button variant="outline" className="mt-2">
-                    Tệp đính kèm
-                  </Button>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-semibold">Quá trình xử lý</h3>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>STT</TableHead>
-                      <TableHead>Thao tác</TableHead>
-                      <TableHead>Người thực hiện</TableHead>
-                      <TableHead>Chức vụ</TableHead>
-                      <TableHead>Phòng ban</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                      <TableHead>Ngày thực hiện</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>{/* Add table rows here */}</TableBody>
-                </Table>
-              </div>
-            </div>
-          </TabsContent>
-          <TabsContent value="view" className="p-4">
-            <div className="bg-gray-100 p-4 h-[500px] flex items-center justify-center">
-              Contract PDF Viewer Placeholder
-            </div>
-          </TabsContent>
-        </Tabs>
-        <div className="p-4 flex justify-end">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="bg-gray-100 hover:bg-gray-200 text-black"
-          >
-            Đóng
-          </Button>
-        </div>
       </DialogContent>
     </Dialog>
   )

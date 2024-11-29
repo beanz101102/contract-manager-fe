@@ -23,7 +23,7 @@ export const useApprovalFlows = () => {
     })
   }
 
-  const useAddApprovalFlow = () => {
+  const useAddApprovalFlow = (onSuccess?: () => void) => {
     return useMutation({
       mutationFn: async (payload: Omit<ApprovalFlow, "approvalStatus">) => {
         const response = await api.post("/api/approval_flow/add", payload)
@@ -32,6 +32,7 @@ export const useApprovalFlows = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["approval-flows"] })
         toast.success("Thêm luồng duyệt thành công")
+        onSuccess && onSuccess()
       },
       onError: (error: any) => {
         toast.error("Lỗi khi thêm luồng duyệt: " + error.message)

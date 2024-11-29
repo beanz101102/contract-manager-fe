@@ -1,25 +1,26 @@
-import React, { RefObject } from 'react';
-import { Dimmer } from 'semantic-ui-react';
-import { Div } from '../ui/components/Div';
-import { ConfirmContent } from './ConfirmContent';
+import React, { RefObject } from "react"
+import { Dimmer } from "semantic-ui-react"
 
-const ADJUSTERS_DIMENSIONS = 20;
+import { Div } from "../ui/components/Div"
+import { ConfirmContent } from "./ConfirmContent"
+
+const ADJUSTERS_DIMENSIONS = 20
 
 interface Props {
-  dimmerActive: boolean;
-  cancelDelete: () => void;
-  deleteImage: () => void;
-  width: number;
-  height: number;
-  canvasRef: RefObject<HTMLCanvasElement>;
-  positionTop: number;
-  positionLeft: number;
-  onClick: DragEventListener<HTMLDivElement>;
-  handleMouseOut: DragEventListener<HTMLDivElement>;
-  handleMouseDown: DragEventListener<HTMLDivElement>;
-  handleMouseMove: DragEventListener<HTMLDivElement>;
-  handleMouseUp: DragEventListener<HTMLDivElement>;
-  handleImageScale: DragEventListener<HTMLDivElement>;
+  dimmerActive: boolean
+  cancelDelete: () => void
+  deleteImage: () => void
+  width: number
+  height: number
+  canvasRef: RefObject<HTMLCanvasElement>
+  positionTop: number
+  positionLeft: number
+  onClick: DragEventListener<HTMLDivElement>
+  handleMouseOut: DragEventListener<HTMLDivElement>
+  handleMouseDown: DragEventListener<HTMLDivElement>
+  handleMouseMove: DragEventListener<HTMLDivElement>
+  handleMouseUp: DragEventListener<HTMLDivElement>
+  handleImageScale: DragEventListener<HTMLDivElement>
 }
 
 export const Image: React.FC<Props> = ({
@@ -46,23 +47,23 @@ export const Image: React.FC<Props> = ({
       onMouseOut={handleMouseOut}
       onDoubleClick={onClick}
       style={{
-        position: 'absolute',
+        position: "absolute",
         top: positionTop,
         left: positionLeft,
-        borderStyle: 'dashed',
+        borderStyle: "dashed",
         borderWidth: 1,
-        borderColor: 'grey',
+        borderColor: "grey",
         width: width + 2,
         height: height + 2,
-        cursor: 'move',
+        cursor: "move",
       }}
     >
       <Dimmer.Dimmable as={Div} size="medium" dimmed={dimmerActive}>
         <canvas
           ref={canvasRef}
           style={{
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
           }}
         />
         <Dimmer active={dimmerActive} onClickOutside={cancelDelete}>
@@ -79,14 +80,33 @@ export const Image: React.FC<Props> = ({
         onMouseUp={handleMouseUp}
         onMouseMove={handleImageScale}
         style={{
-          position: 'absolute',
-          cursor: 'nwse-resize',
+          position: "absolute",
+          cursor: "nwse-resize",
           top: -5,
           left: -5,
           width: ADJUSTERS_DIMENSIONS,
           height: ADJUSTERS_DIMENSIONS,
         }}
       />
+      <div
+        onClick={deleteImage}
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          cursor: "pointer",
+          backgroundColor: "red",
+          color: "white",
+          borderRadius: "50%",
+          width: 20,
+          height: 20,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        x
+      </div>
     </div>
-  );
-};
+  )
+}

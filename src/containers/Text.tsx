@@ -1,12 +1,14 @@
-import React, { useState, useRef } from 'react';
-import { Text as Component } from '../components/Text';
-import { getMovePosition } from '../utils/helpers';
-import { DragActions, TextMode } from '../entities';
+import React, { useRef, useState } from "react"
+
+import { Text as Component } from "../components/Text"
+import { DragActions, TextMode } from "../entities"
+import { getMovePosition } from "../utils/helpers"
 
 interface Props {
-  pageWidth: number;
-  pageHeight: number;
-  updateTextAttachment: (textObject: Partial<TextAttachment>) => void;
+  pageWidth: number
+  pageHeight: number
+  updateTextAttachment: (textObject: Partial<TextAttachment>) => void
+  removeText: () => void
 }
 
 export const Text = ({
@@ -21,19 +23,20 @@ export const Text = ({
   pageHeight,
   pageWidth,
   updateTextAttachment,
+  removeText,
 }: TextAttachment & Props) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [content, setContent] = useState(text || '');
-  const [mouseDown, setMouseDown] = useState(false);
-  const [positionTop, setPositionTop] = useState(y);
-  const [positionLeft, setPositionLeft] = useState(x);
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [content, setContent] = useState(text || "")
+  const [mouseDown, setMouseDown] = useState(false)
+  const [positionTop, setPositionTop] = useState(y)
+  const [positionLeft, setPositionLeft] = useState(x)
   const [operation, setOperation] = useState<DragActions>(
     DragActions.NO_MOVEMENT
-  );
-  const [textMode, setTextMode] = useState<TextMode>(TextMode.COMMAND);
+  )
+  const [textMode, setTextMode] = useState<TextMode>(TextMode.COMMAND)
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (mouseDown) {
       const { top, left } = getMovePosition(
@@ -45,30 +48,30 @@ export const Text = ({
         height,
         pageWidth,
         pageHeight
-      );
+      )
 
-      setPositionTop(top);
-      setPositionLeft(left);
+      setPositionTop(top)
+      setPositionLeft(left)
     }
-  };
+  }
 
   const handleMousedown = (event: React.MouseEvent<HTMLDivElement>) => {
     if (textMode !== TextMode.COMMAND) {
-      return;
+      return
     }
 
-    setMouseDown(true);
-    setOperation(DragActions.MOVE);
-  };
+    setMouseDown(true)
+    setOperation(DragActions.MOVE)
+  }
 
   const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (textMode !== TextMode.COMMAND) {
-      return;
+      return
     }
 
-    setMouseDown(false);
+    setMouseDown(false)
 
     if (operation === DragActions.MOVE) {
       const { top, left } = getMovePosition(
@@ -80,12 +83,12 @@ export const Text = ({
         height,
         pageWidth,
         pageHeight
-      );
+      )
 
       updateTextAttachment({
         x: left,
         y: top,
-      });
+      })
     }
 
     // if (operation === DragActions.SCALE) {
@@ -96,50 +99,50 @@ export const Text = ({
 
     // }
 
-    setOperation(DragActions.NO_MOVEMENT);
-  };
+    setOperation(DragActions.NO_MOVEMENT)
+  }
 
   const handleMouseOut = (event: React.MouseEvent<HTMLDivElement>) => {
     if (operation === DragActions.MOVE) {
-      handleMouseUp(event);
+      handleMouseUp(event)
     }
 
     if (textMode === TextMode.INSERT) {
-      setTextMode(TextMode.COMMAND);
-      prepareTextAndUpdate();
+      setTextMode(TextMode.COMMAND)
+      prepareTextAndUpdate()
     }
-  };
+  }
 
   const prepareTextAndUpdate = () => {
     // Deselect any selection when returning to command mode
-    document.getSelection()?.removeAllRanges();
+    document.getSelection()?.removeAllRanges()
 
-    const lines = [content];
+    const lines = [content]
     updateTextAttachment({
       lines,
       text: content,
-    });
-  };
+    })
+  }
 
   const toggleEditMode = () => {
-    const input = inputRef.current;
+    const input = inputRef.current
     const mode =
-      textMode === TextMode.COMMAND ? TextMode.INSERT : TextMode.COMMAND;
+      textMode === TextMode.COMMAND ? TextMode.INSERT : TextMode.COMMAND
 
-    setTextMode(mode);
+    setTextMode(mode)
 
     if (input && mode === TextMode.INSERT) {
-      input.focus();
-      input.select();
+      input.focus()
+      input.select()
     } else {
-      prepareTextAndUpdate();
+      prepareTextAndUpdate()
     }
-  };
+  }
 
   const onChangeText = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.currentTarget.value;
-    setContent(value);
-  };
+    const value = event.currentTarget.value
+    setContent(value)
+  }
 
   return (
     <Component
@@ -159,6 +162,7 @@ export const Text = ({
       handleMouseOut={handleMouseOut}
       handleMouseDown={handleMousedown}
       handleMouseMove={handleMouseMove}
+      removeText={removeText}
     />
-  );
-};
+  )
+}

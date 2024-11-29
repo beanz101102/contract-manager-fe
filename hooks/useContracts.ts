@@ -63,9 +63,12 @@ export const useContracts = () => {
     return useQuery({
       queryKey: ["contract", id],
       queryFn: async () => {
-        const response = await api.post<DetailContract>("/api/contract/detail", {
-          id,
-        })
+        const response = await api.post<DetailContract>(
+          "/api/contract/detail",
+          {
+            id,
+          }
+        )
         return response.data
       },
       enabled: !!id,
@@ -223,10 +226,20 @@ export const useContracts = () => {
   const useSignContract = () => {
     return useMutation({
       mutationFn: async (payload: {
-        contracts: number[]
+        contractId: number
         signerId: number
+        file: File
       }) => {
-        const response = await api.post("/api/contract/sign", payload)
+        const formData = new FormData()
+        formData.append("file", payload.file)
+        formData.append("contractId", payload.contractId.toString())
+        formData.append("signerId", payload.signerId.toString())
+
+        const response = await api.post("/api/contract/sign", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         return response.data
       },
       onSuccess: () => {

@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ChevronLeft, Plus, Search, Upload, X } from "lucide-react"
 import { useForm } from "react-hook-form"
-import { Document, Page } from "react-pdf"
 import * as z from "zod"
 
 import { User } from "@/types/auth"
@@ -46,21 +45,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 
 // Create new plugin instance
@@ -75,7 +59,6 @@ const formSchema = z.object({
   idNumber: z.string().min(1, "Vui lòng nhập số CCCD"),
   email: z.string().email("Email không hợp lệ"),
   phone: z.string().min(10, "Số điện thoại không hợp lệ"),
-  signerCount: z.string().min(1, "Vui lòng chọn số lượng người ký"),
   notes: z.string(),
   approvalFlow: z.string().min(1, "Vui lòng chọn luồng duyệt"),
 })
@@ -144,7 +127,6 @@ export default function ContractForm() {
       idNumber: "",
       email: "",
       phone: "",
-      signerCount: "",
       notes: "",
       approvalFlow: "",
     },
@@ -486,32 +468,6 @@ export default function ContractForm() {
 
                 <FormField
                   control={form.control}
-                  name="signerCount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Số lượng người ký *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="bg-white">
-                            <SelectValue placeholder="Chọn số lượng người ký" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">1 người</SelectItem>
-                          <SelectItem value="2">2 người</SelectItem>
-                          <SelectItem value="3">3 người</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="approvalFlow"
                   render={({ field }) => (
                     <FormItem>
@@ -698,13 +654,7 @@ export default function ContractForm() {
                                   alert("Vui lòng chọn luồng duyệt")
                                   return
                                 }
-                                if (
-                                  selectedSigners.length !==
-                                  parseInt(form.getValues("signerCount"))
-                                ) {
-                                  alert("Vui lòng chọn đủ số lượng người ký")
-                                  return
-                                }
+
                                 setOpenFlowDialog(false)
                               }}
                             >

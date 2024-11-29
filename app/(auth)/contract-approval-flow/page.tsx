@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { atom, useAtom } from "jotai"
 import { Eye, Filter, Pencil, Plus, Search, X } from "lucide-react"
 
-import { ApprovalFlowsList } from "@/types/api"
+import { ApprovalFlow, ApprovalFlowStep, ApprovalFlowsList } from "@/types/api"
 import { User } from "@/types/auth"
 import { useApprovalFlows } from "@/hooks/useApprovalFlows"
 import { useUsers } from "@/hooks/useUsers"
@@ -219,6 +219,7 @@ const ApprovalWorkflowModal = ({
     [key: number]: boolean
   }>({})
   const [searchTerm, setSearchTerm] = useState("")
+  const [name, setName] = useState("")
 
   const [approvalSteps, setApprovalSteps] = useState<
     Array<{
@@ -263,6 +264,22 @@ const ApprovalWorkflowModal = ({
     })
   }
 
+  const { useAddApprovalFlow } = useApprovalFlows()
+  const { mutate: addApprovalFlow } = useAddApprovalFlow(() => {
+    onOpenChange(false)
+  })
+
+  const handleSaveApprovalFlow = () => {
+    addApprovalFlow({
+      name,
+      steps: approvalSteps.map((step) => ({
+        departmentId: step.approver?.department?.id,
+        approverId: step.approver?.id,
+        stepOrder: step.step,
+      })) as ApprovalFlowStep[],
+    })
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] p-6">
@@ -285,6 +302,8 @@ const ApprovalWorkflowModal = ({
                 id="workflow-name"
                 placeholder="Nhập tên luồng duyệt"
                 className="w-full bg-white"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </div>
           </div>
@@ -319,45 +338,9 @@ const ApprovalWorkflowModal = ({
                     <TableCell className="text-center font-medium">
                       {step.step}
                     </TableCell>
+                    <TableCell>Trực tiếp</TableCell>
                     <TableCell>
-                      <Select
-                        value={step.approvalType}
-                        onValueChange={(value) => {
-                          setApprovalSteps((prev) =>
-                            prev.map((s, i) =>
-                              i === index ? { ...s, approvalType: value } : s
-                            )
-                          )
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn loại duyệt" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="approve">Phê duyệt</SelectItem>
-                          <SelectItem value="review">Xem xét</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Select
-                        value={step.department}
-                        onValueChange={(value) => {
-                          setApprovalSteps((prev) =>
-                            prev.map((s, i) =>
-                              i === index ? { ...s, department: value } : s
-                            )
-                          )
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn phòng ban" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="legal">Pháp chế</SelectItem>
-                          <SelectItem value="hr">Nhân sự</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {step.approver?.department?.departmentName || "--"}
                     </TableCell>
                     <TableCell>
                       <Popover
@@ -441,6 +424,7 @@ const ApprovalWorkflowModal = ({
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"
+              onClick={handleSaveApprovalFlow}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
               Lưu lại

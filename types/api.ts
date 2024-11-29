@@ -35,7 +35,6 @@ export interface AddUserPayload extends UserDetail {
 export interface UpdateUserPayload extends UserDetail {}
 
 export interface Department {
-  id: number
   departmentName: string
   description: string
 }
@@ -53,15 +52,15 @@ export interface UserSignature {
   signatureUrl: string
   createdAt: string
 }
+export type ApprovalFlowStep = {
+  departmentId: number
+  approverId: number
+  stepOrder: number
+}
 
 export interface ApprovalFlow {
-  contract: number
-  approver: number
-  action: string
-  actionSource: "customer" | "internal"
-  approvalStatus?: "pending" | "approved" | "rejected"
-  comments: string
-  stepNumber: number
+  name: string
+  steps: ApprovalFlowStep[]
 }
 
 export interface ContractSignature {
@@ -374,4 +373,12 @@ export const mappingRole = {
   admin: "Admin",
   employee: "Nhân viên",
   customer: "Khách hàng",
+}
+
+export interface DepartmentList {
+  id: number
+  departmentName: string
+  description: string
+  createdAt: string
+  updatedAt: string
 }

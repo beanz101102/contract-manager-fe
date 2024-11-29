@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import DetailContract from "@/components/DetailContract"
 
 const contractListAtom = atom<ContractList[]>([])
 
@@ -32,6 +33,8 @@ export default function ContractSearch() {
   const { useAllContracts, useBulkDeleteContracts } = useContracts()
   const [page, setPage] = useState(1)
   const { user } = useAuth()
+  const [isOpen, setIsOpen] = useState(false)
+  const [contractId, setContractId] = useState(0)
   const { data: contracts, isLoading } = useAllContracts(
     searchTerm,
     page,
@@ -220,26 +223,18 @@ export default function ContractSearch() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-3 items-center">
-                        <NextImage
-                          src="/eye.png"
-                          alt="eye"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        />
-                        {/* <NextImage
-                          src="/mail.png"
-                          alt="mail"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        /> */}
-                        <NextImage
-                          src="/edit.png"
-                          alt="edit"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        />
-                        {/* <NextImage
-                          src="/setting.png"
-                          alt="setting"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        /> */}
+                        <div
+                          onClick={() => {
+                            setContractId(contract.id)
+                            setIsOpen(true)
+                          }}
+                        >
+                          <NextImage
+                            src="/eye.png"
+                            alt="eye"
+                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          />
+                        </div>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -249,6 +244,11 @@ export default function ContractSearch() {
           </Table>
         </InfiniteScroll>
       </div>
+      <DetailContract
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        id={contractId}
+      />
     </div>
   )
 }

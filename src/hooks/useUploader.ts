@@ -1,38 +1,55 @@
-import React, { useState, createRef } from 'react';
-import { readAsPDF, readAsDataURL, readAsImage } from '../utils/asyncReader';
-import { ggID } from '../utils/helpers';
-import { Pdf } from './usePdf';
-import { AttachmentTypes } from '../entities';
+import React, { createRef, useState } from "react"
 
-type ActionEvent<T> = React.TouchEvent<T> | React.MouseEvent<T>;
+import { AttachmentTypes } from "../entities"
+import { readAsDataURL, readAsImage, readAsPDF } from "../utils/asyncReader"
+import { ggID } from "../utils/helpers"
+import { Pdf } from "./usePdf"
+
+type ActionEvent<T> = React.TouchEvent<T> | React.MouseEvent<T>
 
 export enum UploadTypes {
-  PDF = 'pdf',
-  IMAGE = 'image',
+  PDF = "pdf",
+  IMAGE = "image",
 }
 
 const handlers = {
-  pdf: async (file: File) => {
+  pdf: async (file: File | string) => {
     try {
-      const pdf = await readAsPDF(file);
+      if (typeof file === "string") {
+        const response = await fetch(file)
+        const blob = await response.blob()
+        const pdfFile = new File([blob], "document.pdf", {
+          type: "application/pdf",
+        })
+        const pdf = await readAsPDF(pdfFile)
+        return {
+          file: pdfFile,
+          name: "document.pdf",
+          pages: Array(pdf.numPages)
+            .fill(0)
+            .map((_, index) => pdf.getPage(index + 1)),
+        } as Pdf
+      }
+
+      const pdf = await readAsPDF(file)
       return {
         file,
         name: file.name,
         pages: Array(pdf.numPages)
           .fill(0)
           .map((_, index) => pdf.getPage(index + 1)),
-      } as Pdf;
+      } as Pdf
     } catch (error) {
-      console.log('Failed to load pdf', error);
-      throw new Error('Failed to load PDF');
+      console.log("Failed to load pdf", error)
+      throw new Error("Failed to load PDF")
     }
   },
   image: async (file: File) => {
     try {
-      const url = await readAsDataURL(file);
-      const img = await readAsImage(url as string);
-      const id = ggID();
-      const { width, height } = img;
+      const url = await readAsDataURL(file)
+      const img = await readAsImage(url as string)
+      const id = ggID()
+      const { width, height } = img
 
       const imageAttachemnt: ImageAttachment = {
         id,
@@ -43,14 +60,24 @@ const handlers = {
         y: 0,
         img,
         file,
-      };
-      return imageAttachemnt;
+      }
+      return imageAttachemnt
     } catch (error) {
-      console.log('Failed to load image', error);
-      throw new Error('Failed to load image');
+      console.log("Failed to load image", error)
+      throw new Error("Failed to load image")
     }
   },
-};
+}
+
+const loadPdfFromUrl = async (url: string) => {
+  try {
+    const result = await handlers.pdf(url)
+    return result
+  } catch (error) {
+    console.log("Failed to load PDF from URL", error)
+    throw error
+  }
+}
 
 /**
  * @function useUploader
@@ -65,56 +92,56 @@ export const useUploader = ({
   afterUploadPdf,
   afterUploadAttachment,
 }: {
-  use: UploadTypes;
-  afterUploadPdf?: (upload: Pdf) => void;
-  afterUploadAttachment?: (upload: Attachment) => void;
+  use: UploadTypes
+  afterUploadPdf?: (upload: Pdf) => void
+  afterUploadAttachment?: (upload: Attachment) => void
 }) => {
-  const [isUploading, setIsUploading] = useState(false);
-  const inputRef = createRef<HTMLInputElement>();
+  const [isUploading, setIsUploading] = useState(false)
+  const inputRef = createRef<HTMLInputElement>()
 
   const onClick = (event: ActionEvent<HTMLInputElement>) => {
-    event.currentTarget.value = '';
-  };
+    event.currentTarget.value = ""
+  }
 
   const handleClick = () => {
-    const input = inputRef.current;
+    const input = inputRef.current
 
     if (input) {
-      setIsUploading(true);
-      input.click();
+      setIsUploading(true)
+      input.click()
     }
-  };
+  }
 
   const upload = async (
     event: React.ChangeEvent<HTMLInputElement> & { dataTransfer?: DataTransfer }
   ) => {
     if (!isUploading) {
-      return;
+      return
     }
 
     const files: FileList | undefined =
       event.currentTarget.files ||
-      (event.dataTransfer && event.dataTransfer.files);
+      (event.dataTransfer && event.dataTransfer.files)
     if (!files) {
-      setIsUploading(false);
-      return;
+      setIsUploading(false)
+      return
     }
 
-    const file = files[0];
+    const file = files[0]
 
-    const result = await handlers[use](file);
+    const result = await handlers[use](file)
 
     if (use === UploadTypes.PDF && afterUploadPdf) {
-      afterUploadPdf(result as Pdf);
+      afterUploadPdf(result as Pdf)
     }
 
     if (use === UploadTypes.IMAGE && afterUploadAttachment) {
-      console.log('===> was this also called');
-      afterUploadAttachment(result as ImageAttachment);
+      console.log("===> was this also called")
+      afterUploadAttachment(result as ImageAttachment)
     }
-    setIsUploading(false);
-    return;
-  };
+    setIsUploading(false)
+    return
+  }
 
   return {
     upload,
@@ -122,5 +149,6 @@ export const useUploader = ({
     inputRef,
     isUploading,
     handleClick,
-  };
-};
+    loadPdfFromUrl,
+  }
+}

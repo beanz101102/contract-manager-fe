@@ -1,15 +1,16 @@
-import React from 'react';
-import { AttachmentTypes } from '../entities';
-import { Image } from '../containers/Image';
-import { Drawing } from '../containers/Drawing';
-import { Text } from '../containers/Text';
+import React from "react"
+
+import { Drawing } from "../containers/Drawing"
+import { Image } from "../containers/Image"
+import { Text } from "../containers/Text"
+import { AttachmentTypes } from "../entities"
 
 interface Props {
-  attachments: Attachment[];
-  pdfName: string;
-  pageDimensions: Dimensions;
-  removeAttachment: (index: number) => void;
-  updateAttachment: (index: number, attachment: Partial<Attachment>) => void;
+  attachments: Attachment[]
+  pdfName: string
+  pageDimensions: Dimensions
+  removeAttachment: (index: number) => void
+  updateAttachment: (index: number, attachment: Partial<Attachment>) => void
 }
 
 export const Attachments: React.FC<Props> = ({
@@ -19,15 +20,15 @@ export const Attachments: React.FC<Props> = ({
   removeAttachment,
   updateAttachment,
 }) => {
-  const handleAttachmentUpdate = (index: number) => (
-    attachment: Partial<Attachment>
-  ) => updateAttachment(index, attachment);
+  const handleAttachmentUpdate =
+    (index: number) => (attachment: Partial<Attachment>) =>
+      updateAttachment(index, attachment)
 
   return attachments ? (
     <>
       {attachments.length
         ? attachments.map((attachment, index) => {
-            const key = `${pdfName}-${index}`;
+            const key = `${pdfName}-${index}`
 
             if (attachment.type === AttachmentTypes.IMAGE) {
               return (
@@ -39,7 +40,7 @@ export const Attachments: React.FC<Props> = ({
                   updateImageAttachment={handleAttachmentUpdate(index)}
                   {...(attachment as ImageAttachment)}
                 />
-              );
+              )
             }
 
             if (attachment.type === AttachmentTypes.DRAWING) {
@@ -52,7 +53,7 @@ export const Attachments: React.FC<Props> = ({
                   updateDrawingAttachment={handleAttachmentUpdate(index)}
                   {...(attachment as DrawingAttachment)}
                 />
-              );
+              )
             }
 
             if (attachment.type === AttachmentTypes.TEXT) {
@@ -62,13 +63,14 @@ export const Attachments: React.FC<Props> = ({
                   pageWidth={pageDimensions.width}
                   pageHeight={pageDimensions.height}
                   updateTextAttachment={handleAttachmentUpdate(index)}
+                  removeText={() => removeAttachment(index)}
                   {...(attachment as TextAttachment)}
                 />
-              );
+              )
             }
-            return null;
+            return null
           })
         : null}
     </>
-  ) : null;
-};
+  ) : null
+}

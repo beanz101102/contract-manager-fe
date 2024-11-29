@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
@@ -102,17 +103,6 @@ export default function ContractSigning() {
           />
         </div>
         <div className="flex gap-2">
-          <Button
-            className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
-            onClick={() => {
-              if (selectedEmployees.length > 0) {
-                setIsOpenSignModal(true)
-              }
-            }}
-            disabled={selectedEmployees.length === 0}
-          >
-            <Check className="w-4 h-4" /> Ký hợp đồng
-          </Button>
           <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
             <Pencil className="w-4 h-4" /> Yêu cầu sửa
           </Button>
@@ -246,6 +236,9 @@ export default function ContractSigning() {
                           alt="eye"
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                         />
+                        <Link href={`/contract-signing/${contract.id}`}>
+                          <Button>Ký hợp đồng</Button>
+                        </Link>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -256,84 +249,84 @@ export default function ContractSigning() {
         </InfiniteScroll>
       </div>
 
-      <SignContractModal
+      {/* <SignContractModal
         isOpen={isOpenSignModal}
         onOpenChange={setIsOpenSignModal}
         selectedContracts={contractList?.filter((c) =>
           selectedEmployees.includes(c.id)
         )}
-      />
+      /> */}
     </div>
   )
 }
 
-const SignContractModal = ({
-  isOpen,
-  onOpenChange,
-  selectedContracts,
-}: {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  selectedContracts?: ContractList[]
-}) => {
-  const { useSignContract } = useContracts()
-  const { mutate: signContract } = useSignContract()
-  const { user } = useAuth()
+// const SignContractModal = ({
+//   isOpen,
+//   onOpenChange,
+//   selectedContracts,
+// }: {
+//   isOpen: boolean
+//   onOpenChange: (open: boolean) => void
+//   selectedContracts?: ContractList[]
+// }) => {
+//   const { useSignContract } = useContracts()
+//   const { mutate: signContract } = useSignContract()
+//   const { user } = useAuth()
 
-  const handleSign = () => {
-    signContract({
-      contracts: selectedContracts?.map((c) => c.id) ?? [],
-      signerId: user?.id ?? 0,
-    })
-    onOpenChange(false)
-  }
+//   const handleSign = () => {
+//     signContract({
+//       contracts: selectedContracts?.map((c) => c.id) ?? [],
+//       signerId: user?.id ?? 0,
+//     })
+//     onOpenChange(false)
+//   }
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] p-6">
-        <DialogHeader className="border-b pb-4">
-          <DialogTitle className="text-xl font-semibold">
-            Xác nhận ký hợp đồng
-          </DialogTitle>
-        </DialogHeader>
+//   return (
+//     <Dialog open={isOpen} onOpenChange={onOpenChange}>
+//       <DialogContent className="sm:max-w-[600px] p-6">
+//         <DialogHeader className="border-b pb-4">
+//           <DialogTitle className="text-xl font-semibold">
+//             Xác nhận ký hợp đồng
+//           </DialogTitle>
+//         </DialogHeader>
 
-        <div className="py-4">
-          <p className="text-gray-600 mb-4">
-            Bạn có chắc chắn muốn ký {selectedContracts?.length} hợp đồng sau:
-          </p>
-          <div className="max-h-[200px] overflow-y-auto">
-            {selectedContracts?.map((contract, index) => (
-              <div
-                key={contract.id}
-                className="py-2 px-3 bg-gray-50 rounded mb-2 flex justify-between"
-              >
-                <span>{contract.contractNumber}</span>
-                <span className="text-gray-500">
-                  {dayjs(contract.createdAt).format("DD/MM/YYYY")}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+//         <div className="py-4">
+//           <p className="text-gray-600 mb-4">
+//             Bạn có chắc chắn muốn ký {selectedContracts?.length} hợp đồng sau:
+//           </p>
+//           <div className="max-h-[200px] overflow-y-auto">
+//             {selectedContracts?.map((contract, index) => (
+//               <div
+//                 key={contract.id}
+//                 className="py-2 px-3 bg-gray-50 rounded mb-2 flex justify-between"
+//               >
+//                 <span>{contract.contractNumber}</span>
+//                 <span className="text-gray-500">
+//                   {dayjs(contract.createdAt).format("DD/MM/YYYY")}
+//                 </span>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
 
-        <DialogFooter className="border-t pt-4">
-          <div className="flex justify-end gap-2">
-            <Button
-              className="bg-[#4BC5BE] hover:bg-[#2ea39d] text-white"
-              onClick={handleSign}
-            >
-              Xác nhận
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="border-gray-300 hover:bg-gray-100"
-            >
-              Hủy
-            </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
+//         <DialogFooter className="border-t pt-4">
+//           <div className="flex justify-end gap-2">
+//             <Button
+//               className="bg-[#4BC5BE] hover:bg-[#2ea39d] text-white"
+//               onClick={handleSign}
+//             >
+//               Xác nhận
+//             </Button>
+//             <Button
+//               variant="outline"
+//               onClick={() => onOpenChange(false)}
+//               className="border-gray-300 hover:bg-gray-100"
+//             >
+//               Hủy
+//             </Button>
+//           </div>
+//         </DialogFooter>
+//       </DialogContent>
+//     </Dialog>
+//   )
+// }

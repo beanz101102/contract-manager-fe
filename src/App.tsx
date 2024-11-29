@@ -1,4 +1,6 @@
-import React, { useLayoutEffect, useState } from "react"
+"use client"
+
+import React, { useEffect, useLayoutEffect, useState } from "react"
 
 import "semantic-ui-css/semantic.min.css"
 import { Button, Container, Grid, Segment } from "semantic-ui-react"
@@ -15,12 +17,18 @@ import { DrawingModal } from "./modals/components/DrawingModal"
 import { HelpModal } from "./modals/components/HelpModal"
 import * as serviceWorker from "./serviceWorker"
 import { ggID } from "./utils/helpers"
+import { savePdfToServer } from "./utils/pdf"
 import { prepareAssets } from "./utils/prepareAssets"
 
 prepareAssets()
 serviceWorker.unregister()
 
-const AppPDF: React.FC = () => {
+interface AppPDFProps {
+  url: string
+  setFile: React.Dispatch<React.SetStateAction<File | null>>
+}
+
+const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
   const [helpModalOpen, setHelpModalOpen] = useState(false)
   const [drawingModalOpen, setDrawingModalOpen] = useState(false)
   const {
@@ -36,6 +44,7 @@ const AppPDF: React.FC = () => {
     previousPage,
     nextPage,
     setDimensions,
+    newFile,
     name,
     dimensions,
   } = usePdf()
@@ -61,6 +70,7 @@ const AppPDF: React.FC = () => {
     isUploading,
     onClick,
     upload: uploadPdf,
+    loadPdfFromUrl,
   } = useUploader({
     use: UploadTypes.PDF,
     afterUploadPdf: initializePageAndAttachments,
@@ -137,19 +147,40 @@ const AppPDF: React.FC = () => {
     </>
   )
 
-  const handleSavePdf = () => savePdf(allPageAttachments)
+  const handleSaveToServer = async () => {
+    const file = await newFile(allPageAttachments)
+    setFile(file || null)
+  }
+  const handleDownloadPdf = () => savePdf(allPageAttachments)
+
+  const handleLoadPdfFromUrl = async (url: string) => {
+    try {
+      // setIsUploading(true)
+      const result = await loadPdfFromUrl(url)
+      initializePageAndAttachments(result)
+    } catch (error) {
+      console.error("Error loading PDF from URL:", error)
+    } finally {
+      // setIsUploading(false)
+    }
+  }
+
+  useEffect(() => {
+    handleLoadPdfFromUrl(url)
+  }, [url])
 
   return (
-    <Container style={{ margin: 30 }}>
+    <div className="w-full">
       {hiddenInputs}
       <MenuBar
         openHelp={() => setHelpModalOpen(true)}
-        savePdf={handleSavePdf}
+        saveToServer={handleSaveToServer}
         addText={addText}
         addImage={handleImageClick}
         addDrawing={() => setDrawingModalOpen(true)}
         savingPdfStatus={isSaving}
         uploadNewPdf={handlePdfClick}
+        downloadPdf={handleDownloadPdf}
         isPdfLoaded={!!file}
       />
 
@@ -202,9 +233,7 @@ const AppPDF: React.FC = () => {
         dismiss={() => setDrawingModalOpen(false)}
         confirm={addDrawing}
       />
-
-      <HelpModal open={helpModalOpen} dismiss={() => setHelpModalOpen(false)} />
-    </Container>
+    </div>
   )
 }
 

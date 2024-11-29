@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileText, List, User, UserPlus, Users } from "lucide-react"
+import { Building2, FileText, List, User, UserPlus, Users } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -13,20 +13,20 @@ import NextImage from "../ui/next-img"
 
 export default function SidebarMenu() {
   return (
-    <div className="flex flex-col h-screen bg-white border-r w-[300px]">
-      <div className="p-4 border-b">
-        <div className="flex items-center space-x-2">
+    <div className="flex flex-col h-screen bg-white border-r w-[280px]">
+      <div className="py-3 px-4 border-b">
+        <div className="flex items-center justify-center">
           <NextImage
             src="/img/logo.png"
             alt="logo"
             width={32}
             height={32}
-            className="w-[200px]"
+            className="w-[160px]"
           />
         </div>
       </div>
-      <ScrollArea className="flex-grow">
-        <nav className="p-2">
+      <ScrollArea className="flex-grow px-2 py-1">
+        <nav>
           <DropdownMenu />
         </nav>
       </ScrollArea>
@@ -36,81 +36,105 @@ export default function SidebarMenu() {
 
 function DropdownMenu() {
   return (
-    <div className="w-full max-w-md mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+    <div className="w-full">
       <Accordion type="multiple" className="w-full">
-        <AccordionItem value="contract">
-          <AccordionTrigger className="text-lg font-medium">
+        <AccordionItem value="contract" className="border-none">
+          <AccordionTrigger className="hover:bg-gray-100 rounded-lg px-3 py-2 text-gray-700">
             <span className="flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="mr-2"
-              >
-                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" />
-                <line x1="9" y1="9" x2="10" y2="9" />
-                <line x1="9" y1="13" x2="15" y2="13" />
-                <line x1="9" y1="17" x2="15" y2="17" />
-              </svg>
-              Hợp đồng
+              <FileText className="mr-2 h-5 w-5" />
+              <span className="text-sm font-medium">Hợp đồng</span>
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <ul className="space-y-2">
+            <ul className="space-y-1 px-2">
               <Link href="/contract-search">
-                <li className="pl-6">Tra cứu hợp đồng</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Tra cứu hợp đồng
+                </li>
               </Link>
               <Link href="/individual-management">
-                <li className="pl-6">Cá nhân quản lý</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Cá nhân quản lý
+                </li>
               </Link>
               <Link href="/contract-approval">
-                <li className="pl-6">Duyệt hợp đồng</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Duyệt hợp đồng
+                </li>
               </Link>
               <Link href="/contract-signing">
-                <li className="pl-6">Ký hợp đồng</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Ký hợp đồng
+                </li>
               </Link>
               <Link href="/contract-approval-flow">
-                <li className="pl-6">Luồng duyệt hợp đồng</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Luồng duyệt hợp đồng
+                </li>
               </Link>
               <Link href="/personal-signature">
-                <li className="pl-6">Chữ ký cá nhân</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Chữ ký cá nhân
+                </li>
               </Link>
             </ul>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="employee">
-          <AccordionTrigger className="text-lg font-medium">
+
+        <AccordionItem value="employee" className="border-none">
+          <AccordionTrigger className="hover:bg-gray-100 rounded-lg px-3 py-2 text-gray-700">
             <span className="flex items-center">
               <Users className="mr-2 h-5 w-5" />
-              Quản lý nhân viên
+              <span className="text-sm font-medium">Quản lý nhân viên</span>
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <ul className="space-y-2">
+            <ul className="space-y-1 px-2">
               <Link href="/employee-list">
-                <li className="pl-6 flex items-center">Danh sách nhân viên</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Danh sách nhân viên
+                </li>
               </Link>
             </ul>
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="customer">
-          <AccordionTrigger className="text-lg font-medium">
+
+        <AccordionItem value="customer" className="border-none">
+          <AccordionTrigger className="hover:bg-gray-100 rounded-lg px-3 py-2 text-gray-700">
             <span className="flex items-center">
               <User className="mr-2 h-5 w-5" />
-              Quản lý khách hàng
+              <span className="text-sm font-medium">Quản lý khách hàng</span>
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <ul className="space-y-2">
+            <ul className="space-y-1 px-2">
               <Link href="/customer-list">
-                <li className="pl-6 flex items-center">Danh sách khách hàng</li>
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Danh sách khách hàng
+                </li>
+              </Link>
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="department" className="border-none">
+          <AccordionTrigger className="hover:bg-gray-100 rounded-lg px-3 py-2 text-gray-700">
+            <span className="flex items-center">
+              <Building2 className="mr-2 h-5 w-5" />
+              <span className="text-sm font-medium">Quản lý phòng ban</span>
+            </span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <ul className="space-y-1 px-2">
+              <Link href="/department">
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Danh sách phòng ban
+                </li>
+              </Link>
+              <Link href="/department/create">
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Tạo phòng ban mới
+                </li>
               </Link>
             </ul>
           </AccordionContent>
