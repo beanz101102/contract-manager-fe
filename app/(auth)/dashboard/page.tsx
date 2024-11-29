@@ -12,8 +12,19 @@ export default function DashboardPage() {
   const { useContractStatistics } = useContracts()
   const { data: statistics, isLoading } = useContractStatistics()
 
-  if (isLoading || !statistics) {
+  if (isLoading) {
     return <div>Loading...</div>
+  }
+
+  if (!statistics || statistics.total === 0) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-4">Thống kê hợp đồng</h2>
+        <div className="text-center py-12">
+          <p className="text-gray-500">Chưa có hợp đồng nào được tạo</p>
+        </div>
+      </div>
+    )
   }
 
   const chartData = {
@@ -104,7 +115,7 @@ export default function DashboardPage() {
                     ?.color.color,
               }}
             >
-              {data.count} ({data.percentage})
+              {data.count} ({data.percentage || "0%"})
             </p>
           </div>
         ))}
