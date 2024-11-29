@@ -75,32 +75,32 @@ function DropdownMenu() {
           </AccordionTrigger>
           <AccordionContent>
             <ul className="space-y-1 px-2">
-              <Link href="/contract-search">
+              <Link href="/contract/search">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Tra cứu hợp đồng
                 </li>
               </Link>
-              <Link href="/individual-management">
+              <Link href="/contract/personal">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Cá nhân quản lý
                 </li>
               </Link>
-              <Link href="/contract-approval">
+              <Link href="/contract/review">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Duyệt hợp đồng
                 </li>
               </Link>
-              <Link href="/contract-signing">
+              <Link href="/contract/sign">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Ký hợp đồng
                 </li>
               </Link>
-              <Link href="/contract-approval-flow">
+              <Link href="/contract/workflow">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Luồng duyệt hợp đồng
                 </li>
               </Link>
-              <Link href="/personal-signature">
+              <Link href="/contract/user-signature">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Chữ ký cá nhân
                 </li>
@@ -118,7 +118,7 @@ function DropdownMenu() {
           </AccordionTrigger>
           <AccordionContent>
             <ul className="space-y-1 px-2">
-              <Link href="/employee-list">
+              <Link href="/employees">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Danh sách nhân viên
                 </li>
@@ -136,7 +136,7 @@ function DropdownMenu() {
           </AccordionTrigger>
           <AccordionContent>
             <ul className="space-y-1 px-2">
-              <Link href="/customer-list">
+              <Link href="/customers">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Danh sách khách hàng
                 </li>

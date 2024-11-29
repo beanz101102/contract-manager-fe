@@ -18,47 +18,54 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export default function CustomerInformationForm() {
+export default function EmployeeRegistrationForm() {
   const router = useRouter()
   const { useAddUser } = useUsers()
   const { mutate: addUser } = useAddUser()
-
-  const [code, setCode] = useState("KH001")
-  const [fullName, setFullName] = useState("Trần Thị A")
+  const [code, setCode] = useState("NV002")
+  const [fullName, setFullName] = useState("Nguyễn Văn B")
   const [birthPlace, setBirthPlace] = useState("Hà Nội")
-  const [address, setAddress] = useState("456 Đường XYZ, Quận ABC, Hà Nội")
-  const [gender, setGender] = useState("Nữ")
-  const [birthDate, setBirthDate] = useState("1995-05-15")
-  const [idNumber, setIdNumber] = useState("001199123789")
-  const [issueDate, setIssueDate] = useState("2021-03-15")
+  const [address, setAddress] = useState("123 Đường ABC, Quận XYZ, Hà Nội")
+  const [gender, setGender] = useState("Nam")
+  const [birthDate, setBirthDate] = useState("1990-01-01")
+  const [idNumber, setIdNumber] = useState("001099123456")
+  const [issueDate, setIssueDate] = useState("2020-01-01")
   const [issuePlace, setIssuePlace] = useState("Cục Cảnh sát")
-  const [phone, setPhone] = useState("0987654321")
-  const [email, setEmail] = useState("tranthia@gmail.com")
+  const [phone, setPhone] = useState("09123456789")
+  const [email, setEmail] = useState("nguyenvanb@gmail.com")
+  const [department, setDepartment] = useState("Phòng Hành chính Nhân sự")
+  const [position, setPosition] = useState("Nhân viên")
+  const [account, setAccount] = useState("nguyenvanb")
+  const [password, setPassword] = useState("123456")
+  const [active, setActive] = useState(true)
 
   const handleSubmit = () => {
     const payload = {
-      code: code || "",
-      fullName: fullName || "",
-      placeOfBirth: birthPlace || "",
-      address: address || "",
-      gender: gender || "",
+      code,
+      username: account,
+      fullName,
+      placeOfBirth: birthPlace,
+      address,
+      gender,
       dateOfBirth: birthDate || null,
-      idNumber: idNumber || "",
+      idNumber,
       idIssueDate: issueDate || null,
       idIssuePlace: issuePlace || null,
-      phoneNumber: phone || "",
-      email: email || "",
-      department: 1,
-      role: "customer",
-      position: "Khách hàng",
-      passwordHash: "",
+      phoneNumber: phone,
+      email,
+      department:
+        departmentConfigs.find((config) => config.label === department)
+          ?.value || 0,
+      position,
+      passwordHash: password,
+      role: "employee",
     } as EmployeeFormData
 
     console.log("payload", payload)
 
     addUser(payload, {
       onSuccess: () => {
-        router.push("/customer-list")
+        router.push("/employees")
       },
     })
   }
@@ -110,14 +117,14 @@ export default function CustomerInformationForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-black" htmlFor="code">
-                    Mã khách hàng (*)
+                    Mã nhân viên (*)
                   </Label>
                   <Input
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     style={{ border: "1px solid #0000004D" }}
                     className="bg-white rounded text-black"
-                    placeholder="Mã khách hàng"
+                    placeholder="Mã nhân viên"
                   />
                 </div>
               </div>
@@ -302,6 +309,101 @@ export default function CustomerInformationForm() {
                 type="email"
                 placeholder="Email"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-black" htmlFor="department">
+                Phòng ban (*)
+              </Label>
+              <Select value={department} onValueChange={setDepartment}>
+                <SelectTrigger
+                  style={{ border: "1px solid #0000004D" }}
+                  className="rounded text-black"
+                >
+                  <SelectValue placeholder="Chọn phòng ban" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departmentConfigs.map((department) => (
+                    <SelectItem key={department.value} value={department.label}>
+                      {department.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-black" htmlFor="position">
+                Chức vụ (*)
+              </Label>
+              <Input
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                style={{
+                  border: "1px solid #0000004D",
+                }}
+                className="bg-white rounded text-black"
+                id="position"
+                placeholder="Chức vụ"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-black" htmlFor="account">
+                Tài khoản (*)
+              </Label>
+              <Input
+                value={account}
+                onChange={(e) => setAccount(e.target.value)}
+                style={{
+                  border: "1px solid #0000004D",
+                }}
+                className="bg-white rounded text-black"
+                id="account"
+                placeholder="Tài khoản"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-black" htmlFor="password">
+                Mật khẩu (*)
+              </Label>
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{
+                  border: "1px solid #0000004D",
+                }}
+                className="bg-white rounded text-black"
+                id="password"
+                type="password"
+                placeholder="Mật khẩu"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-black" htmlFor="active">
+                Trạng thái
+              </Label>
+              <Select
+                value={active ? "active" : "inactive"}
+                onValueChange={(value) => setActive(value === "active")}
+              >
+                <SelectTrigger
+                  style={{ border: "1px solid #0000004D" }}
+                  className="rounded text-black"
+                >
+                  <SelectValue placeholder="Chọn trạng thái" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Kích hoạt</SelectItem>
+                  <SelectItem value="inactive">Không kích hoạt</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

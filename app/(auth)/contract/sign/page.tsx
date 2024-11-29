@@ -236,7 +236,7 @@ export default function ContractSigning() {
                           alt="eye"
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                         />
-                        <Link href={`/contract-signing/${contract.id}`}>
+                        <Link href={`/contracts/sign/${contract.id}`}>
                           <Button>Ký hợp đồng</Button>
                         </Link>
                       </div>

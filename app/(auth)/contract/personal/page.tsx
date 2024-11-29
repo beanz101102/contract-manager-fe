@@ -143,7 +143,7 @@ export default function IndividualManagement() {
         <div className="flex gap-3">
           <Button
             className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
-            onClick={() => router.push("/add-contract")}
+            onClick={() => router.push("/contract/new")}
           >
             <Plus className="w-4 h-4 mr-2" /> Thêm mới
           </Button>

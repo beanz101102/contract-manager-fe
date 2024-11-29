@@ -200,7 +200,7 @@ export default function ContractForm() {
               variant="ghost"
               className="gap-2"
               onClick={() => {
-                router.push("/individual-management")
+                router.push("/contract/personal")
               }}
             >
               <ChevronLeft className="w-4 h-4" />

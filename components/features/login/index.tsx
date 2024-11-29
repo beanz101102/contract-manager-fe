@@ -19,45 +19,41 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-blue-100 relative">
+    <div className="flex h-screen bg-gradient-to-r from-blue-50 to-blue-100 relative">
       {/* Left side */}
-      <div className="w-[40%] p-8 flex flex-col justify-between items-center">
-        <div className="flex-grow"></div>
+      <div className="w-[45%] p-12 flex flex-col justify-between items-center">
+        <div className="flex-grow" />
         <NextImage
           src="/img/logo.png"
           alt="PHATDAT CORPORATION logo"
-          className="w-[500px]"
+          className="w-[400px] transition-transform hover:scale-105"
         />
-        <div className="flex-grow"></div>
+        <div className="flex-grow" />
         <NextImage
           src="/img/banner_login.png"
           alt="Login illustration"
-          className="w-[500px]"
+          className="w-[600px] transition-transform hover:scale-105"
         />
       </div>
 
       {/* Right side */}
-      <div className="w-[60%] bg-white p-8 flex items-center justify-center">
-        <div className="max-w-[50vh] w-full">
-          <p
-            style={{
-              textShadow: "0px 4px 4px 0px #00000040",
-            }}
-            className="text-4xl font-extrabold text-[#359499] mb-8"
-          >
+      <div className="w-[55%] bg-white p-12 flex items-center justify-center rounded-l-[50px] shadow-2xl">
+        <div className="max-w-[500px] w-full">
+          <h1 className="text-4xl font-extrabold text-[#359499] mb-12 relative">
             Đăng nhập
-          </p>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
+            <span className="absolute bottom-0 left-0 w-20 h-1 bg-[#4BC5BE] rounded-full"></span>
+          </h1>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-2">
               <Label
                 htmlFor="username"
-                className="text-xl text-black font-extrabold"
+                className="text-xl text-gray-700 font-bold"
               >
                 Tên đăng nhập
               </Label>
               <Input
                 id="username"
-                className="bg-[#F5F5F5] p-4 border-none h-[85px] rounded-[25px] mt-2"
+                className="bg-gray-50 p-6 border border-gray-200 h-[70px] rounded-2xl mt-2 focus:ring-2 focus:ring-[#4BC5BE] focus:border-transparent transition-all"
                 type="text"
                 placeholder="Nhập tên đăng nhập"
                 value={username}
@@ -65,16 +61,16 @@ const LoginPage = () => {
               />
             </div>
 
-            <div className="mb-6">
+            <div className="space-y-2">
               <Label
-                htmlFor="username"
-                className="text-xl text-black font-extrabold"
+                htmlFor="password"
+                className="text-xl text-gray-700 font-bold"
               >
                 Mật khẩu
               </Label>
               <Input
                 id="password"
-                className="bg-[#F5F5F5] p-4 border-none h-[85px] rounded-[25px] mt-2"
+                className="bg-gray-50 p-6 border border-gray-200 h-[70px] rounded-2xl mt-2 focus:ring-2 focus:ring-[#4BC5BE] focus:border-transparent transition-all"
                 type="password"
                 placeholder="Nhập mật khẩu"
                 value={password}
@@ -82,16 +78,19 @@ const LoginPage = () => {
               />
             </div>
 
-            <div className="mb-6 flex justify-end">
-              <p className="text-sm text-[#4B9FA4] hover:underline font-bold">
+            {/* <div className="flex justify-end">
+              <button
+                type="button"
+                className="text-sm text-[#4B9FA4] hover:text-[#359499] font-bold transition-colors"
+              >
                 Quên mật khẩu?
-              </p>
-            </div>
-            <div className="flex justify-center">
+              </button>
+            </div> */}
+
+            <div className="flex justify-center pt-4">
               <Button
-                // type="submit"
-                className="max-w-[256px] w-full bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
-                onClick={handleSubmit}
+                type="submit"
+                className="max-w-[300px] w-full bg-[#4BC5BE] rounded-xl text-white hover:bg-[#359499] h-[60px] text-lg font-bold transition-all duration-300 hover:shadow-lg"
               >
                 Đăng nhập
               </Button>

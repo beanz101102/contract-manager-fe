@@ -10,7 +10,7 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
       <div className="h-screen">
         <SidebarMenu />
       </div>
-      <div className="w-full">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <div
           className="h-[100px] w-full flex items-center px-5"
           style={{
@@ -21,7 +21,7 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
             CÔNG TY CP PHÁT TRIỂN BĐS PHÁT ĐẠT
           </p>
         </div>
-        <div className="p-6 text-black">{children}</div>
+        <div className="flex-1 overflow-auto p-6 text-black">{children}</div>
       </div>
     </div>
   )

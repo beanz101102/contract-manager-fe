@@ -87,10 +87,7 @@ export default function DepartmentCreatePage() {
           />
 
           <div className="flex gap-4">
-            <Button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white"
-            >
+            <Button type="submit" className="max-w-[200px] w-full mx-auto">
               Tạo phòng ban
             </Button>
           </div>

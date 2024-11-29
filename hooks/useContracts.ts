@@ -60,6 +60,7 @@ export const useContracts = () => {
         }>(`/api/contract?${params}`)
         return response.data?.data
       },
+      refetchInterval: 10000,
     })
   }
 
@@ -77,6 +78,7 @@ export const useContracts = () => {
         return response.data
       },
       enabled: !!id,
+      refetchInterval: 10000,
     })
   }
 
@@ -149,6 +151,7 @@ export const useContracts = () => {
         const response = await api.post("/api/contract/count")
         return response.data
       },
+      refetchInterval: 10000,
     })
   }
 
@@ -180,6 +183,7 @@ export const useContracts = () => {
         return response.data
       },
       enabled: !!contractId,
+      refetchInterval: 10000,
     })
   }
 
@@ -286,6 +290,7 @@ export const useContracts = () => {
         )
         return response.data
       },
+      refetchInterval: 10000,
     })
   }
 

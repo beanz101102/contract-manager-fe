@@ -14,14 +14,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  console.log("user", user)
-
   useEffect(() => {
     const user = localStorage.getItem("user")
     if (user) {
       setUser(JSON.parse(user))
       if (pathname === "/login") {
-        router.push("/employee-list")
+        router.push("/dashboard")
       }
     } else {
       router.push("/login")
@@ -41,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       localStorage.setItem("user", JSON.stringify(response.data?.user))
       setUser(response.data?.user)
-      router.push("/employee-list")
+      router.push("/dashboard")
     } catch (error) {
       console.error("Login error:", error)
       // throw error

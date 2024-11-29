@@ -39,6 +39,7 @@ export const useUsers = () => {
         }>(`/api/user/listUsers?${params.toString()}`)
         return response.data
       },
+      refetchInterval: 10000,
     })
   }
 
@@ -51,6 +52,7 @@ export const useUsers = () => {
         return response.data
       },
       enabled: !!id,
+      refetchInterval: 10000,
     })
   }
 
