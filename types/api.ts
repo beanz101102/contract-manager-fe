@@ -382,3 +382,33 @@ export interface DepartmentList {
   createdAt: string
   updatedAt: string
 }
+
+export interface ContractStatistics {
+  total: number
+  details: {
+    draft: {
+      count: number
+      percentage: string
+    }
+    pending_approval: {
+      count: number
+      percentage: string
+    }
+    ready_to_sign: {
+      count: number
+      percentage: string
+    }
+    cancelled: {
+      count: number
+      percentage: string
+    }
+    completed: {
+      count: number
+      percentage: string
+    }
+    rejected: {
+      count: number
+      percentage: string
+    }
+  }
+}

@@ -38,6 +38,34 @@ function DropdownMenu() {
   return (
     <div className="w-full">
       <Accordion type="multiple" className="w-full">
+        <AccordionItem value="dashboard" className="border-none">
+          <AccordionTrigger className="hover:bg-gray-100 rounded-lg px-3 py-2 text-gray-700">
+            <span className="flex items-center">
+              <List className="mr-2 h-5 w-5" />
+              <span className="text-sm font-medium">Dashboard</span>
+            </span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <ul className="space-y-1 px-2">
+              <Link href="/dashboard">
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Tổng quan
+                </li>
+              </Link>
+              {/* <Link href="/dashboard/contracts">
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Thống kê hợp đồng
+                </li>
+              </Link>
+              <Link href="/dashboard/reports">
+                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                  Báo cáo chi tiết
+                </li>
+              </Link> */}
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
+
         <AccordionItem value="contract" className="border-none">
           <AccordionTrigger className="hover:bg-gray-100 rounded-lg px-3 py-2 text-gray-700">
             <span className="flex items-center">

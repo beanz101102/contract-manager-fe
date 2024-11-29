@@ -1,7 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
-import { Contract, ContractList, DetailContract } from "@/types/api"
+import {
+  Contract,
+  ContractList,
+  ContractStatistics,
+  DetailContract,
+} from "@/types/api"
 import { api } from "@/lib/axios"
 
 interface AddContractPayload {
@@ -272,6 +277,18 @@ export const useContracts = () => {
     })
   }
 
+  const useContractStatistics = () => {
+    return useQuery({
+      queryKey: ["contract-statistics"],
+      queryFn: async () => {
+        const response = await api.get<ContractStatistics>(
+          "/api/contract/statistics"
+        )
+        return response.data
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -284,5 +301,6 @@ export const useContracts = () => {
     useApproveContract,
     useSignContract,
     useCancelContract,
+    useContractStatistics,
   }
 }
