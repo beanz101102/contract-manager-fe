@@ -1,10 +1,10 @@
 "use client"
 
-import React, { ChangeEvent, useEffect, useState } from "react"
+import React, { ChangeEvent, useEffect, useRef, useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
-import { Eye, Filter, Plus, Trash2 } from "lucide-react"
+import { Eye, Plus, Trash2 } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
 
 import { SignatureList } from "@/types/api"
@@ -19,22 +19,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import NextImage from "@/components/ui/next-img"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -75,7 +59,7 @@ const SignatureManagementInterface = () => {
           className="bg-teal-500 hover:bg-teal-600 transition-colors duration-200 rounded-lg px-4 py-2 text-white font-medium"
           onClick={() => setIsOpenDigitalSignature(true)}
         >
-          <Plus className="w-4 h-4 mr-2" /> Thêm mới
+          <Plus className="w-4 h-4 mr-2" /> Thêm mi
         </Button>
       </div>
 
@@ -136,10 +120,10 @@ const SignatureManagementInterface = () => {
                       {dayjs(sig.createdAt).format("DD/MM/YYYY")}
                     </TableCell>
                     <TableCell className="text-gray-700">
-                      {sig.user.department.departmentName}
+                      {sig.user?.department?.departmentName}
                     </TableCell>
                     <TableCell className="text-gray-700">
-                      {sig.user.position}
+                      {sig.user?.position}
                     </TableCell>
                     <TableCell>
                       <NextImage
@@ -187,19 +171,226 @@ const DigitalSignatureModal = ({
   onOpenChange: (open: boolean) => void
 }) => {
   const { user } = useAuth()
-  const [signature, setSignature] = useState<File | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [stampImage, setStampImage] = useState<File | null>(null)
+  const [finalSignature, setFinalSignature] = useState<File | null>(null)
   const { useAddSignature } = useUserSignatures()
+  const [isDrawing, setIsDrawing] = useState(false)
+  const [lastX, setLastX] = useState(0)
+  const [lastY, setLastY] = useState(0)
+
   const { mutate: addSignature } = useAddSignature(() => {
     onOpenChange(false)
-    setSignature(null)
+    resetForm()
   })
 
-  const handleSignatureUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const resetForm = () => {
+    setStampImage(null)
+    setFinalSignature(null)
+    clearCanvas()
+  }
+
+  // Xử lý upload ảnh dấu
+  const handleStampUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setSignature(file)
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File quá lớn. Vui lòng chọn file nhỏ hơn 2MB")
+        return
+      }
+      if (!file.type.startsWith("image/")) {
+        alert("Vui lòng chọn file ảnh")
+        return
+      }
+      setStampImage(file)
+      drawStampToCanvas(file)
     }
   }
+
+  // Vẽ ảnh dấu lên canvas
+  const drawStampToCanvas = (stampFile: File) => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
+    if (!ctx || !canvas) return
+
+    const img = new Image()
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      // Vẽ ảnh dấu ở giữa canvas
+      const scale =
+        Math.min(canvas.width / img.width, canvas.height / img.height) * 0.8
+      const x = (canvas.width - img.width * scale) / 2
+      const y = (canvas.height - img.height * scale) / 2
+      ctx.drawImage(img, x, y, img.width * scale, img.height * scale)
+    }
+    img.src = URL.createObjectURL(stampFile)
+  }
+
+  // Xử lý upload ảnh chữ ký và vẽ đè lên ảnh dấu
+  const handleSignatureUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && stampImage) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File quá lớn. Vui lòng chọn file nhỏ hơn 2MB")
+        return
+      }
+      if (!file.type.startsWith("image/")) {
+        alert("Vui lòng chọn file ảnh")
+        return
+      }
+
+      const img = new Image()
+      img.onload = () => {
+        const canvas = canvasRef.current
+        const ctx = canvas?.getContext("2d")
+        if (ctx && canvas) {
+          // Tính toán kích thước chữ ký
+          const signatureWidth = canvas.width * 0.8
+          const scale = signatureWidth / img.width
+          const signatureHeight = img.height * scale
+
+          // Đặt vị trí ở góc phải dưới, cách mép 20px
+          const padding = 20
+          const x = canvas.width - signatureWidth - padding
+          const y = canvas.height - signatureHeight - padding
+
+          // Vẽ chữ ký tại vị trí đã tính
+          ctx.drawImage(img, x, y, signatureWidth, signatureHeight)
+
+          // Lưu kết quả
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const finalFile = new File([blob], "combined-signature.png", {
+                type: "image/png",
+              })
+              setFinalSignature(finalFile)
+            }
+          })
+        }
+      }
+      img.src = URL.createObjectURL(file)
+    }
+  }
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
+    if (ctx && canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      if (stampImage) {
+        drawStampToCanvas(stampImage) // Vẽ lại ảnh dấu sau khi xóa
+      }
+    }
+  }
+
+  // Thiết lập canvas cho vẽ
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
+    if (ctx) {
+      ctx.strokeStyle = "#000000"
+      ctx.lineWidth = 2
+      ctx.lineCap = "round"
+      ctx.lineJoin = "round"
+    }
+  }, [])
+
+  // Xử lý bắt đầu vẽ bằng chuột
+  const handleStartDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true)
+    const canvas = canvasRef.current
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      setLastX(x)
+      setLastY(y)
+    }
+  }
+
+  // Xử lý vẽ khi di chuyển chuột
+  const handleDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
+    if (ctx && canvas) {
+      const rect = canvas.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+
+      ctx.beginPath()
+      ctx.moveTo(lastX, lastY)
+      ctx.lineTo(x, y)
+      ctx.stroke()
+
+      setLastX(x)
+      setLastY(y)
+    }
+  }
+
+  // Xử lý kết thúc vẽ
+  const handleEndDrawing = () => {
+    setIsDrawing(false)
+    // Lưu chữ ký khi kết thúc vẽ
+    const canvas = canvasRef.current
+    if (canvas) {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], "signature.png", { type: "image/png" })
+          setFinalSignature(file)
+        }
+      })
+    }
+  }
+
+  // Xử lý bắt đầu vẽ trên thiết bị cảm ứng
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault()
+    const canvas = canvasRef.current
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect()
+      const touch = e.touches[0]
+      const x = touch.clientX - rect.left
+      const y = touch.clientY - rect.top
+      setLastX(x)
+      setLastY(y)
+      setIsDrawing(true)
+    }
+  }
+
+  // Xử lý vẽ trên thiết bị cảm ứng
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault()
+    if (!isDrawing) return
+
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
+    if (ctx && canvas) {
+      const rect = canvas.getBoundingClientRect()
+      const touch = e.touches[0]
+      const x = touch.clientX - rect.left
+      const y = touch.clientY - rect.top
+
+      ctx.beginPath()
+      ctx.moveTo(lastX, lastY)
+      ctx.lineTo(x, y)
+      ctx.stroke()
+
+      setLastX(x)
+      setLastY(y)
+    }
+  }
+
+  // Xử lý kết thúc vẽ trên thiết bị cảm ứng
+  const handleTouchEnd = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    e.preventDefault()
+    handleEndDrawing()
+  }
+
+  useEffect(() => {
+    clearCanvas()
+  }, [stampImage])
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -211,85 +402,89 @@ const DigitalSignatureModal = ({
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Upload ảnh dấu */}
           <div>
-            <Label
-              htmlFor="signature-upload"
-              className="text-gray-700 font-medium mb-2 block"
-            >
-              Tải lên chữ ký
+            <Label className="text-gray-700 font-medium mb-2 block">
+              Tải lên ảnh dấu
             </Label>
-            <div className="mt-2">
-              <label
-                htmlFor="signature-upload"
-                className="flex flex-col items-center justify-center w-full h-40
-                  border-2 border-dashed border-gray-300 rounded-xl
-                  cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200"
-              >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg
-                    className="w-8 h-8 mb-3 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                  <p className="mb-2 text-sm text-gray-500">
-                    <span className="font-semibold">Nhấp để tải lên</span> hoặc
-                    kéo thả file
-                  </p>
-                  <p className="text-xs text-gray-500">PNG, JPG (Tối đa 2MB)</p>
-                </div>
-                <Input
-                  id="signature-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleSignatureUpload}
-                  className="hidden"
+            <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100">
+              {stampImage ? (
+                <img
+                  src={URL.createObjectURL(stampImage)}
+                  alt="Stamp preview"
+                  className="h-full object-contain p-2"
                 />
-              </label>
-            </div>
+              ) : (
+                <div className="text-center p-4">
+                  <Plus className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                  <p className="text-sm text-gray-500">Tải lên ảnh dấu</p>
+                </div>
+              )}
+              <Input
+                type="file"
+                className="hidden"
+                onChange={handleStampUpload}
+                accept="image/*"
+              />
+            </label>
           </div>
 
-          {signature && (
-            <div className="border-2 border-dashed border-gray-300 p-6 rounded-xl">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-700 font-medium">
-                  Xem trước chữ ký
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSignature(null)}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="w-4 h-4" />
+          {stampImage && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Label className="text-gray-700 font-medium">
+                  Chọn cách ký:
+                </Label>
+                <Input
+                  type="file"
+                  className="flex-1"
+                  onChange={handleSignatureUpload}
+                  accept="image/*"
+                  placeholder="Tải lên ảnh chữ ký"
+                />
+                <span className="text-gray-500">hoặc</span>
+                <Button variant="outline" onClick={clearCanvas}>
+                  Ký trực tiếp
                 </Button>
               </div>
-              <div className="flex items-center justify-center h-32 bg-white rounded-lg overflow-hidden">
-                <img
-                  src={URL.createObjectURL(signature)}
-                  alt="Signature Preview"
-                  className="max-w-full max-h-full object-contain"
+
+              {/* Canvas để hiển thị và ký */}
+              <div className="border-2 border-dashed border-gray-300 p-4 rounded-xl">
+                <canvas
+                  ref={canvasRef}
+                  width={400}
+                  height={350}
+                  className="border rounded-lg bg-white cursor-crosshair"
+                  onMouseDown={handleStartDrawing}
+                  onMouseMove={handleDrawing}
+                  onMouseUp={handleEndDrawing}
+                  onMouseLeave={handleEndDrawing}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 />
+                <p className="mt-2 text-sm text-gray-500 text-center">
+                  Có thể tải lên ảnh chữ ký hoặc ký trực tiếp lên ảnh dấu
+                </p>
               </div>
             </div>
           )}
 
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end gap-4">
+            <Button variant="outline" onClick={resetForm}>
+              Làm mới
+            </Button>
             <Button
               onClick={() => {
-                addSignature({
-                  userId: user?.id as number,
-                  signatureImagePath: signature as File,
-                })
+                if (finalSignature) {
+                  addSignature({
+                    userId: user?.id as number,
+                    signatureImagePath: finalSignature,
+                  })
+                }
               }}
-              className="bg-teal-500 hover:bg-teal-600 transition-colors duration-200 px-6 py-2 text-white font-medium rounded-lg"
+              disabled={!finalSignature}
+              className="bg-teal-500 hover:bg-teal-600"
             >
               Lưu chữ ký
             </Button>
