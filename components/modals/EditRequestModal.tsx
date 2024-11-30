@@ -1,12 +1,17 @@
 import { useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
-import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
 import { Label } from "@radix-ui/react-label"
 
 import { useContracts } from "@/hooks/useContracts"
 
 import { Button } from "../ui/button"
-import { DialogFooter, DialogHeader } from "../ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog"
 import { Textarea } from "../ui/textarea"
 
 const EditRequestModal = ({
