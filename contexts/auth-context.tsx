@@ -2,6 +2,7 @@
 
 import { createContext, use, useContext, useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { toast } from "react-hot-toast"
 
 import { AuthContextType, User } from "@/types/auth"
 import { api } from "@/lib/axios"
@@ -38,15 +39,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         message: string
         user: User
       }>("/api/auth/login", {
-        email: username,
+        username: username,
         passwordHash: password,
       })
 
       localStorage.setItem("user", JSON.stringify(response.data?.user))
       setUser(response.data?.user)
       router.push("/")
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error)
+      toast.error(
+        error.response.data.message ??
+          "Vui lòng kiểm tra lại tài khoản và mật khẩu"
+      )
       // throw error
     }
   }
