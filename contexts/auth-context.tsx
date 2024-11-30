@@ -19,16 +19,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       setUser(JSON.parse(user))
       if (pathname === "/login") {
-        router.push("/dashboard")
+        router.push("/")
       }
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 500)
     } else {
       router.push("/login")
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 500)
     }
   }, [])
 
   const login = async (username: string, password: string) => {
     try {
-      setIsLoading(true)
       const response = await api.post<{
         message: string
         user: User
@@ -39,18 +44,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       localStorage.setItem("user", JSON.stringify(response.data?.user))
       setUser(response.data?.user)
-      router.push("/dashboard")
+      router.push("/")
     } catch (error) {
       console.error("Login error:", error)
       // throw error
-    } finally {
-      setIsLoading(false)
     }
   }
 
   const logout = () => {
     localStorage.removeItem("user")
     setUser(null)
+    router.push("/login")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex gap-2 justify-center items-center h-screen">
+        <div
+          style={{
+            background: "#2563eb",
+          }}
+          className="w-5 h-5 rounded-full animate-pulse"
+        ></div>
+        <div
+          style={{
+            background: "#2563eb",
+          }}
+          className="w-5 h-5 rounded-full animate-pulse"
+        ></div>
+        <div
+          style={{
+            background: "#2563eb",
+          }}
+          className="w-5 h-5 rounded-full animate-pulse"
+        ></div>
+      </div>
+    )
   }
 
   return (

@@ -42,10 +42,29 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
 
 export default LayoutApp
 
+export const HeaderContent = () => {
+  return (
+    <div className="flex flex-col flex-1 overflow-hidden">
+      <div
+        className="h-[100px] w-full flex items-center justify-between px-5"
+        style={{
+          background: "linear-gradient(90deg, #36989D 0%, #3C5F60 100%)",
+        }}
+      >
+        <p className="text-white text-3xl font-bold">
+          CÔNG TY CP PHÁT TRIỂN BĐS PHÁT ĐẠT
+        </p>
+
+        <ContentRight />
+      </div>
+    </div>
+  )
+}
+
 const notificationsAtom = atom<Notification[]>([])
 const ContentRight = () => {
   const { useGetNotifications } = useNotifications()
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const { data } = useGetNotifications(user?.id ?? 0)
   const [notifications, setNotifications] = useAtom(notificationsAtom)
   const { useMarkAllAsRead } = useNotifications()
@@ -68,13 +87,10 @@ const ContentRight = () => {
   return (
     <div className="flex items-center gap-6">
       <Popover>
-        <PopoverTrigger
-          className="relative"
-          onClick={() => markAllAsRead(user?.id ?? 0)}
-        >
+        <PopoverTrigger className="relative">
           <Bell
             size={24}
-            className="text-gray-600 hover:text-gray-800 cursor-pointer transition-colors duration-200"
+            className="text-white hover:text-gray-100 cursor-pointer transition-colors duration-200"
           />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
@@ -82,50 +98,72 @@ const ContentRight = () => {
             </span>
           )}
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-0 bg-white shadow-lg border border-gray-100">
-          <div className="p-4 border-b border-gray-100">
-            <h3 className="font-medium text-gray-700">Thông báo</h3>
+        <PopoverContent className="w-80 p-0 bg-white shadow-lg border border-gray-200 rounded-lg">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="font-medium text-gray-900">Thông báo</h3>
           </div>
           <div className="max-h-[400px] overflow-y-auto">
             {notifications?.length > 0 ? (
               notifications.map((notification: any) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
+                  className={`p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${
                     !notification.isRead ? "bg-blue-50" : ""
                   }`}
                 >
                   <p
                     className={`text-sm ${
                       !notification.isRead
-                        ? "font-medium text-gray-800"
+                        ? "font-medium text-gray-900"
                         : "text-gray-700"
                     }`}
                   >
                     {notification.message}
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     {new Date(notification.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               ))
             ) : (
-              <div className="p-4 text-center text-gray-400">
+              <div className="p-4 text-center text-gray-500">
                 Không có thông báo
               </div>
             )}
           </div>
         </PopoverContent>
       </Popover>
-      <div className="flex items-center gap-3 text-white bg-white/10 rounded-lg px-4 py-2 hover:bg-white/20 transition-colors duration-200 cursor-pointer">
-        <div className="p-1 bg-white/20 rounded-full">
-          <User size={20} className="text-white" />
-        </div>
-        <div>
-          <p className="font-medium text-sm">Nguyễn Văn A</p>
-          <p className="text-xs text-gray-200">Admin</p>
-        </div>
-      </div>
+      <Popover>
+        <PopoverTrigger>
+          <div className="flex items-center gap-3 text-white bg-white/10 rounded-lg px-4 py-2 hover:bg-white/20 transition-colors duration-200 cursor-pointer">
+            <div className="p-1 bg-white/20 rounded-full">
+              <User size={20} className="text-white" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">{user?.fullName}</p>
+              <p className="text-xs text-gray-200">{user?.role}</p>
+            </div>
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-2 bg-white shadow-lg border border-gray-200 rounded-lg">
+          <div className="flex flex-col space-y-1">
+            <button
+              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
+              onClick={() => {
+                /* handle view profile */
+              }}
+            >
+              Thông tin cá nhân
+            </button>
+            <button
+              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200"
+              onClick={logout}
+            >
+              Đăng xuất
+            </button>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }
