@@ -52,7 +52,6 @@ import { Textarea } from "@/components/ui/textarea"
 const formSchema = z.object({
   department: z.string().min(1, "Vui lòng chọn phòng ban"),
   creator: z.string().min(1, "Vui lòng nhập người tạo"),
-  creationDate: z.string().min(1, "Vui lòng chọn ngày tạo"),
   contractNumber: z.string().min(1, "Vui lòng nhập số hợp đồng"),
   customerName: z.string().min(1, "Vui lòng nhập tên khách hàng"),
   customerId: z.string(),
@@ -92,7 +91,7 @@ export default function ContractForm() {
 
   const { useListUsers: useListSigners } = useUsers()
   const { data: signersData, isLoading: isLoadingSigners } = useListSigners(
-    "employee",
+    "",
     1,
     10,
     searchSignerTerm,
@@ -104,8 +103,6 @@ export default function ContractForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       department: "",
-      creator: user?.fullName || "",
-      creationDate: "",
       contractNumber: "",
       customerName: "",
       customerId: "",
@@ -234,20 +231,6 @@ export default function ContractForm() {
                           {...field}
                           disabled
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="creationDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ngày tạo</FormLabel>
-                      <FormControl>
-                        <Input className="bg-white" type="date" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

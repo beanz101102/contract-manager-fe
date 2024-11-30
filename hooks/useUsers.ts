@@ -16,7 +16,7 @@ export const useUsers = () => {
 
   // Get list users
   const useListUsers = (
-    role?: "admin" | "employee" | "customer",
+    role?: "admin" | "employee" | "customer" | "",
     page: number = 1,
     limit: number = 10,
     text?: string,

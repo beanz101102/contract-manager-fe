@@ -49,7 +49,15 @@ export const useContracts = () => {
       | "completed"
   ) => {
     return useQuery({
-      queryKey: ["contracts", contractNumber, page, limit],
+      queryKey: [
+        "contracts",
+        contractNumber,
+        page,
+        limit,
+        customerId,
+        createdById,
+        status,
+      ],
       queryFn: async () => {
         const params = new URLSearchParams()
         if (contractNumber) {
