@@ -23,8 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-import { EditRequestModal } from "../review/page"
+import EditRequestModal from "@/components/modals/EditRequestModal"
 
 const contractListAtom = atom<ContractList[]>([])
 
