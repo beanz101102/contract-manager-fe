@@ -412,3 +412,23 @@ export interface ContractStatistics {
     }
   }
 }
+
+export interface Notification {
+  contract: {
+    id: number
+    contractNumber: string
+    contractType: string
+    createdAt: string
+    cancelReason: string | null
+    deletedAt: string | null
+    note: string
+    pdfFilePath: string
+    status: string
+    updatedAt: string
+  }
+  createdAt: string
+  id: number
+  isRead: boolean
+  message: string
+  type: string
+}
