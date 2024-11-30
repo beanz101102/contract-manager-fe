@@ -2,6 +2,7 @@
 
 import { createContext, use, useContext, useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { toast } from "react-hot-toast"
 
 import { AuthContextType, User } from "@/types/auth"
 import { api } from "@/lib/axios"
@@ -19,38 +20,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       setUser(JSON.parse(user))
       if (pathname === "/login") {
-        router.push("/dashboard")
+        router.push("/")
       }
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 500)
     } else {
       router.push("/login")
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 500)
     }
   }, [])
 
   const login = async (username: string, password: string) => {
     try {
-      setIsLoading(true)
       const response = await api.post<{
         message: string
         user: User
       }>("/api/auth/login", {
-        email: username,
+        username: username,
         passwordHash: password,
       })
 
       localStorage.setItem("user", JSON.stringify(response.data?.user))
       setUser(response.data?.user)
-      router.push("/dashboard")
-    } catch (error) {
+      router.push("/")
+    } catch (error: any) {
       console.error("Login error:", error)
+      toast.error(
+        error.response.data.message ??
+          "Vui lòng kiểm tra lại tài khoản và mật khẩu"
+      )
       // throw error
-    } finally {
-      setIsLoading(false)
     }
   }
 
   const logout = () => {
     localStorage.removeItem("user")
     setUser(null)
+    router.push("/login")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex gap-2 justify-center items-center h-screen">
+        <div
+          style={{
+            background: "#2563eb",
+          }}
+          className="w-5 h-5 rounded-full animate-pulse"
+        ></div>
+        <div
+          style={{
+            background: "#2563eb",
+          }}
+          className="w-5 h-5 rounded-full animate-pulse"
+        ></div>
+        <div
+          style={{
+            background: "#2563eb",
+          }}
+          className="w-5 h-5 rounded-full animate-pulse"
+        ></div>
+      </div>
+    )
   }
 
   return (

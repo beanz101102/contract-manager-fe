@@ -19,6 +19,18 @@ interface AddContractPayload {
   file: File | null
 }
 
+interface UpdateContractPayload {
+  id: number
+  contractNumber: number | string
+  customer: number
+  contractType: string
+  approvalTemplateId: number
+  note: string
+  signers: any[]
+  createdById: number
+  file: File | null
+}
+
 export const useContracts = () => {
   const queryClient = useQueryClient()
 
@@ -37,7 +49,15 @@ export const useContracts = () => {
       | "completed"
   ) => {
     return useQuery({
-      queryKey: ["contracts", contractNumber, page, limit],
+      queryKey: [
+        "contracts",
+        contractNumber,
+        page,
+        limit,
+        customerId,
+        createdById,
+        status,
+      ],
       queryFn: async () => {
         const params = new URLSearchParams()
         if (contractNumber) {
@@ -103,6 +123,7 @@ export const useContracts = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
+          withCredentials: true,
         })
         return response.data
       },
@@ -294,6 +315,35 @@ export const useContracts = () => {
     })
   }
 
+  const useUpdateContract = () => {
+    return useMutation({
+      mutationFn: async (payload: UpdateContractPayload) => {
+        const formData = new FormData()
+        Object.entries(payload).forEach(([key, value]) => {
+          if (value instanceof File) {
+            formData.append(key, value)
+          } else {
+            formData.append(key, String(value))
+          }
+        })
+
+        const response = await api.post("/api/contract/update", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        return response.data
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["contracts"] })
+        toast.success("Cập nhật hợp đồng thành công")
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -307,5 +357,6 @@ export const useContracts = () => {
     useSignContract,
     useCancelContract,
     useContractStatistics,
+    useUpdateContract,
   }
 }

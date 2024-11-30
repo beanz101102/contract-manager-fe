@@ -1,12 +1,16 @@
-import React from "react"
-import { Button, Dropdown, Icon, Menu } from "semantic-ui-react"
+import React, { useState } from "react"
+import { FileSignature, Image, PenLine, Save } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+
+import { SignatureListModal } from "../modals/components/SignatureListModal"
 
 interface MenuBarProps {
   openHelp: () => void
   saveToServer: () => void
   downloadPdf: () => void
   addText: () => void
-  addImage: () => void
+  addImage: (file?: File) => void
   addDrawing: () => void
   savingPdfStatus: boolean
   uploadNewPdf: () => void
@@ -23,42 +27,47 @@ export const MenuBar: React.FC<MenuBarProps> = ({
   savingPdfStatus,
   uploadNewPdf,
   isPdfLoaded,
-}) => (
-  <Menu pointing>
-    <Menu.Item header>PDF Editor</Menu.Item>
-    <Menu.Menu position="right">
-      {isPdfLoaded && (
-        <>
-          <Dropdown
-            data-testid="edit-menu-dropdown"
-            item
-            closeOnBlur
-            icon="edit outline"
-            simple
-          >
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={addText}>Add Text</Dropdown.Item>
-              <Dropdown.Item onClick={addImage}>Add Image</Dropdown.Item>
-              <Dropdown.Item onClick={addDrawing}>Add Drawing</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-          <Button onClick={saveToServer} disabled={savingPdfStatus}>
-            Save to Server
+}) => {
+  const handleSignatureSelect = async (signatureUrl: string) => {
+    try {
+      const response = await fetch(signatureUrl)
+      const blob = await response.blob()
+      const file = new File([blob], "signature.png", { type: "image/png" })
+      addImage(file as any)
+    } catch (error) {
+      console.error("Error loading signature:", error)
+    }
+  }
+
+  return (
+    <div className="w-full bg-white border-b">
+      <div className="mx-auto flex h-12 items-center justify-between px-4">
+        {/* Left side */}
+        <div className="flex items-center gap-2">
+          <Button onClick={() => addImage()}>
+            <Image className="h-4 w-4 mr-1.5" />
+            Thêm hình ảnh
           </Button>
 
-          <Button onClick={downloadPdf} disabled={savingPdfStatus}>
-            Download PDF
+          <Button onClick={addDrawing}>
+            <PenLine className="h-4 w-4 mr-1.5" />
+            Chữ ký
           </Button>
-          <Menu.Item
-            data-testid="upload-menu-item"
-            name="Upload New"
-            onClick={uploadNewPdf}
-          />
-        </>
-      )}
-      <Menu.Item data-testid="help-menu-item" onClick={openHelp}>
-        <Icon name="question circle outline" />
-      </Menu.Item>
-    </Menu.Menu>
-  </Menu>
-)
+          <SignatureListModal onSelect={handleSignatureSelect} />
+        </div>
+
+        {/* Right side */}
+        <Button
+          variant="default"
+          size="sm"
+          className="bg-blue-500 hover:bg-blue-600 text-white"
+          onClick={saveToServer}
+          disabled={savingPdfStatus}
+        >
+          <Save className="h-4 w-4 mr-1.5" />
+          {savingPdfStatus ? "Đang lưu..." : "Lưu"}
+        </Button>
+      </div>
+    </div>
+  )
+}

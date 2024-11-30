@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useAuth } from "@/contexts/auth-context"
 import AppPDF from "@/src/App"
 import { atom, useAtom } from "jotai"
 import { Plus, Trash2 } from "lucide-react"
@@ -39,6 +40,7 @@ export default function EmployeeList() {
   const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
   const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
+  const { user } = useAuth()
 
   const { useListUsers, useDeleteUser } = useUsers()
   const { data: employees, isLoading } = useListUsers(
@@ -86,7 +88,6 @@ export default function EmployeeList() {
 
   return (
     <div className="p-8 bg-white rounded-xl shadow-sm">
-      {/* <AppPDF /> */}
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         Danh sách nhân viên
       </h1>
@@ -134,20 +135,22 @@ export default function EmployeeList() {
             </div>
           </div>
         </div>
-        <div className="flex gap-3">
-          <Link href="/employees/new">
-            <Button className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
-              <Plus className="w-4 h-4 mr-2" /> Thêm mới
+        {(user?.role === "admin" || user?.role === "manager") && (
+          <div className="flex gap-3">
+            <Link href="/employees/new">
+              <Button className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
+                <Plus className="w-4 h-4 mr-2" /> Thêm mới
+              </Button>
+            </Link>
+            <Button
+              className="bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
+              disabled={selectedEmployees.length === 0}
+              onClick={() => deleteUser(selectedEmployees)}
+            >
+              <Trash2 className="w-4 h-4 mr-2" /> Xóa
             </Button>
-          </Link>
-          <Button
-            className="bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
-            disabled={selectedEmployees.length === 0}
-            onClick={() => deleteUser(selectedEmployees)}
-          >
-            <Trash2 className="w-4 h-4 mr-2" /> Xóa
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="overflow-x-auto">

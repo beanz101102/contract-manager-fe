@@ -39,48 +39,50 @@ const DetailContract = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] p-6">
+      <DialogContent className="sm:max-w-[900px] p-0">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full">
-            <TabsTrigger value="info" className="flex-1">
+          <TabsList className="w-full border-b">
+            <TabsTrigger value="info" className="flex-1 px-6 py-3">
               Thông tin hợp đồng
             </TabsTrigger>
-            <TabsTrigger value="view" className="flex-1">
+            <TabsTrigger value="view" className="flex-1 px-6 py-3">
               Xem hợp đồng
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="info" className="p-4">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold">Thông tin chung</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <p>Ngày tạo: {dayjs(data?.createdAt).format("DD/MM/YYYY")}</p>
-                  <p>Người tạo: {data?.createdBy?.fullName}</p>
-                  <p>
-                    Trạng thái:{" "}
-                    {
-                      mapiContractStatus[
-                        data?.status as keyof typeof mapiContractStatus
-                      ]?.label
-                    }
-                  </p>
-                  <p>Diễn giải: {data?.note}</p>
+          <TabsContent value="info" className="p-6">
+            <div className="space-y-6">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-lg mb-3">Thông tin chung</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex gap-2">
+                    <span className="text-gray-500">Ngày tạo:</span>
+                    <span>{dayjs(data?.createdAt).format("DD/MM/YYYY")}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-gray-500">Người tạo:</span>
+                    <span>{data?.createdBy?.fullName}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-gray-500">Trạng thái:</span>
+                    <span>
+                      {
+                        mapiContractStatus[
+                          data?.status as keyof typeof mapiContractStatus
+                        ]?.label
+                      }
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-gray-500">Diễn giải:</span>
+                    <span>{data?.note}</span>
+                  </div>
                 </div>
               </div>
-              {/* <div>
-                <h3 className="font-semibold">Thông tin khác</h3>
-                <div>
-                  <p>Nhận xét:</p>
-                  <Button variant="outline" className="mt-2">
-                    Tệp đính kèm
-                  </Button>
-                </div>
-              </div> */}
-              <div>
-                <h3 className="font-semibold">Quá trình xử lý</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-lg mb-3">Quá trình xử lý</h3>
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-gray-100">
                       <TableHead>STT</TableHead>
                       <TableHead>Thao tác</TableHead>
                       <TableHead>Người thực hiện</TableHead>
@@ -134,24 +136,20 @@ const DetailContract = ({
               </div>
             </div>
           </TabsContent>
-          <TabsContent value="view" className="p-4">
+          <TabsContent value="view" className="p-6">
             {data?.pdfFilePath && (
               <object
                 data={`http://localhost:8000${data?.pdfFilePath}`}
                 type="application/pdf"
-                className="w-full h-[40vh]"
+                className="w-full h-[60vh] rounded-lg"
               >
                 <p>Không thể hiển thị file PDF.</p>
               </object>
             )}
           </TabsContent>
         </Tabs>
-        <div className="p-4 flex justify-end">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="bg-gray-100 hover:bg-gray-200 text-black"
-          >
+        <div className="p-6 flex justify-end border-t bg-gray-50">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Đóng
           </Button>
         </div>

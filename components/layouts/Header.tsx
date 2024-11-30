@@ -1,4 +1,8 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 import { Building2, FileText, List, User, UserPlus, Users } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -12,10 +16,16 @@ import {
 import NextImage from "../ui/next-img"
 
 export default function SidebarMenu() {
+  const router = useRouter()
   return (
     <div className="flex flex-col h-screen bg-white border-r w-[280px]">
       <div className="py-3 px-4 border-b">
-        <div className="flex items-center justify-center">
+        <div
+          className="flex items-center justify-center cursor-pointer"
+          onClick={() => {
+            router.push("/")
+          }}
+        >
           <NextImage
             src="/img/logo.png"
             alt="logo"
@@ -35,6 +45,7 @@ export default function SidebarMenu() {
 }
 
 function DropdownMenu() {
+  const { user } = useAuth()
   return (
     <div className="w-full">
       <Accordion type="multiple" className="w-full">
@@ -100,11 +111,13 @@ function DropdownMenu() {
                   Luồng duyệt hợp đồng
                 </li>
               </Link>
-              <Link href="/contract/user-signature">
-                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
-                  Chữ ký cá nhân
-                </li>
-              </Link>
+              {(user?.role === "admin" || user?.role === "manager") && (
+                <Link href="/contract/user-signature">
+                  <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                    Chữ ký cá nhân
+                  </li>
+                </Link>
+              )}
             </ul>
           </AccordionContent>
         </AccordionItem>
@@ -159,11 +172,13 @@ function DropdownMenu() {
                   Danh sách phòng ban
                 </li>
               </Link>
-              <Link href="/department/create">
-                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
-                  Tạo phòng ban mới
-                </li>
-              </Link>
+              {user?.role === "admin" && (
+                <Link href="/department/create">
+                  <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                    Tạo phòng ban mới
+                  </li>
+                </Link>
+              )}
             </ul>
           </AccordionContent>
         </AccordionItem>

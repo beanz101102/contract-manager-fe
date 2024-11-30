@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
@@ -38,6 +38,7 @@ export default function IndividualManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [contract, setContract] = useState<ContractList | null>(null)
   const router = useRouter()
+
   const {
     useAllContracts,
     useBulkDeleteContracts,
@@ -295,11 +296,18 @@ export default function IndividualManagement() {
                           alt="mail"
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                         /> */}
-                        <NextImage
-                          src="/edit.png"
-                          alt="edit"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        />
+                        <div
+                          onClick={() => {
+                            router.push(`/contract/edit/${contract.id}`)
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <NextImage
+                            src="/edit.png"
+                            alt="edit"
+                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          />
+                        </div>
                         {/* <NextImage
                           src="/setting.png"
                           alt="setting"
