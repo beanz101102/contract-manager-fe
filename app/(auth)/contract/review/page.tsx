@@ -415,7 +415,7 @@ const ModalConfirm = ({
   )
 }
 
-const EditRequestModal = ({
+export const EditRequestModal = ({
   isOpen,
   onOpenChange,
   selectedEmployees,

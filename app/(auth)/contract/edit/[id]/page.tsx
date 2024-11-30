@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ChevronLeft, Plus, Search, Upload, X } from "lucide-react"
@@ -52,7 +52,6 @@ import { Textarea } from "@/components/ui/textarea"
 const formSchema = z.object({
   department: z.string().min(1, "Vui lòng chọn phòng ban"),
   creator: z.string().min(1, "Vui lòng nhập người tạo"),
-  creationDate: z.string().min(1, "Vui lòng chọn ngày tạo"),
   contractNumber: z.string().min(1, "Vui lòng nhập số hợp đồng"),
   customerName: z.string().min(1, "Vui lòng nhập tên khách hàng"),
   customerId: z.string(),
@@ -63,7 +62,7 @@ const formSchema = z.object({
   approvalFlow: z.string().min(1, "Vui lòng chọn luồng duyệt"),
 })
 
-export default function ContractForm() {
+export default function EditContractPage() {
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
@@ -74,11 +73,14 @@ export default function ContractForm() {
   const router = useRouter()
   const [openFlowDialog, setOpenFlowDialog] = useState(false)
   const [searchFlowTerm, setSearchFlowTerm] = useState("")
-  const [openSignerSelect, setOpenSignerSelect] = useState<{
-    [key: number]: boolean
-  }>({})
   const [searchSignerTerm, setSearchSignerTerm] = useState("")
   const [selectedSigners, setSelectedSigners] = useState<User[]>([])
+  const id = useParams().id
+  const { useContractDetail, useUpdateContract } = useContracts()
+  const { mutate: updateContract } = useUpdateContract()
+
+  const { data: contractDetail, isLoading: isLoadingContractDetail } =
+    useContractDetail(Number(id))
 
   const { useListUsers } = useUsers()
   const { data, isLoading } = useListUsers("customer", 1, 10, searchTerm, null)
@@ -104,8 +106,7 @@ export default function ContractForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       department: "",
-      creator: user?.fullName || "",
-      creationDate: "",
+      creator: "",
       contractNumber: "",
       customerName: "",
       customerId: "",
@@ -116,6 +117,39 @@ export default function ContractForm() {
       approvalFlow: "",
     },
   })
+
+  useEffect(() => {
+    if (contractDetail) {
+      setCurrentCustomer(contractDetail.customer)
+
+      form.reset({
+        creator: contractDetail.createdBy.fullName,
+        contractNumber: contractDetail.contractNumber,
+        customerName: contractDetail.customer.fullName,
+        customerId: contractDetail.customer.code,
+        idNumber: contractDetail.customer.idNumber,
+        email: contractDetail.customer.email,
+        phone: contractDetail.customer.phoneNumber || "",
+        notes: contractDetail.note,
+        approvalFlow: contractDetail.approvalTemplate?.id.toString(),
+      })
+
+      if (contractDetail.signers) {
+        const sortedSigners = [...contractDetail.signers]
+          .sort((a, b) => a.signOrder - b.signOrder)
+          .map(
+            (signer) =>
+              ({
+                ...signer.signer,
+                id: signer.signer.id,
+                fullName: signer.signer.name,
+                email: signer.signer.email,
+              } as any)
+          )
+        setSelectedSigners(sortedSigners)
+      }
+    }
+  }, [contractDetail])
 
   useEffect(() => {
     if (user?.fullName) {
@@ -194,6 +228,7 @@ export default function ContractForm() {
             <Button
               onClick={() => {
                 const payload = {
+                  id: Number(id),
                   contractNumber: form.getValues("contractNumber"),
                   customerId: currentCustomer?.id || 0,
                   contractType: "purchase",
@@ -209,9 +244,7 @@ export default function ContractForm() {
                   file: pdfFile,
                 }
 
-                console.log("payload", payload)
-
-                addContract(payload as any)
+                updateContract(payload as any)
               }}
             >
               Lưu hợp đồng
@@ -234,20 +267,6 @@ export default function ContractForm() {
                           {...field}
                           disabled
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="creationDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ngày tạo</FormLabel>
-                      <FormControl>
-                        <Input className="bg-white" type="date" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -445,7 +464,12 @@ export default function ContractForm() {
                     >
                       <div className="flex flex-col items-center gap-2">
                         <Upload className="w-6 h-6" />
-                        <span>{fileName || "Chọn hợp đồng (.pdf)"}</span>
+                        <span>
+                          {fileName ||
+                            (contractDetail?.pdfFilePath
+                              ? "Chọn hợp đồng mới (.pdf)"
+                              : "Chọn hợp đồng (.pdf)")}
+                        </span>
                       </div>
                     </Button>
                   </div>
@@ -629,7 +653,6 @@ export default function ContractForm() {
                             <Button
                               variant="outline"
                               onClick={() => setOpenFlowDialog(false)}
-                              className="bg-white border-gray-200 hover:bg-gray-50 text-gray-700"
                             >
                               Hủy
                             </Button>
@@ -677,9 +700,13 @@ export default function ContractForm() {
 
         <Card className="p-4">
           <div className="aspect-[1/1.4] bg-muted rounded-lg flex items-center justify-center overflow-auto">
-            {pdfFile ? (
+            {pdfFile || contractDetail?.pdfFilePath ? (
               <object
-                data={URL.createObjectURL(pdfFile)}
+                data={
+                  pdfFile
+                    ? URL.createObjectURL(pdfFile)
+                    : `http://localhost:8000${contractDetail?.pdfFilePath}`
+                }
                 type="application/pdf"
                 className="w-full h-full"
               >
