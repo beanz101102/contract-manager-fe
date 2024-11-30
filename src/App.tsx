@@ -16,6 +16,7 @@ import { UploadTypes, useUploader } from "./hooks/useUploader"
 import { DrawingModal } from "./modals/components/DrawingModal"
 import { HelpModal } from "./modals/components/HelpModal"
 import * as serviceWorker from "./serviceWorker"
+import { readAsDataURL, readAsImage } from "./utils/asyncReader"
 import { ggID } from "./utils/helpers"
 import { savePdfToServer } from "./utils/pdf"
 import { prepareAssets } from "./utils/prepareAssets"
@@ -169,6 +170,35 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
     handleLoadPdfFromUrl(url)
   }, [url])
 
+  const handleAddImage = async (file?: File) => {
+    if (file) {
+      // Xử lý file được truyền vào (từ chữ ký có sẵn)
+      try {
+        const url = await readAsDataURL(file)
+        const img = await readAsImage(url as string)
+        const id = ggID()
+        const { width, height } = img
+
+        const imageAttachment: ImageAttachment = {
+          id,
+          type: AttachmentTypes.IMAGE,
+          width,
+          height,
+          x: 0,
+          y: 0,
+          img,
+          file,
+        }
+        addAttachment(imageAttachment)
+      } catch (error) {
+        console.log("Failed to load image", error)
+      }
+    } else {
+      // Mở dialog chọn file khi không có file được truyền vào
+      handleImageClick()
+    }
+  }
+
   return (
     <div className="w-full">
       {hiddenInputs}
@@ -176,7 +206,7 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
         openHelp={() => setHelpModalOpen(true)}
         saveToServer={handleSaveToServer}
         addText={addText}
-        addImage={handleImageClick}
+        addImage={handleAddImage}
         addDrawing={() => setDrawingModalOpen(true)}
         savingPdfStatus={isSaving}
         uploadNewPdf={handlePdfClick}

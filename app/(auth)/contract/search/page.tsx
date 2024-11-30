@@ -127,12 +127,6 @@ export default function ContractSearch() {
           <Table className="min-w-[1200px] w-full">
             <TableHeader>
               <TableRow className="hover:bg-gray-50 bg-gray-100">
-                <TableHead className="w-[50px]">
-                  <Checkbox
-                    checked={selectedEmployees.length === contracts?.length}
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
                 <TableHead className="w-[60px] text-gray-700 font-semibold">
                   STT
                 </TableHead>
@@ -184,12 +178,6 @@ export default function ContractSearch() {
                     key={contract.id}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedEmployees.includes(contract.id)}
-                        onCheckedChange={() => handleSelectOne(contract.id)}
-                      />
-                    </TableCell>
                     <TableCell className="text-gray-700 text-base">
                       {index + 1}
                     </TableCell>

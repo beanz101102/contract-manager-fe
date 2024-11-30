@@ -59,7 +59,7 @@ const SignatureManagementInterface = () => {
           className="bg-teal-500 hover:bg-teal-600 transition-colors duration-200 rounded-lg px-4 py-2 text-white font-medium"
           onClick={() => setIsOpenDigitalSignature(true)}
         >
-          <Plus className="w-4 h-4 mr-2" /> Thêm mi
+          <Plus className="w-4 h-4 mr-2" /> Thêm mới
         </Button>
       </div>
 
@@ -134,9 +134,6 @@ const SignatureManagementInterface = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-4">
-                        <button className="text-gray-600 hover:text-gray-900 transition-colors">
-                          <Eye className="w-5 h-5" />
-                        </button>
                         <button
                           onClick={() => deleteSignature(sig.id)}
                           className="text-red-500 hover:text-red-700 transition-colors"
