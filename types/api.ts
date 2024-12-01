@@ -457,3 +457,38 @@ export interface CustomerReport {
     rejected: { count: number; percentage: string }
   }
 }
+
+export const positionConfigs = [
+  {
+    label: "Nhân viên",
+    value: "employee",
+  },
+  {
+    label: "Quản lý",
+    value: "manager",
+  },
+]
+
+export interface AdvancedStatistics {
+  monthlyTrend: { month: string; count: number }[]
+  summary: {
+    total: number
+    byStatus: {
+      rejected: number
+      cancelled: number
+      draft: number
+      completed: number
+      pending_approval: number
+    }
+  }
+  byStatus: {
+    cancelled: number
+    completed: number
+    draft: number
+    pending_approval: number
+    rejected: number
+  }
+
+  total: number
+  timeRange: null
+}

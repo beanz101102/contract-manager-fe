@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
 import {
+  AdvancedStatistics,
   Contract,
   ContractList,
   ContractStatistics,
@@ -391,6 +392,30 @@ export const useContracts = () => {
     })
   }
 
+  const useAdvancedStatistics = (payload: {
+    startTime?: number
+    endTime?: number
+    status?: string
+    createdById?: number
+    customerId?: number
+  }) => {
+    return useQuery({
+      queryKey: ["advanced-statistics", payload],
+      queryFn: async () => {
+        const params = new URLSearchParams()
+        Object.entries(payload).forEach(([key, value]) => {
+          if (value !== undefined) {
+            params.append(key, value.toString())
+          }
+        })
+        const response = await api.get<AdvancedStatistics>(
+          `/api/contract/advanced-statistics?${params}`
+        )
+        return response.data
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -407,5 +432,6 @@ export const useContracts = () => {
     useUpdateContract,
     useContractsInRange,
     useCustomerReport,
+    useAdvancedStatistics,
   }
 }

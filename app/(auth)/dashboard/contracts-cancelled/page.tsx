@@ -39,7 +39,6 @@ export default function ContractReport() {
     status: "cancelled",
   })
   const contracts = data || []
-  console.log("datadatadatadatadatadatadata", contracts)
 
   const generatePDF = async () => {
     const element = targetRef.current

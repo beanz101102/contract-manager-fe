@@ -63,13 +63,19 @@ function DropdownMenu() {
                   Tổng quan
                 </li>
               </Link>
-              {user?.role === "admin" && (
+              {(user?.role === "admin" || user?.role === "manager") && (
                 <>
+                  <Link href="/dashboard/contract-statistics">
+                    <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                      Báo cáo thống kê hợp đồng{" "}
+                    </li>
+                  </Link>
                   <Link href="/dashboard/contracts-success">
                     <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                       Thống kê hợp đồng thành công
                     </li>
                   </Link>
+
                   <Link href="/dashboard/contracts-cancelled">
                     <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                       Thống kê hợp đồng hủy

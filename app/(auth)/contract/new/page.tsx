@@ -131,13 +131,6 @@ export default function ContractForm() {
       note: values.notes,
       file: pdfFile,
     }
-
-    console.log("payload", payload)
-
-    // addContract({
-    //   ...payload,
-    //   file: pdfFile,
-    // })
   }
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -174,7 +167,7 @@ export default function ContractForm() {
   const approvalFlows = approvalFlowsData || []
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6 bg-white rounded-[10px] border-none shadow-lg">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <div className="flex items-center gap-4 mb-6">
@@ -187,31 +180,6 @@ export default function ContractForm() {
             >
               <ChevronLeft className="w-4 h-4" />
               Quay lại
-            </Button>
-            <Button
-              onClick={() => {
-                const payload = {
-                  contractNumber: form.getValues("contractNumber"),
-                  customerId: currentCustomer?.id || 0,
-                  contractType: "purchase",
-                  createdById: user?.id || 0,
-                  signers: JSON.stringify(
-                    selectedSigners.map((signer, idx) => ({
-                      userId: signer?.id,
-                      order: idx + 1,
-                    }))
-                  ),
-                  approvalTemplateId: parseInt(form.getValues("approvalFlow")),
-                  note: form.getValues("notes"),
-                  file: pdfFile,
-                }
-
-                console.log("payload", payload)
-
-                addContract(payload as any)
-              }}
-            >
-              Lưu hợp đồng
             </Button>
           </div>
 
@@ -226,7 +194,7 @@ export default function ContractForm() {
                       <FormLabel>Người tạo</FormLabel>
                       <FormControl>
                         <Input
-                          className="bg-white"
+                          className="bg-white h-10 border border-gray-200 rounded-md focus-visible:ring-1 focus-visible:ring-gray-950"
                           placeholder="Nhập tên người tạo"
                           {...field}
                           disabled
@@ -246,8 +214,8 @@ export default function ContractForm() {
                     <FormLabel>Số hợp đồng *</FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-white"
-                        placeholder="Nhập số hợp đồng"
+                        className="bg-white h-10 border border-gray-200 rounded-md focus-visible:ring-1 focus-visible:ring-gray-950"
+                        placeholder="Nhập số hp đồng"
                         {...field}
                       />
                     </FormControl>
@@ -261,16 +229,16 @@ export default function ContractForm() {
                 name="customerName"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Tên khách hàng *</FormLabel>
+                    <FormLabel className="text-gray-700">
+                      Tên khách hàng *
+                    </FormLabel>
                     <Popover open={open} onOpenChange={setOpen}>
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
                             variant="outline"
+                            className="h-10 w-full justify-between bg-white hover:bg-gray-50 border-gray-200 text-left font-normal"
                             role="combobox"
-                            className={`w-full justify-between bg-white ${
-                              !field.value && "text-muted-foreground"
-                            }`}
                           >
                             {field.value
                               ? customers?.find(
@@ -278,28 +246,33 @@ export default function ContractForm() {
                                     customer.fullName === field.value
                                 )?.fullName
                               : "Chọn khách hàng"}
-                            <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            <Search className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[400px] p-0">
-                        <Command>
+                      <PopoverContent className="w-[400px] p-0 bg-white border border-gray-200 shadow-lg">
+                        <Command className="border-none bg-white">
                           <CommandInput
                             placeholder="Tìm kiếm khách hàng..."
                             value={searchTerm}
                             onValueChange={setSearchTerm}
+                            className="border-none focus:ring-0"
                           />
-                          <CommandEmpty>
+                          <CommandEmpty className="py-4 text-sm text-gray-500 text-center">
                             {isLoading
                               ? "Đang tải..."
                               : "Không tìm thấy khách hàng"}
                           </CommandEmpty>
                           <CommandList>
-                            <CommandGroup heading="Suggestions">
+                            <CommandGroup
+                              heading="Gợi ý"
+                              className="text-sm text-gray-700"
+                            >
                               {customers?.map((customer: any) => (
                                 <CommandItem
                                   key={customer?.id}
                                   value={customer?.fullName}
+                                  className="hover:bg-gray-50 cursor-pointer py-3 px-4 "
                                   onSelect={() => {
                                     setCurrentCustomer(customer)
                                     form.setValue(
@@ -319,7 +292,9 @@ export default function ContractForm() {
                                     setOpen(false)
                                   }}
                                 >
-                                  {customer?.fullName}
+                                  <span className="text-gray-700">
+                                    {customer?.fullName}
+                                  </span>
                                 </CommandItem>
                               ))}
                             </CommandGroup>
@@ -340,7 +315,7 @@ export default function ContractForm() {
                     <FormLabel>Mã khách hàng</FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-white"
+                        className="bg-white h-10 border border-gray-200 rounded-md focus-visible:ring-1 focus-visible:ring-gray-950"
                         placeholder="Nhập mã khách hàng"
                         {...field}
                       />
@@ -358,7 +333,7 @@ export default function ContractForm() {
                     <FormLabel>Số CCCD *</FormLabel>
                     <FormControl>
                       <Input
-                        className="bg-white"
+                        className="bg-white h-10 border border-gray-200 rounded-md focus-visible:ring-1 focus-visible:ring-gray-950"
                         placeholder="Nhập số căn cước công dân"
                         {...field}
                       />
@@ -377,7 +352,7 @@ export default function ContractForm() {
                       <FormLabel>Email *</FormLabel>
                       <FormControl>
                         <Input
-                          className="bg-white"
+                          className="bg-white h-10 border border-gray-200 rounded-md focus-visible:ring-1 focus-visible:ring-gray-950"
                           type="email"
                           placeholder="Nhập email"
                           {...field}
@@ -396,7 +371,7 @@ export default function ContractForm() {
                       <FormLabel>Số điện thoại *</FormLabel>
                       <FormControl>
                         <Input
-                          className="bg-white"
+                          className="bg-white h-10 border border-gray-200 rounded-md focus-visible:ring-1 focus-visible:ring-gray-950"
                           placeholder="Nhập số điện thoại"
                           {...field}
                         />
@@ -420,7 +395,7 @@ export default function ContractForm() {
                     />
                     <Button
                       variant="outline"
-                      className="w-full h-24 border-dashed bg-white"
+                      className="w-full h-24 border-dashed bg-white hover:bg-gray-50 border-gray-200"
                       onClick={() =>
                         document.getElementById("pdf-upload")?.click()
                       }
@@ -449,7 +424,7 @@ export default function ContractForm() {
                         <DialogTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-full justify-between bg-white hover:bg-gray-50 border-gray-200 text-gray-700"
+                            className="h-10 w-full justify-between bg-white hover:bg-gray-50 border-gray-200 text-gray-700"
                             type="button"
                           >
                             <span className="text-gray-600">
@@ -523,7 +498,7 @@ export default function ContractForm() {
                                 <PopoverTrigger asChild>
                                   <Button
                                     variant="outline"
-                                    className="w-full justify-between bg-white hover:bg-gray-50 border-gray-200"
+                                    className="h-10 w-full justify-between bg-white hover:bg-gray-50 border-gray-200"
                                   >
                                     Thêm người ký
                                     <Plus className="ml-2 h-4 w-4 shrink-0 text-gray-500" />
@@ -645,7 +620,7 @@ export default function ContractForm() {
                     <FormLabel>Ghi chú</FormLabel>
                     <FormControl>
                       <Textarea
-                        className="bg-white"
+                        className="bg-white min-h-[80px] border border-gray-200 rounded-md focus-visible:ring-1 focus-visible:ring-gray-950"
                         placeholder="Nhập ghi chú"
                         {...field}
                       />
@@ -656,6 +631,34 @@ export default function ContractForm() {
               />
             </form>
           </Form>
+          <div className="flex w-full ">
+            <Button
+              className="mt-6 mx-auto w-full"
+              onClick={() => {
+                const payload = {
+                  contractNumber: form.getValues("contractNumber"),
+                  customerId: currentCustomer?.id || 0,
+                  contractType: "purchase",
+                  createdById: user?.id || 0,
+                  signers: JSON.stringify(
+                    selectedSigners.map((signer, idx) => ({
+                      userId: signer?.id,
+                      order: idx + 1,
+                    }))
+                  ),
+                  approvalTemplateId: parseInt(form.getValues("approvalFlow")),
+                  note: form.getValues("notes"),
+                  file: pdfFile,
+                }
+
+                console.log("payload", payload)
+
+                addContract(payload as any)
+              }}
+            >
+              Lưu hợp đồng
+            </Button>
+          </div>
         </div>
 
         <Card className="p-4">

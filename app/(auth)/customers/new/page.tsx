@@ -2,7 +2,10 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft, CalendarIcon } from "lucide-react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
 import { EmployeeFormData, departmentConfigs } from "@/types/api"
 import { useUsers } from "@/hooks/useUsers"
@@ -18,43 +21,47 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+// Add validation schema
+const customerSchema = z.object({
+  code: z.string().min(1, "Mã khách hàng là bắt buộc"),
+  fullName: z.string().min(1, "Họ và tên là bắt buộc"),
+  birthPlace: z.string().min(1, "Nơi sinh là bắt buộc"),
+  address: z.string().min(1, "Địa chỉ là bắt buộc"),
+  gender: z.enum(["Nam", "Nữ", "Khác"], {
+    required_error: "Giới tính là bắt buộc",
+  }),
+  birthDate: z.string().min(1, "Ngày sinh là bắt buộc"),
+  idNumber: z.string().min(1, "Số CCCD là bắt buộc"),
+  issueDate: z.string().min(1, "Ngày cấp là bắt buộc"),
+  issuePlace: z.string().min(1, "Nơi cấp là bắt buộc"),
+  phone: z.string().min(1, "Số điện thoại là bắt buộc"),
+  email: z.string().email("Email không hợp lệ").min(1, "Email là bắt buộc"),
+})
+
+type CustomerFormData = z.infer<typeof customerSchema>
+
 export default function CustomerInformationForm() {
   const router = useRouter()
   const { useAddUser } = useUsers()
   const { mutate: addUser } = useAddUser()
 
-  const [code, setCode] = useState("KH001")
-  const [fullName, setFullName] = useState("Trần Thị A")
-  const [birthPlace, setBirthPlace] = useState("Hà Nội")
-  const [address, setAddress] = useState("456 Đường XYZ, Quận ABC, Hà Nội")
-  const [gender, setGender] = useState("Nữ")
-  const [birthDate, setBirthDate] = useState("1995-05-15")
-  const [idNumber, setIdNumber] = useState("001199123789")
-  const [issueDate, setIssueDate] = useState("2021-03-15")
-  const [issuePlace, setIssuePlace] = useState("Cục Cảnh sát")
-  const [phone, setPhone] = useState("0987654321")
-  const [email, setEmail] = useState("tranthia@gmail.com")
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<CustomerFormData>({
+    resolver: zodResolver(customerSchema),
+  })
 
-  const handleSubmit = () => {
+  const onSubmit = (data: CustomerFormData) => {
     const payload = {
-      code: code || "",
-      fullName: fullName || "",
-      placeOfBirth: birthPlace || "",
-      address: address || "",
-      gender: gender || "",
-      dateOfBirth: birthDate || null,
-      idNumber: idNumber || "",
-      idIssueDate: issueDate || null,
-      idIssuePlace: issuePlace || null,
-      phoneNumber: phone || "",
-      email: email || "",
+      ...data,
       department: 1,
       role: "customer",
       position: "Khách hàng",
       passwordHash: "",
-    } as EmployeeFormData
-
-    console.log("payload", payload)
+    } as unknown as EmployeeFormData
 
     addUser(payload, {
       onSuccess: () => {
@@ -78,7 +85,7 @@ export default function CustomerInformationForm() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
           </Button>
           <Button
-            onClick={handleSubmit}
+            onClick={handleSubmit(onSubmit)}
             className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold"
           >
             Lưu thông tin
@@ -113,12 +120,20 @@ export default function CustomerInformationForm() {
                     Mã khách hàng (*)
                   </Label>
                   <Input
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    style={{ border: "1px solid #0000004D" }}
+                    {...register("code")}
+                    style={{
+                      border: errors.code
+                        ? "1px solid red"
+                        : "1px solid #0000004D",
+                    }}
                     className="bg-white rounded text-black"
                     placeholder="Mã khách hàng"
                   />
+                  {errors.code && (
+                    <span className="text-red-500 text-sm">
+                      {errors.code.message}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -127,8 +142,7 @@ export default function CustomerInformationForm() {
                     Họ và tên (*)
                   </Label>
                   <Input
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    {...register("fullName")}
                     style={{
                       border: "1px solid #0000004D",
                     }}
@@ -136,14 +150,16 @@ export default function CustomerInformationForm() {
                     id="fullName"
                     placeholder="Họ và tên"
                   />
+                  {errors.fullName && (
+                    <p className="text-red-500">{errors.fullName.message}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label className="text-black" htmlFor="birthPlace">
                     Nơi sinh
                   </Label>
                   <Input
-                    value={birthPlace}
-                    onChange={(e) => setBirthPlace(e.target.value)}
+                    {...register("birthPlace")}
                     style={{
                       border: "1px solid #0000004D",
                     }}
@@ -151,6 +167,9 @@ export default function CustomerInformationForm() {
                     id="birthPlace"
                     placeholder="Nơi sinh"
                   />
+                  {errors.birthPlace && (
+                    <p className="text-red-500">{errors.birthPlace.message}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -162,8 +181,7 @@ export default function CustomerInformationForm() {
                 Địa chỉ
               </Label>
               <Input
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                {...register("address")}
                 style={{
                   border: "1px solid #0000004D",
                 }}
@@ -171,19 +189,25 @@ export default function CustomerInformationForm() {
                 id="address"
                 placeholder="Địa chỉ"
               />
+              {errors.address && (
+                <p className="text-red-500">{errors.address.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="gender">
                 Giới tính (*)
               </Label>
               <Select
-                value={gender}
                 onValueChange={(value) =>
-                  setGender(value as "Nam" | "Nữ" | "Khác")
+                  setValue("gender", value as "Nam" | "Nữ" | "Khác")
                 }
               >
                 <SelectTrigger
-                  style={{ border: "1px solid #0000004D" }}
+                  style={{
+                    border: errors.gender
+                      ? "1px solid red"
+                      : "1px solid #0000004D",
+                  }}
                   className="rounded text-black"
                 >
                   <SelectValue placeholder="Chọn giới tính" />
@@ -194,6 +218,11 @@ export default function CustomerInformationForm() {
                   <SelectItem value="Khác">Khác</SelectItem>
                 </SelectContent>
               </Select>
+              {errors.gender && (
+                <span className="text-red-500 text-sm">
+                  {errors.gender.message}
+                </span>
+              )}
             </div>
           </div>
 
@@ -204,8 +233,7 @@ export default function CustomerInformationForm() {
               </Label>
               <div className="relative">
                 <Input
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
+                  {...register("birthDate")}
                   style={{
                     border: "1px solid #0000004D",
                   }}
@@ -216,14 +244,16 @@ export default function CustomerInformationForm() {
                 />
                 <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
+              {errors.birthDate && (
+                <p className="text-red-500">{errors.birthDate.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="idNumber">
                 Số CCCD (*)
               </Label>
               <Input
-                value={idNumber}
-                onChange={(e) => setIdNumber(e.target.value)}
+                {...register("idNumber")}
                 style={{
                   border: "1px solid #0000004D",
                 }}
@@ -231,6 +261,9 @@ export default function CustomerInformationForm() {
                 id="idNumber"
                 placeholder="Số CCCD"
               />
+              {errors.idNumber && (
+                <p className="text-red-500">{errors.idNumber.message}</p>
+              )}
             </div>
           </div>
 
@@ -241,8 +274,7 @@ export default function CustomerInformationForm() {
               </Label>
               <div className="relative">
                 <Input
-                  value={issueDate}
-                  onChange={(e) => setIssueDate(e.target.value)}
+                  {...register("issueDate")}
                   style={{
                     border: "1px solid #0000004D",
                   }}
@@ -253,14 +285,16 @@ export default function CustomerInformationForm() {
                 />
                 <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
+              {errors.issueDate && (
+                <p className="text-red-500">{errors.issueDate.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="issuePlace">
                 Nơi cấp
               </Label>
               <Input
-                value={issuePlace}
-                onChange={(e) => setIssuePlace(e.target.value)}
+                {...register("issuePlace")}
                 style={{
                   border: "1px solid #0000004D",
                 }}
@@ -268,6 +302,9 @@ export default function CustomerInformationForm() {
                 id="issuePlace"
                 placeholder="Nơi cấp"
               />
+              {errors.issuePlace && (
+                <p className="text-red-500">{errors.issuePlace.message}</p>
+              )}
             </div>
           </div>
 
@@ -277,8 +314,7 @@ export default function CustomerInformationForm() {
                 Số điện thoại
               </Label>
               <Input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                {...register("phone")}
                 style={{
                   border: "1px solid #0000004D",
                 }}
@@ -286,14 +322,16 @@ export default function CustomerInformationForm() {
                 id="phone"
                 placeholder="Số điện thoại"
               />
+              {errors.phone && (
+                <p className="text-red-500">{errors.phone.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="email">
                 Email (*)
               </Label>
               <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register("email")}
                 style={{
                   border: "1px solid #0000004D",
                 }}
@@ -302,6 +340,9 @@ export default function CustomerInformationForm() {
                 type="email"
                 placeholder="Email"
               />
+              {errors.email && (
+                <p className="text-red-500">{errors.email.message}</p>
+              )}
             </div>
           </div>
         </div>
