@@ -18,10 +18,10 @@ import SidebarMenu from "./Header"
 const LayoutApp = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex min-h-screen w-full">
-      <div className="h-screen">
+      <div className="h-screen fixed">
         <SidebarMenu />
       </div>
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex pl-[280px] flex-col flex-1 overflow-hidden">
         <div
           className="h-[100px] w-full flex items-center justify-between px-5"
           style={{
@@ -34,7 +34,9 @@ const LayoutApp = ({ children }: { children: React.ReactNode }) => {
 
           <ContentRight />
         </div>
-        <div className="flex-1 overflow-auto p-6 text-black">{children}</div>
+        <div className="flex-1 p-6 text-black h-[calc(100vh-100px)] overflow-auto">
+          {children}
+        </div>
       </div>
     </div>
   )
