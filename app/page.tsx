@@ -11,8 +11,18 @@ export default function Dashboard() {
       <HeaderContent />
 
       {/* Grid Layout */}
-      <div className="flex justify-center items-center w-full h-[calc(100vh-100px)]">
-        <div className="mx-auto max-w-4xl w-full">
+      <div
+        className="flex justify-center items-center w-full h-[calc(100vh-100px)] relative"
+        style={{
+          backgroundImage: "url('/background.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Overlay layer */}
+        <div className="absolute inset-0 bg-[#98A5B2D4]"></div>
+
+        <div className="mx-auto max-w-4xl w-full relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               {
@@ -95,7 +105,7 @@ export default function Dashboard() {
                     alt={item.title}
                     className="h-[100px] w-[100px]"
                   />
-                  <span className="text-sm font-medium text-center">
+                  <span className="text-sm font-medium text-center text-white">
                     {item.title}
                   </span>
                 </div>
@@ -107,7 +117,7 @@ export default function Dashboard() {
                       alt={item.title}
                       className="h-[100px] w-[100px]"
                     />
-                    <span className="text-sm font-medium text-center">
+                    <span className="text-sm font-medium text-center text-white">
                       {item.title}
                     </span>
                   </div>

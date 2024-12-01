@@ -432,3 +432,28 @@ export interface Notification {
   message: string
   type: string
 }
+
+export interface ContractsInRange {
+  cancelReason: string | null
+  contractNumber: string
+  createdBy: { id: number; name: string }
+  id: number
+  customer: { id: number; name: string }
+  note: string
+  status: string
+  updatedAt: string
+}
+
+export interface CustomerReport {
+  customerId: number
+  customerName: string
+  statistics: {
+    total: number
+    draft: { count: number; percentage: string }
+    pending: { count: number; percentage: string }
+    cancelled: { count: number; percentage: string }
+    completed: { count: number; percentage: string }
+    readyToSign: { count: number; percentage: string }
+    rejected: { count: number; percentage: string }
+  }
+}

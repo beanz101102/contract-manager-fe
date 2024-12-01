@@ -5,6 +5,7 @@ import { Pie } from "react-chartjs-2"
 
 import { mapiContractStatus } from "@/types/api"
 import { useContracts } from "@/hooks/useContracts"
+import { Loading } from "@/components/ui/loading"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -13,7 +14,7 @@ export default function DashboardPage() {
   const { data: statistics, isLoading } = useContractStatistics()
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <Loading />
   }
 
   if (!statistics || statistics.total === 0) {

@@ -63,16 +63,25 @@ function DropdownMenu() {
                   Tổng quan
                 </li>
               </Link>
-              {/* <Link href="/dashboard/contracts">
-                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
-                  Thống kê hợp đồng
-                </li>
-              </Link>
-              <Link href="/dashboard/reports">
-                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
-                  Báo cáo chi tiết
-                </li>
-              </Link> */}
+              {user?.role === "admin" && (
+                <>
+                  <Link href="/dashboard/contracts-success">
+                    <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                      Thống kê hợp đồng thành công
+                    </li>
+                  </Link>
+                  <Link href="/dashboard/contracts-cancelled">
+                    <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                      Thống kê hợp đồng hủy
+                    </li>
+                  </Link>
+                  <Link href="/dashboard/contracts-customers">
+                    <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                      Thống kê hợp đồng khách hàng
+                    </li>
+                  </Link>
+                </>
+              )}
             </ul>
           </AccordionContent>
         </AccordionItem>

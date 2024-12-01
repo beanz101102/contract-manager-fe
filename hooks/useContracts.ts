@@ -5,6 +5,8 @@ import {
   Contract,
   ContractList,
   ContractStatistics,
+  ContractsInRange,
+  CustomerReport,
   DetailContract,
 } from "@/types/api"
 import { api } from "@/lib/axios"
@@ -344,6 +346,51 @@ export const useContracts = () => {
     })
   }
 
+  // contracts-in-range
+  const useContractsInRange = (payload: {
+    startTime: number
+    endTime: number
+    status: string
+  }) => {
+    return useQuery({
+      queryKey: ["contracts-in-range", payload],
+      queryFn: async () => {
+        const params = new URLSearchParams({
+          startTime: payload.startTime.toString(),
+          endTime: payload.endTime.toString(),
+          status: payload.status,
+        }).toString()
+
+        const response = await api.get<{
+          data: { contracts: ContractsInRange[] }
+        }>(`/api/contract/contracts-in-range?${params}`)
+        return response.data?.data?.contracts
+      },
+    })
+  }
+
+  // customer-report
+  const useCustomerReport = (payload: {
+    startTime: number
+    endTime: number
+    status: string
+  }) => {
+    return useQuery({
+      queryKey: ["customer-report", payload],
+      queryFn: async () => {
+        const params = new URLSearchParams({
+          startTime: payload.startTime.toString(),
+          endTime: payload.endTime.toString(),
+          status: payload.status,
+        }).toString()
+        const response = await api.get<{
+          data: { customers: CustomerReport[] }
+        }>(`/api/contract/customer-report?${params}`)
+        return response.data?.data?.customers
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -358,5 +405,7 @@ export const useContracts = () => {
     useCancelContract,
     useContractStatistics,
     useUpdateContract,
+    useContractsInRange,
+    useCustomerReport,
   }
 }
