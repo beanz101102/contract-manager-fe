@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: contract_manager_fe
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+    restart: always
+    networks:
+      - nginx-proxy
+    labels:
+      - "project=contract-manager-fe"
+      - "service=nextjs"
+
+networks:
+  nginx-proxy:
+    external: true
