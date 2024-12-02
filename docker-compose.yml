@@ -2,9 +2,7 @@ version: '3'
 
 services:
   nextjs:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: sukibrown/contract-manager-fe-nextjs:latest
     container_name: contract_manager_fe
     expose:
       - "3000"
