@@ -108,7 +108,7 @@ export default function ContractForm() {
       </div>
       <div className="flex-1 bg-gray-50 w-[70%]">
         <AppPDF
-          url={`http://localhost:8000${data?.pdfFilePath}`}
+          url={`${process.env.NEXT_PUBLIC_API_URL}${data?.pdfFilePath}`}
           setFile={setFile}
         />
       </div>

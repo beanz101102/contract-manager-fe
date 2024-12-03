@@ -36,14 +36,14 @@ export const SignatureListModal = ({ onSelect }: SignatureListModalProps) => {
               <div
                 key={sig.id}
                 onClick={() => {
-                  onSelect(`http://localhost:8000${sig.signatureImagePath}`)
+                  onSelect(`${process.env.NEXT_PUBLIC_API_URL}${sig.signatureImagePath}`)
                   setOpen(false)
                 }}
                 className="cursor-pointer group relative overflow-hidden rounded-xl border-2 border-gray-200 p-4 transition-all hover:border-teal-500 hover:shadow-lg"
               >
                 <div className="absolute inset-0 bg-teal-500/0 transition-colors group-hover:bg-teal-500/5" />
                 <NextImage
-                  src={`http://localhost:8000${sig.signatureImagePath}`}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${sig.signatureImagePath}`}
                   alt="Signature"
                   className="mx-auto w-[100px] h-[100px] object-contain transition-transform"
                 />

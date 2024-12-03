@@ -700,7 +700,7 @@ export default function EditContractPage() {
                 data={
                   pdfFile
                     ? URL.createObjectURL(pdfFile)
-                    : `http://localhost:8000${contractDetail?.pdfFilePath}`
+                    : `${process.env.NEXT_PUBLIC_API_URL}${contractDetail?.pdfFilePath}`
                 }
                 type="application/pdf"
                 className="w-full h-full"

@@ -74,7 +74,7 @@ export default function CustomerInformationForm() {
     <Card className="w-full bg-white rounded-[10px] border-none">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-b-[#675D5D]">
         <CardTitle className="text-2xl font-bold text-black">
-          Tạo mới nhân viên
+          Thêm mới khách hàng
         </CardTitle>
         <div className="flex space-x-2">
           <Button
@@ -156,12 +156,12 @@ export default function CustomerInformationForm() {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-black" htmlFor="birthPlace">
-                    Nơi sinh
+                    Nơi sinh (*)
                   </Label>
                   <Input
                     {...register("birthPlace")}
                     style={{
-                      border: "1px solid #0000004D",
+                      border: errors.birthPlace ? "1px solid red" : "1px solid #0000004D",
                     }}
                     className="bg-white rounded text-black"
                     id="birthPlace"
@@ -178,12 +178,12 @@ export default function CustomerInformationForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="address">
-                Địa chỉ
+                Địa chỉ (*)
               </Label>
               <Input
                 {...register("address")}
                 style={{
-                  border: "1px solid #0000004D",
+                  border: errors.address ? "1px solid red" : "1px solid #0000004D",
                 }}
                 className="bg-white rounded text-black"
                 id="address"
@@ -229,13 +229,13 @@ export default function CustomerInformationForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="birthDate">
-                Ngày sinh
+                Ngày sinh (*)
               </Label>
               <div className="relative">
                 <Input
                   {...register("birthDate")}
                   style={{
-                    border: "1px solid #0000004D",
+                    border: errors.birthDate ? "1px solid red" : "1px solid #0000004D",
                   }}
                   className="bg-white rounded text-black"
                   id="birthDate"
@@ -270,13 +270,13 @@ export default function CustomerInformationForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="issueDate">
-                Ngày cấp
+                Ngày cấp (*)
               </Label>
               <div className="relative">
                 <Input
                   {...register("issueDate")}
                   style={{
-                    border: "1px solid #0000004D",
+                    border: errors.issueDate ? "1px solid red" : "1px solid #0000004D",
                   }}
                   className="bg-white rounded text-black"
                   id="issueDate"
@@ -291,12 +291,12 @@ export default function CustomerInformationForm() {
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="issuePlace">
-                Nơi cấp
+                Nơi cấp (*)
               </Label>
               <Input
                 {...register("issuePlace")}
                 style={{
-                  border: "1px solid #0000004D",
+                  border: errors.issuePlace ? "1px solid red" : "1px solid #0000004D",
                 }}
                 className="bg-white rounded text-black"
                 id="issuePlace"
@@ -311,7 +311,7 @@ export default function CustomerInformationForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="phone">
-                Số điện thoại
+                Số điện thoại (*)
               </Label>
               <Input
                 {...register("phone")}

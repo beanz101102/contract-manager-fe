@@ -1,10 +1,10 @@
 "use client"
 
-import * as React from "react"
 import { format } from "date-fns"
 import html2canvas from "html2canvas-pro"
 import jsPDF from "jspdf"
 import { CalendarIcon, Download } from "lucide-react"
+import * as React from "react"
 import {
   Bar,
   CartesianGrid,
@@ -20,7 +20,6 @@ import {
   YAxis,
 } from "recharts"
 
-import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -30,13 +29,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { useContracts } from "@/hooks/useContracts"
 
 // Helper function to generate months array
 const generateMonthsArray = () => {
@@ -124,11 +117,28 @@ export default function ContractDashboard() {
       })
 
       const imgData = canvas.toDataURL("image/png")
-      const pdf = new jsPDF("p", "mm", "a4")
-      const pdfWidth = pdf.internal.pageSize.getWidth()
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+      const padding = 5
+      
+      // Tính toán kích thước PDF dựa trên tỷ lệ canvas
+      const pdfWidth = 297 // Chiều rộng tối đa (A4 landscape)
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width + (2 * padding)
+      
+      // Khởi tạo PDF với kích thước tùy chỉnh
+      const pdf = new jsPDF({
+        orientation: pdfWidth > pdfHeight ? 'l' : 'p',
+        unit: 'mm',
+        format: [pdfWidth + (2 * padding), pdfHeight]
+      })
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight)
+      // Thêm ảnh với padding
+      pdf.addImage(
+        imgData, 
+        "PNG", 
+        padding, 
+        padding, 
+        pdfWidth, 
+        pdfHeight - (2 * padding)
+      )
       pdf.save("bao-cao-hop-dong.pdf")
     } catch (error) {
       console.error("Error generating PDF:", error)

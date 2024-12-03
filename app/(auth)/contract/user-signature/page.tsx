@@ -127,7 +127,7 @@ const SignatureManagementInterface = () => {
                     </TableCell>
                     <TableCell>
                       <NextImage
-                        src={`http://localhost:8000${sig?.signatureImagePath}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${sig?.signatureImagePath}`}
                         alt="Signature"
                         className="w-16 h-16 object-contain"
                       />

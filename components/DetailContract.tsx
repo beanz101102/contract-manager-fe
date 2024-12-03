@@ -138,13 +138,11 @@ const DetailContract = ({
           </TabsContent>
           <TabsContent value="view" className="p-6">
             {data?.pdfFilePath && (
-              <object
-                data={`http://localhost:8000${data?.pdfFilePath}`}
-                type="application/pdf"
+              <iframe
+                src={`${process.env.NEXT_PUBLIC_API_URL}${data?.pdfFilePath}#toolbar=0&navpanes=0&scrollbar=0`}
                 className="w-full h-[60vh] rounded-lg"
-              >
-                <p>Không thể hiển thị file PDF.</p>
-              </object>
+                frameBorder="0"
+              />
             )}
           </TabsContent>
         </Tabs>

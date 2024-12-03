@@ -5,7 +5,7 @@ const nextConfig = {
     appDir: true,
   },
   images: {
-    domains: ["localhost"],
+    domains: ["localhost", "api.phatdat.online", "phatdat.online"],
   },
   output: 'standalone',
 }

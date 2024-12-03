@@ -16,7 +16,7 @@ export const useUsers = () => {
 
   // Get list users
   const useListUsers = (
-    role?: "admin" | "employee" | "customer" | "",
+    role?: "admin" | "employee" | "customer" | "manager",
     page: number = 1,
     limit: number = 10,
     text?: string,
@@ -26,7 +26,8 @@ export const useUsers = () => {
       queryKey: ["users", role, page, limit, text, departmentId],
       queryFn: async () => {
         const params = new URLSearchParams()
-        if (role) params.append("role", role)
+
+        role && params.append("role", role)
         params.append("page", page.toString())
         params.append("limit", limit.toString())
         if (text) params.append("text", text)
@@ -68,7 +69,18 @@ export const useUsers = () => {
         toast.success("Thêm người dùng thành công")
       },
       onError: (error) => {
-        toast.error("Lỗi khi thêm người dùng: " + error.message)
+        const errorMessage = (error as any).response?.data?.message ?? error.message ?? 'Vui lòng kiểm tra lại mã nhân viên, tài khoảng, hoặc số CCCD có thể bị trùng'
+        if (errorMessage.includes('IDX')) {
+          toast.error('Mã nhân viên đã tồn tại trong hệ thống');
+        }
+        if (errorMessage.includes('username')) {
+            toast.error('Tên đăng nhập đã tồn tại trong hệ thống');
+        }
+        if (errorMessage.includes('email')) {
+            toast.error('Email đã tồn tại trong hệ thống');
+        }
+
+        toast.error("Lỗi khi thêm người dùng: Vui lòng kiểm tra lại mã nhân viên, tài khoảng, hoặc số CCCD có thể bị trùng")
       },
     })
   }
