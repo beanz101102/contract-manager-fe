@@ -89,7 +89,10 @@ const ContentRight = () => {
   return (
     <div className="flex items-center gap-6">
       <Popover>
-        <PopoverTrigger className="relative">
+        <PopoverTrigger
+          className="relative"
+          onClick={() => markAllAsRead(user?.id ?? 0)}
+        >
           <Bell
             size={24}
             className="text-white hover:text-gray-100 cursor-pointer transition-colors duration-200"

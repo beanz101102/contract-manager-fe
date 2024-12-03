@@ -19,7 +19,7 @@ export const useDepartment = () => {
     })
   }
 
-  const useAddDepartment = () => {
+  const useAddDepartment = (onDone?: () => void) => {
     return useMutation({
       mutationFn: async (payload: Department) => {
         const response = await api.post(
@@ -31,6 +31,52 @@ export const useDepartment = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["departments"] })
         toast.success("Thêm phòng ban thành công")
+        onDone?.()
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
+    })
+  }
+
+  const useUpdateDepartment = (onDone?: () => void) => {
+    return useMutation({
+      mutationFn: async ({
+        id,
+        payload,
+      }: {
+        id: number
+        payload: Department
+      }) => {
+        const response = await api.post(
+          `/api/department/updateDepartment/${id}`,
+          payload
+        )
+        return response.data
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["departments"] })
+        toast.success("Cập nhật phòng ban thành công")
+        onDone?.()
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
+    })
+  }
+
+  const useDeleteDepartment = () => {
+    return useMutation({
+      mutationFn: async (payload: { id: number }) => {
+        const response = await api.delete(
+          `/api/department/deleteDepartment`,
+          payload
+        )
+        return response.data
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["departments"] })
+        toast.success("Xóa phòng ban thành công")
         router.push("/department")
       },
       onError: (error: any) => {
@@ -42,5 +88,7 @@ export const useDepartment = () => {
   return {
     useListDepartments,
     useAddDepartment,
+    useUpdateDepartment,
+    useDeleteDepartment,
   }
 }
