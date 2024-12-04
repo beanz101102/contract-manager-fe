@@ -373,6 +373,7 @@ export const mappingRole = {
   admin: "Admin",
   employee: "Nhân viên",
   customer: "Khách hàng",
+  manager: "Quản lý",
 }
 
 export interface DepartmentList {
