@@ -290,9 +290,7 @@ export default function EmployeeList() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-3">
-                          <Link
-                            href={`/edit-employee-information/${employee.id}`}
-                          >
+                          <Link href={`/employees/edit/${employee.id}`}>
                             <NextImage
                               src="/edit.png"
                               alt="edit"

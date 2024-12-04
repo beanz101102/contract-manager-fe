@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { atom, useAtom } from "jotai"
 import { uniqBy } from "lodash"
@@ -65,6 +66,7 @@ export const HeaderContent = () => {
 
 const notificationsAtom = atom<Notification[]>([])
 const ContentRight = () => {
+  const router = useRouter()
   const { useGetNotifications } = useNotifications()
   const { user, logout } = useAuth()
   const { data } = useGetNotifications(user?.id ?? 0)
@@ -155,7 +157,7 @@ const ContentRight = () => {
             <button
               className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
               onClick={() => {
-                /* handle view profile */
+                router.push("/profile")
               }}
             >
               Thông tin cá nhân

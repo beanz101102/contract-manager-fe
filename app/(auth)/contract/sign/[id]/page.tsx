@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import AppPDF from "@/src/App"
 import { ArrowLeft, Download, Send } from "lucide-react"
@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 export default function ContractForm() {
   const params = useParams()
   const { useContractDetail } = useContracts()
+  const router = useRouter()
   const { data } = useContractDetail(Number(params.id))
 
   const { useSignContract } = useContracts()
@@ -30,13 +31,12 @@ export default function ContractForm() {
     })
   }
 
-  console.log("file", file)
-
   return (
     <div className="flex min-h-screen">
       <div className="w-[30%] min-h-screen bg-white p-6 border-r">
         <Button
           variant="ghost"
+          onClick={() => router.back()}
           className="flex items-center gap-2 mb-8 hover:bg-gray-100"
         >
           <ArrowLeft className="h-5 w-5" />

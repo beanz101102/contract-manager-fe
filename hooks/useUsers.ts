@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
@@ -13,6 +14,7 @@ import { api } from "@/lib/axios"
 
 export const useUsers = () => {
   const queryClient = useQueryClient()
+  const router = useRouter()
 
   // Get list users
   const useListUsers = (
@@ -67,20 +69,26 @@ export const useUsers = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["users"] })
         toast.success("Thêm người dùng thành công")
+        router.push("/employees")
       },
       onError: (error) => {
-        const errorMessage = (error as any).response?.data?.message ?? error.message ?? 'Vui lòng kiểm tra lại mã nhân viên, tài khoảng, hoặc số CCCD có thể bị trùng'
-        if (errorMessage.includes('IDX')) {
-          toast.error('Mã nhân viên đã tồn tại trong hệ thống');
+        const errorMessage =
+          (error as any).response?.data?.message ??
+          error.message ??
+          "Vui lòng kiểm tra lại mã nhân viên, tài khoảng, hoặc số CCCD có thể bị trùng"
+        if (errorMessage.includes("IDX")) {
+          toast.error("Mã nhân viên đã tồn tại trong hệ thống")
         }
-        if (errorMessage.includes('username')) {
-            toast.error('Tên đăng nhập đã tồn tại trong hệ thống');
+        if (errorMessage.includes("username")) {
+          toast.error("Tên đăng nhập đã tồn tại trong hệ thống")
         }
-        if (errorMessage.includes('email')) {
-            toast.error('Email đã tồn tại trong hệ thống');
+        if (errorMessage.includes("email")) {
+          toast.error("Email đã tồn tại trong hệ thống")
         }
 
-        toast.error("Lỗi khi thêm người dùng: Vui lòng kiểm tra lại mã nhân viên, tài khoảng, hoặc số CCCD có thể bị trùng")
+        toast.error(
+          "Lỗi khi thêm người dùng: Vui lòng kiểm tra lại mã nhân viên, tài khoảng, hoặc số CCCD có thể bị trùng"
+        )
       },
     })
   }
@@ -95,6 +103,7 @@ export const useUsers = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["users"] })
         toast.success("Cập nhật thông tin thành công")
+        router.push("/employees")
       },
       onError: (error: any) => {
         toast.error(error?.response?.data?.message)

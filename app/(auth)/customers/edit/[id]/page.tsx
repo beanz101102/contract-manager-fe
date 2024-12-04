@@ -115,7 +115,7 @@ export default function EditEmployeeInformationForm() {
     <Card className="w-full bg-white rounded-[10px] border-none">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-b-[#675D5D]">
         <CardTitle className="text-2xl font-bold text-black">
-          Chỉnh sửa thông tin nhân viên
+          Chỉnh sửa thông tin khách hàng
         </CardTitle>
         <div className="flex space-x-2">
           <Button

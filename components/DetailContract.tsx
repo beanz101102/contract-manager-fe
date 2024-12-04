@@ -39,13 +39,19 @@ const DetailContract = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] p-0">
+      <DialogContent className="sm:max-w-[900px] p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full border-b">
-            <TabsTrigger value="info" className="flex-1 px-6 py-3">
+            <TabsTrigger
+              value="info"
+              className="flex-1 px-6 py-3 hover:bg-[#4bc5be]/10 data-[state=active]:bg-[#4bc5be] data-[state=active]:border-b-2 data-[state=active]:border-[#4bc5be] data-[state=active]:font-bold data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+            >
               Thông tin hợp đồng
             </TabsTrigger>
-            <TabsTrigger value="view" className="flex-1 px-6 py-3">
+            <TabsTrigger
+              value="view"
+              className="flex-1 px-6 py-3 hover:bg-[#4bc5be]/10 data-[state=active]:bg-[#4bc5be] data-[state=active]:border-b-2 data-[state=active]:border-[#4bc5be] data-[state=active]:font-bold data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200"
+            >
               Xem hợp đồng
             </TabsTrigger>
           </TabsList>
@@ -125,9 +131,11 @@ const DetailContract = ({
                               ]?.label}
                         </TableCell>
                         <TableCell>
-                          {dayjs(
-                            process?.signedAt ?? process?.approvedAt
-                          ).format("DD/MM/YYYY")}
+                          {process?.status === "pending"
+                            ? "--"
+                            : dayjs(
+                                process?.signedAt ?? process?.approvedAt
+                              ).format("DD/MM/YYYY")}
                         </TableCell>
                       </TableRow>
                     ))}

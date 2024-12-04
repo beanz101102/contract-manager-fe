@@ -1,10 +1,16 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft, CalendarIcon } from "lucide-react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
-import { Gender, departmentConfigs } from "@/types/api"
+import { Gender, departmentConfigs, positionConfigs } from "@/types/api"
+import { cn } from "@/lib/utils"
+import { useDepartment } from "@/hooks/useDepartment"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,94 +24,103 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+const employeeSchema = z.object({
+  code: z.string().min(1, "Mã nhân viên là bắt buộc"),
+  fullName: z.string().min(1, "Họ và tên là bắt buộc"),
+  birthPlace: z.string().min(1, "Nơi sinh là bắt buộc"),
+  address: z.string().min(1, "Địa chỉ là bắt buộc"),
+  gender: z.enum(["Nam", "Nữ", "Khác"], {
+    required_error: "Vui lòng chọn giới tính",
+  }),
+  birthDate: z.string().min(1, "Ngày sinh là bắt buộc"),
+  idNumber: z.string().min(1, "Số CCCD là bắt buộc"),
+  issueDate: z.string().min(1, "Ngày cấp là bắt buộc"),
+  issuePlace: z.string().min(1, "Nơi cấp là bắt buộc"),
+  phone: z.string().min(1, "Số điện thoại là bắt buộc"),
+  email: z.string().min(1, "Email là bắt buộc").email("Email không hợp lệ"),
+  department: z.string().min(1, "Phòng ban là bắt buộc"),
+  position: z.string().min(1, "Chức vụ là bắt buộc"),
+  account: z.string().min(1, "Tài khoản là bắt buộc"),
+  password: z
+    .string()
+    .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
+    .min(1, "Mật khẩu là bắt buộc"),
+})
+
+type EmployeeFormValues = z.infer<typeof employeeSchema>
+
 export default function EditEmployeeInformationForm() {
   const router = useRouter()
-
   const { id } = useParams()
-  const { useUserDetails } = useUsers()
+  const { useUserDetails, useUpdateUser } = useUsers()
   const { data: user } = useUserDetails(Number(id))
+  const { mutate: updateUser } = useUpdateUser()
+  const { useListDepartments } = useDepartment()
+  const { data: departments } = useListDepartments()
+  const { user: currentUser } = useAuth()
 
-  const [formData, setFormData] = useState({
-    code: "",
-    fullName: "",
-    gender: "",
-    dateOfBirth: "",
-    placeOfBirth: "",
-    address: "",
-    idNumber: "",
-    idIssueDate: "",
-    idIssuePlace: "",
-    phoneNumber: "",
-    email: "",
-    position: "",
-    username: "",
-    passwordHash: "",
-    department: "",
+  const form = useForm<EmployeeFormValues>({
+    resolver: zodResolver(employeeSchema),
+    defaultValues: {
+      code: "",
+      fullName: "",
+      birthPlace: "",
+      address: "",
+      gender: undefined,
+      birthDate: "",
+      idNumber: "",
+      issueDate: "",
+      issuePlace: "",
+      phone: "",
+      email: "",
+      department: "",
+      position: "",
+      account: "",
+      password: "",
+    },
   })
 
   useEffect(() => {
     if (user) {
-      console.log("user?.gender", user?.gender)
-      setFormData({
+      form.reset({
         code: user.code || "",
         fullName: user.fullName || "",
-        gender: user?.gender || "",
-        dateOfBirth: user.dateOfBirth || "",
-        placeOfBirth: user.placeOfBirth || "",
+        birthPlace: user.placeOfBirth || "",
         address: user.address || "",
+        gender: (user.gender as "Nam" | "Nữ" | "Khác") || undefined,
+        birthDate: user.dateOfBirth || "",
         idNumber: user.idNumber || "",
-        idIssueDate: user.idIssueDate || "",
-        idIssuePlace: user.idIssuePlace || "",
-        phoneNumber: user.phoneNumber || "",
+        issueDate: user.idIssueDate || "",
+        issuePlace: user.idIssuePlace || "",
+        phone: user.phoneNumber || "",
         email: user.email || "",
-        position: user.position || "",
-        username: user.username || "",
         department: user.department?.departmentName || "",
-        passwordHash: user.passwordHash || "",
+        position: user.position || "",
+        account: user.username || "",
+        password: user.passwordHash || "",
       })
     }
-  }, [user])
+  }, [user, form])
 
-  const handleInputChange =
-    (field: keyof typeof formData) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }))
-    }
-
-  const handleSelectChange =
-    (field: keyof typeof formData) => (value: string) => {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: value,
-      }))
-    }
-
-  const { useUpdateUser } = useUsers()
-
-  const { mutate: updateUser } = useUpdateUser()
-
-  const handleUpdateUser = () => {
+  const onSubmit = (values: EmployeeFormValues) => {
     updateUser({
-      code: formData.code,
-      username: formData.username,
-      fullName: formData.fullName,
-      placeOfBirth: formData.placeOfBirth,
-      address: formData.address,
-      gender: formData.gender as Gender,
-      dateOfBirth: formData.dateOfBirth || undefined,
-      idNumber: formData.idNumber,
-      idIssueDate: formData.idIssueDate || undefined,
-      idIssuePlace: formData.idIssuePlace || undefined,
-      phoneNumber: formData.phoneNumber,
-      email: formData.email,
+      code: values.code,
+      username: values.account,
+      fullName: values.fullName,
+      placeOfBirth: values.birthPlace,
+      address: values.address,
+      gender: values.gender as Gender,
+      dateOfBirth: values.birthDate || undefined,
+      idNumber: values.idNumber,
+      idIssueDate: values.issueDate || undefined,
+      idIssuePlace: values.issuePlace || undefined,
+      phoneNumber: values.phone,
+      email: values.email,
       department:
-        departmentConfigs.find((config) => config.label === formData.department)
-          ?.value || 0,
-      position: formData.position,
-      passwordHash: formData.passwordHash,
+        departments?.find((dept) => dept.departmentName === values.department)
+          ?.id || 0,
+      position: values.position,
+      passwordHash: values.password,
       role: "employee",
       id: user?.id,
     })
@@ -126,7 +141,7 @@ export default function EditEmployeeInformationForm() {
             <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
           </Button>
           <Button
-            onClick={handleUpdateUser}
+            onClick={form.handleSubmit(onSubmit)}
             className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold"
           >
             Lưu thông tin
@@ -134,7 +149,7 @@ export default function EditEmployeeInformationForm() {
         </div>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4 mt-10">
+        <div className="space-y-4 mt-10">
           <div className="flex space-x-4">
             <div className="w-1/3">
               <div className="w-32 h-32 bg-gray-200 rounded-md flex items-center justify-center">
@@ -157,19 +172,22 @@ export default function EditEmployeeInformationForm() {
             <div className="w-2/3 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-black" htmlFor="employeeCode">
+                  <Label className="text-black" htmlFor="code">
                     Mã nhân viên (*)
                   </Label>
                   <Input
-                    id="employeeCode"
-                    value={formData.code}
-                    onChange={handleInputChange("code")}
-                    style={{
-                      border: "1px solid #0000004D",
-                    }}
-                    className="bg-white rounded text-black"
+                    {...form.register("code")}
+                    style={{ border: "1px solid #0000004D" }}
+                    className={cn("bg-white rounded text-black", {
+                      "border-red-500": form.formState.errors.code,
+                    })}
                     placeholder="Mã nhân viên"
                   />
+                  {form.formState.errors.code && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.code.message}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -178,27 +196,36 @@ export default function EditEmployeeInformationForm() {
                     Họ và tên (*)
                   </Label>
                   <Input
-                    id="fullName"
-                    value={formData.fullName}
-                    onChange={handleInputChange("fullName")}
-                    style={{
-                      border: "1px solid #0000004D",
-                    }}
-                    className="bg-white rounded text-black"
+                    {...form.register("fullName")}
+                    style={{ border: "1px solid #0000004D" }}
+                    className={cn("bg-white rounded text-black", {
+                      "border-red-500": form.formState.errors.fullName,
+                    })}
                     placeholder="Họ và tên"
                   />
+                  {form.formState.errors.fullName && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.fullName.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label className="text-black" htmlFor="birthPlace">
-                    Nơi sinh
+                    Nơi sinh (*)
                   </Label>
                   <Input
-                    value={formData.placeOfBirth}
-                    onChange={handleInputChange("placeOfBirth")}
-                    className="bg-white rounded text-black"
-                    id="birthPlace"
+                    {...form.register("birthPlace")}
+                    style={{ border: "1px solid #0000004D" }}
+                    className={cn("bg-white rounded text-black", {
+                      "border-red-500": form.formState.errors.birthPlace,
+                    })}
                     placeholder="Nơi sinh"
                   />
+                  {form.formState.errors.birthPlace && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.birthPlace.message}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -207,130 +234,177 @@ export default function EditEmployeeInformationForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="address">
-                Địa chỉ
+                Địa chỉ (*)
               </Label>
               <Input
-                style={{
-                  border: "1px solid #0000004D",
-                }}
-                className="bg-white rounded text-black"
-                id="address"
-                value={formData.address}
-                onChange={handleInputChange("address")}
+                {...form.register("address")}
+                style={{ border: "1px solid #0000004D" }}
+                className={cn("bg-white rounded text-black", {
+                  "border-red-500": form.formState.errors.address,
+                })}
                 placeholder="Địa chỉ"
               />
+              {form.formState.errors.address && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.address.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="gender">
                 Giới tính (*)
               </Label>
               <Select
-                value={formData.gender}
-                onValueChange={(value) => handleSelectChange("gender")(value)}
+                onValueChange={(value) =>
+                  form.setValue("gender", value as "Nam" | "Nữ" | "Khác")
+                }
+                value={form.watch("gender")}
               >
-                <SelectTrigger className="rounded text-black" id="gender">
+                <SelectTrigger
+                  style={{ border: "1px solid #0000004D" }}
+                  className={cn("rounded text-black", {
+                    "border-red-500": form.formState.errors.gender,
+                  })}
+                >
                   <SelectValue placeholder="Chọn giới tính" />
                 </SelectTrigger>
-                <SelectContent
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
-                  className="rounded text-black"
-                >
+                <SelectContent>
                   <SelectItem value="Nam">Nam</SelectItem>
                   <SelectItem value="Nữ">Nữ</SelectItem>
+                  <SelectItem value="Khác">Khác</SelectItem>
                 </SelectContent>
               </Select>
+              {form.formState.errors.gender && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.gender.message}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="birthDate">
-                Ngày sinh
+                Ngày sinh (*)
               </Label>
               <div className="relative">
                 <Input
-                  value={formData.dateOfBirth}
-                  onChange={handleInputChange("dateOfBirth")}
-                  className="bg-white rounded text-black"
-                  id="birthDate"
-                  placeholder="dd/mm/yyyy"
+                  {...form.register("birthDate")}
+                  style={{ border: "1px solid #0000004D" }}
+                  className={cn("bg-white rounded text-black", {
+                    "border-red-500": form.formState.errors.birthDate,
+                  })}
                   type="date"
+                  placeholder="dd/mm/yyyy"
                 />
                 <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
+              {form.formState.errors.birthDate && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.birthDate.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="idNumber">
                 Số CCCD (*)
               </Label>
               <Input
-                value={formData.idNumber}
-                onChange={handleInputChange("idNumber")}
-                className="bg-white rounded text-black"
-                id="idNumber"
+                {...form.register("idNumber")}
+                style={{ border: "1px solid #0000004D" }}
+                className={cn("bg-white rounded text-black", {
+                  "border-red-500": form.formState.errors.idNumber,
+                })}
                 placeholder="Số CCCD"
               />
+              {form.formState.errors.idNumber && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.idNumber.message}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="issueDate">
-                Ngày cấp
+                Ngày cấp (*)
               </Label>
               <div className="relative">
                 <Input
-                  value={formData.idIssueDate}
-                  onChange={handleInputChange("idIssueDate")}
-                  className="bg-white rounded text-black"
-                  id="issueDate"
-                  placeholder="dd/mm/yyyy"
+                  {...form.register("issueDate")}
+                  style={{ border: "1px solid #0000004D" }}
+                  className={cn("bg-white rounded text-black", {
+                    "border-red-500": form.formState.errors.issueDate,
+                  })}
                   type="date"
+                  placeholder="dd/mm/yyyy"
                 />
                 <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
+              {form.formState.errors.issueDate && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.issueDate.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="issuePlace">
-                Nơi cấp
+                Nơi cấp (*)
               </Label>
               <Input
-                value={formData.idIssuePlace}
-                onChange={handleInputChange("idIssuePlace")}
-                className="bg-white rounded text-black"
-                id="issuePlace"
+                {...form.register("issuePlace")}
+                style={{ border: "1px solid #0000004D" }}
+                className={cn("bg-white rounded text-black", {
+                  "border-red-500": form.formState.errors.issuePlace,
+                })}
                 placeholder="Nơi cấp"
               />
+              {form.formState.errors.issuePlace && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.issuePlace.message}
+                </p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-black" htmlFor="phone">
-                Số điện thoại
+                Số điện thoại (*)
               </Label>
               <Input
-                value={formData.phoneNumber}
-                onChange={handleInputChange("phoneNumber")}
-                className="bg-white rounded text-black"
-                id="phone"
+                {...form.register("phone")}
+                style={{ border: "1px solid #0000004D" }}
+                className={cn("bg-white rounded text-black", {
+                  "border-red-500": form.formState.errors.phone,
+                })}
                 placeholder="Số điện thoại"
               />
+              {form.formState.errors.phone && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.phone.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="email">
                 Email (*)
               </Label>
               <Input
-                value={formData.email}
-                onChange={handleInputChange("email")}
-                className="bg-white rounded text-black"
-                id="email"
+                {...form.register("email")}
+                style={{ border: "1px solid #0000004D" }}
+                className={cn("bg-white rounded text-black", {
+                  "border-red-500": form.formState.errors.email,
+                })}
                 type="email"
                 placeholder="Email"
               />
+              {form.formState.errors.email && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.email.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -340,39 +414,67 @@ export default function EditEmployeeInformationForm() {
                 Phòng ban (*)
               </Label>
               <Select
-                value={formData.department}
-                onValueChange={(value) =>
-                  handleSelectChange("department")(value)
-                }
+                onValueChange={(value) => form.setValue("department", value)}
+                value={form.watch("department")}
               >
-                <SelectTrigger className="rounded text-black" id="department">
+                <SelectTrigger
+                  style={{ border: "1px solid #0000004D" }}
+                  className={cn("rounded text-black", {
+                    "border-red-500": form.formState.errors.department,
+                  })}
+                >
                   <SelectValue placeholder="Chọn phòng ban" />
                 </SelectTrigger>
-                <SelectContent
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
-                  className="rounded text-black"
-                >
-                  {departmentConfigs?.map((department) => (
-                    <SelectItem value={department.label.toString()}>
-                      {department.label}
+                <SelectContent>
+                  {departments?.map((dept) => (
+                    <SelectItem key={dept.id} value={dept.departmentName}>
+                      {dept.departmentName}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              {form.formState.errors.department && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.department.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="position">
                 Chức vụ (*)
               </Label>
-              <Input
-                value={formData.position}
-                onChange={handleInputChange("position")}
-                className="bg-white rounded text-black"
-                id="position"
-                placeholder="Chức vụ"
-              />
+              <Select
+                onValueChange={(value) => form.setValue("position", value)}
+                value={form.watch("position")}
+              >
+                <SelectTrigger
+                  style={{ border: "1px solid #0000004D" }}
+                  className={cn("rounded text-black", {
+                    "border-red-500": form.formState.errors.position,
+                  })}
+                >
+                  <SelectValue placeholder="Chọn chức vụ" />
+                </SelectTrigger>
+                <SelectContent>
+                  {positionConfigs
+                    .filter((pos) => {
+                      if (currentUser?.role === "admin") return true
+                      if (currentUser?.role === "manager")
+                        return pos.value === "employee"
+                      return false
+                    })
+                    .map((pos) => (
+                      <SelectItem key={pos.value} value={pos.value}>
+                        {pos.label}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.position && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.position.message}
+                </p>
+              )}
             </div>
           </div>
 
@@ -382,28 +484,40 @@ export default function EditEmployeeInformationForm() {
                 Tài khoản (*)
               </Label>
               <Input
-                value={formData.username}
-                onChange={handleInputChange("username")}
-                className="bg-white rounded text-black"
-                id="account"
+                {...form.register("account")}
+                style={{ border: "1px solid #0000004D" }}
+                className={cn("bg-white rounded text-black", {
+                  "border-red-500": form.formState.errors.account,
+                })}
                 placeholder="Tài khoản"
               />
+              {form.formState.errors.account && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.account.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="password">
                 Mật khẩu (*)
               </Label>
               <Input
-                value={formData.passwordHash}
-                onChange={handleInputChange("passwordHash")}
-                className="bg-white rounded text-black"
-                id="password"
+                {...form.register("password")}
+                style={{ border: "1px solid #0000004D" }}
+                className={cn("bg-white rounded text-black", {
+                  "border-red-500": form.formState.errors.password,
+                })}
                 type="password"
                 placeholder="Mật khẩu"
               />
+              {form.formState.errors.password && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.password.message}
+                </p>
+              )}
             </div>
           </div>
-        </form>
+        </div>
       </CardContent>
     </Card>
   )
