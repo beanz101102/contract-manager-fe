@@ -41,15 +41,9 @@ export const useDepartment = () => {
 
   const useUpdateDepartment = (onDone?: () => void) => {
     return useMutation({
-      mutationFn: async ({
-        id,
-        payload,
-      }: {
-        id: number
-        payload: Department
-      }) => {
+      mutationFn: async (payload: Department & { id: number }) => {
         const response = await api.post(
-          `/api/department/updateDepartment/${id}`,
+          `/api/department/updateDepartment`,
           payload
         )
         return response.data

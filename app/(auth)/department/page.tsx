@@ -160,11 +160,9 @@ export default function DepartmentPage() {
               disabled={isUpdating}
               onClick={() =>
                 updateDepartment({
+                  departmentName: name,
+                  description: description,
                   id: selectedDepartment?.id || 0,
-                  payload: {
-                    departmentName: name,
-                    description: description,
-                  },
                 })
               }
               type="submit"
