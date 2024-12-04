@@ -236,7 +236,7 @@ export default function ContractForm() {
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant="outline"
+                            variant="outline2"
                             className="h-10 w-full justify-between bg-white hover:bg-gray-50 border-gray-200 text-left font-normal"
                             role="combobox"
                           >

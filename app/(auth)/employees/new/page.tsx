@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns"
 import { ArrowLeft, CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
@@ -17,9 +18,15 @@ import { cn } from "@/lib/utils"
 import { useDepartment } from "@/hooks/useDepartment"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import {
   Select,
   SelectContent,
@@ -82,6 +89,21 @@ export default function EmployeeRegistrationForm() {
       password: "",
     },
   })
+
+  // Add state for dates
+  const [birthDate, setBirthDate] = useState<Date>()
+  const [issueDate, setIssueDate] = useState<Date>()
+
+  // Update the dates when calendar selection changes
+  const onBirthDateChange = (date: Date | undefined) => {
+    setBirthDate(date)
+    form.setValue("birthDate", date ? format(date, "yyyy-MM-dd") : "")
+  }
+
+  const onIssueDateChange = (date: Date | undefined) => {
+    setIssueDate(date)
+    form.setValue("issueDate", date ? format(date, "yyyy-MM-dd") : "")
+  }
 
   const onSubmit = (values: EmployeeFormValues) => {
     const payload = {
@@ -272,19 +294,28 @@ export default function EmployeeRegistrationForm() {
               <Label className="text-black" htmlFor="birthDate">
                 Ngày sinh (*)
               </Label>
-              <div className="relative">
-                <Input
-                  {...form.register("birthDate")}
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
-                  className="bg-white rounded text-black"
-                  id="birthDate"
-                  placeholder="dd/mm/yyyy"
-                  type="date"
-                />
-                <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline2"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !birthDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {birthDate ? format(birthDate, "dd/MM/yyyy") : "Chọn ngày"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={birthDate}
+                    onSelect={onBirthDateChange}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               {form.formState.errors.birthDate && (
                 <p className="text-red-500 text-sm">
                   {form.formState.errors.birthDate.message}
@@ -317,19 +348,28 @@ export default function EmployeeRegistrationForm() {
               <Label className="text-black" htmlFor="issueDate">
                 Ngày cấp (*)
               </Label>
-              <div className="relative">
-                <Input
-                  {...form.register("issueDate")}
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
-                  className="bg-white rounded text-black"
-                  id="issueDate"
-                  placeholder="dd/mm/yyyy"
-                  type="date"
-                />
-                <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline2"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !issueDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {issueDate ? format(issueDate, "dd/MM/yyyy") : "Chọn ngày"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={issueDate}
+                    onSelect={onIssueDateChange}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               {form.formState.errors.issueDate && (
                 <p className="text-red-500 text-sm">
                   {form.formState.errors.issueDate.message}

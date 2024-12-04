@@ -435,7 +435,7 @@ const ApprovalWorkflowModal = ({
                       >
                         <PopoverTrigger asChild>
                           <Button
-                            variant="outline"
+                            variant="outline2"
                             role="combobox"
                             className="w-full justify-between bg-white"
                           >

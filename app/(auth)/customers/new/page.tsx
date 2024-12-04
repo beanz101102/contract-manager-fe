@@ -3,16 +3,24 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns"
 import { ArrowLeft, CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { EmployeeFormData, departmentConfigs } from "@/types/api"
+import { cn } from "@/lib/utils"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import {
   Select,
   SelectContent,
@@ -54,6 +62,9 @@ export default function CustomerInformationForm() {
     resolver: zodResolver(customerSchema),
   })
 
+  const [birthDate, setBirthDate] = useState<Date>()
+  const [issueDate, setIssueDate] = useState<Date>()
+
   const onSubmit = (data: CustomerFormData) => {
     const payload = {
       ...data,
@@ -68,6 +79,16 @@ export default function CustomerInformationForm() {
         router.push("/customers")
       },
     })
+  }
+
+  const onBirthDateChange = (date: Date | undefined) => {
+    setBirthDate(date)
+    setValue("birthDate", date ? format(date, "yyyy-MM-dd") : "")
+  }
+
+  const onIssueDateChange = (date: Date | undefined) => {
+    setIssueDate(date)
+    setValue("issueDate", date ? format(date, "yyyy-MM-dd") : "")
   }
 
   return (
@@ -161,7 +182,9 @@ export default function CustomerInformationForm() {
                   <Input
                     {...register("birthPlace")}
                     style={{
-                      border: errors.birthPlace ? "1px solid red" : "1px solid #0000004D",
+                      border: errors.birthPlace
+                        ? "1px solid red"
+                        : "1px solid #0000004D",
                     }}
                     className="bg-white rounded text-black"
                     id="birthPlace"
@@ -183,7 +206,9 @@ export default function CustomerInformationForm() {
               <Input
                 {...register("address")}
                 style={{
-                  border: errors.address ? "1px solid red" : "1px solid #0000004D",
+                  border: errors.address
+                    ? "1px solid red"
+                    : "1px solid #0000004D",
                 }}
                 className="bg-white rounded text-black"
                 id="address"
@@ -231,19 +256,28 @@ export default function CustomerInformationForm() {
               <Label className="text-black" htmlFor="birthDate">
                 Ngày sinh (*)
               </Label>
-              <div className="relative">
-                <Input
-                  {...register("birthDate")}
-                  style={{
-                    border: errors.birthDate ? "1px solid red" : "1px solid #0000004D",
-                  }}
-                  className="bg-white rounded text-black"
-                  id="birthDate"
-                  placeholder="dd/mm/yyyy"
-                  type="date"
-                />
-                <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline2"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !birthDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {birthDate ? format(birthDate, "dd/MM/yyyy") : "Chọn ngày"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={birthDate}
+                    onSelect={onBirthDateChange}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               {errors.birthDate && (
                 <p className="text-red-500">{errors.birthDate.message}</p>
               )}
@@ -272,19 +306,28 @@ export default function CustomerInformationForm() {
               <Label className="text-black" htmlFor="issueDate">
                 Ngày cấp (*)
               </Label>
-              <div className="relative">
-                <Input
-                  {...register("issueDate")}
-                  style={{
-                    border: errors.issueDate ? "1px solid red" : "1px solid #0000004D",
-                  }}
-                  className="bg-white rounded text-black"
-                  id="issueDate"
-                  placeholder="dd/mm/yyyy"
-                  type="date"
-                />
-                <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline2"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !issueDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {issueDate ? format(issueDate, "dd/MM/yyyy") : "Chọn ngày"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={issueDate}
+                    onSelect={onIssueDateChange}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
               {errors.issueDate && (
                 <p className="text-red-500">{errors.issueDate.message}</p>
               )}
@@ -296,7 +339,9 @@ export default function CustomerInformationForm() {
               <Input
                 {...register("issuePlace")}
                 style={{
-                  border: errors.issuePlace ? "1px solid red" : "1px solid #0000004D",
+                  border: errors.issuePlace
+                    ? "1px solid red"
+                    : "1px solid #0000004D",
                 }}
                 className="bg-white rounded text-black"
                 id="issuePlace"

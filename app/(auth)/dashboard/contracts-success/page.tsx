@@ -53,26 +53,26 @@ export default function ContractReport() {
 
       const imgData = canvas.toDataURL("image/png")
       const padding = 5
-      
+
       // Tính toán kích thước PDF dựa trên tỷ lệ canvas
       const pdfWidth = 297 // Chiều rộng tối đa (A4 landscape)
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width + (2 * padding)
-      
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width + 2 * padding
+
       // Khởi tạo PDF với kích thước tùy chỉnh
       const pdf = new jsPDF({
-        orientation: pdfWidth > pdfHeight ? 'l' : 'p',
-        unit: 'mm',
-        format: [pdfWidth + (2 * padding), pdfHeight]
+        orientation: pdfWidth > pdfHeight ? "l" : "p",
+        unit: "mm",
+        format: [pdfWidth + 2 * padding, pdfHeight],
       })
 
       // Thêm ảnh với padding
       pdf.addImage(
-        imgData, 
-        "PNG", 
-        padding, 
-        padding, 
-        pdfWidth, 
-        pdfHeight - (2 * padding)
+        imgData,
+        "PNG",
+        padding,
+        padding,
+        pdfWidth,
+        pdfHeight - 2 * padding
       )
       pdf.save("bao-cao-hop-dong-thanh-cong.pdf")
     } catch (error) {
@@ -101,7 +101,7 @@ export default function ContractReport() {
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
-                        variant="outline"
+                        variant="outline2"
                         className="border-gray-200 hover:bg-gray-50 text-gray-700"
                       >
                         {startDate

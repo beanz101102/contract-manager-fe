@@ -2,14 +2,22 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
+import { format } from "date-fns"
 import { ArrowLeft, CalendarIcon } from "lucide-react"
 
 import { Gender, departmentConfigs } from "@/types/api"
+import { cn } from "@/lib/utils"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import {
   Select,
   SelectContent,
@@ -43,6 +51,9 @@ export default function EditEmployeeInformationForm() {
     department: "",
   })
 
+  const [birthDate, setBirthDate] = useState<Date>()
+  const [issueDate, setIssueDate] = useState<Date>()
+
   useEffect(() => {
     if (user) {
       console.log("user?.gender", user?.gender)
@@ -63,6 +74,8 @@ export default function EditEmployeeInformationForm() {
         department: user.department?.departmentName || "",
         passwordHash: user.passwordHash || "",
       })
+      setBirthDate(user.dateOfBirth ? new Date(user.dateOfBirth) : undefined)
+      setIssueDate(user.idIssueDate ? new Date(user.idIssueDate) : undefined)
     }
   }, [user])
 
@@ -109,6 +122,22 @@ export default function EditEmployeeInformationForm() {
       role: "employee",
       id: user?.id,
     })
+  }
+
+  const onBirthDateChange = (date: Date | undefined) => {
+    setBirthDate(date)
+    setFormData((prev) => ({
+      ...prev,
+      dateOfBirth: date ? format(date, "yyyy-MM-dd") : "",
+    }))
+  }
+
+  const onIssueDateChange = (date: Date | undefined) => {
+    setIssueDate(date)
+    setFormData((prev) => ({
+      ...prev,
+      idIssueDate: date ? format(date, "yyyy-MM-dd") : "",
+    }))
   }
 
   return (
@@ -249,17 +278,28 @@ export default function EditEmployeeInformationForm() {
               <Label className="text-black" htmlFor="birthDate">
                 Ngày sinh
               </Label>
-              <div className="relative">
-                <Input
-                  value={formData.dateOfBirth}
-                  onChange={handleInputChange("dateOfBirth")}
-                  className="bg-white rounded text-black"
-                  id="birthDate"
-                  placeholder="dd/mm/yyyy"
-                  type="date"
-                />
-                <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline2"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !birthDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {birthDate ? format(birthDate, "dd/MM/yyyy") : "Chọn ngày"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={birthDate}
+                    onSelect={onBirthDateChange}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="idNumber">
@@ -280,17 +320,28 @@ export default function EditEmployeeInformationForm() {
               <Label className="text-black" htmlFor="issueDate">
                 Ngày cấp
               </Label>
-              <div className="relative">
-                <Input
-                  value={formData.idIssueDate}
-                  onChange={handleInputChange("idIssueDate")}
-                  className="bg-white rounded text-black"
-                  id="issueDate"
-                  placeholder="dd/mm/yyyy"
-                  type="date"
-                />
-                <CalendarIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline2"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !issueDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {issueDate ? format(issueDate, "dd/MM/yyyy") : "Chọn ngày"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={issueDate}
+                    onSelect={onIssueDateChange}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-2">
               <Label className="text-black" htmlFor="issuePlace">
