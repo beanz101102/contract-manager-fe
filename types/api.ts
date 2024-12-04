@@ -318,6 +318,74 @@ export const mapiContractStatus = {
   },
 }
 
+export const mapiContractStatus2 = {
+  draft: {
+    label: "Mới",
+    value: "new",
+    color: {
+      backgroundColor: "#DBEAFE",
+      color: "#1E40AF",
+    },
+  },
+  pending_approval: {
+    label: "Chờ duyệt",
+    value: "pending",
+    color: {
+      backgroundColor: "#FEF3C7",
+      color: "#92400E",
+    },
+  },
+  rejected: {
+    label: "Từ chối",
+    value: "rejected",
+    color: {
+      backgroundColor: "#FEE2E2",
+      color: "#991B1B",
+    },
+  },
+  ready_to_sign: {
+    label: "Chờ ký",
+    value: "signed",
+    color: {
+      backgroundColor: "#DCFCE7",
+      color: "#166534",
+    },
+  },
+  completed: {
+    label: "Hoàn thành",
+    value: "completed",
+    color: {
+      backgroundColor: "#F3E8FF",
+      color: "#6B21A8",
+    },
+  },
+
+  waiting_for_sign: {
+    label: "Chờ ký",
+    value: "waiting_for_sign",
+    color: {
+      backgroundColor: "#FEF3C7",
+      color: "#92400E",
+    },
+  },
+  waiting_for_approval: {
+    label: "Chờ duyệt",
+    value: "waiting_for_approval",
+    color: {
+      backgroundColor: "#FEF3C7",
+      color: "#92400E",
+    },
+  },
+  cancelled: {
+    label: "Đã hủy",
+    value: "cancelled",
+    color: {
+      backgroundColor: "#FEE2E2",
+      color: "#991B1B",
+    },
+  },
+}
+
 export interface ApprovalTemplate {
   id: number
   name: string

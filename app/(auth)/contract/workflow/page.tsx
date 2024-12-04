@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
 import { atom, useAtom } from "jotai"
 import { Plus, Search, X } from "lucide-react"
 
@@ -52,6 +53,7 @@ export default function ContractApprovalFlow() {
   )
   const [isOpenViewModal, setIsOpenViewModal] = useState(false)
   const [isOpenEditModal, setIsOpenEditModal] = useState(false)
+  const { user } = useAuth()
 
   const { useListApprovalFlows } = useApprovalFlows()
   const { data, isLoading } = useListApprovalFlows(searchTerm)
@@ -81,12 +83,14 @@ export default function ContractApprovalFlow() {
           </div>
         </div>
 
-        <Button
-          className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
-          onClick={() => setIsOpenApprovalWorkflow(true)}
-        >
-          <Plus className="w-4 h-4 mr-2" /> Thêm mới
-        </Button>
+        {(user?.role === "admin" || user?.role === "manager") && (
+          <Button
+            className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            onClick={() => setIsOpenApprovalWorkflow(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" /> Thêm mới
+          </Button>
+        )}
       </div>
 
       <div className="overflow-x-auto">
@@ -153,19 +157,21 @@ export default function ContractApprovalFlow() {
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
                         />
                       </div>
-                      <div
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedFlow(step)
-                          setIsOpenEditModal(true)
-                        }}
-                      >
-                        <NextImage
-                          src="/edit.png"
-                          alt="edit"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
-                        />
-                      </div>
+                      {(user?.role === "admin" || user?.role === "manager") && (
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setSelectedFlow(step)
+                            setIsOpenEditModal(true)
+                          }}
+                        >
+                          <NextImage
+                            src="/edit.png"
+                            alt="edit"
+                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                          />
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

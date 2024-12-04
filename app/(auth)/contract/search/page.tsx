@@ -8,7 +8,7 @@ import { atom, useAtom } from "jotai"
 import { Download, Plus, Send, Trash2 } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
 
-import { ContractList, mapiContractStatus } from "@/types/api"
+import { ContractList, mapiContractStatus2 } from "@/types/api"
 import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -191,14 +191,14 @@ export default function ContractSearch() {
                       <span
                         className="px-3 py-1 rounded-full text-sm font-medium"
                         style={{
-                          ...mapiContractStatus[
-                            contract.status as keyof typeof mapiContractStatus
+                          ...mapiContractStatus2[
+                            contract.status as keyof typeof mapiContractStatus2
                           ].color,
                         }}
                       >
                         {
-                          mapiContractStatus[
-                            contract.status as keyof typeof mapiContractStatus
+                          mapiContractStatus2[
+                            contract.status as keyof typeof mapiContractStatus2
                           ].label
                         }
                       </span>
