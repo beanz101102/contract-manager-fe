@@ -16,6 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   useEffect(() => {
+    if (pathname.includes("/client-signature")) return
     const user = localStorage.getItem("user")
     if (user) {
       setUser(JSON.parse(user))
@@ -62,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login")
   }
 
-  if (isLoading) {
+  if (isLoading && !pathname.includes("/client-signature")) {
     return (
       <div className="flex gap-2 justify-center items-center h-screen">
         <div

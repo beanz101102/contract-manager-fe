@@ -295,9 +295,10 @@ const ApprovalWorkflowModal = ({
   ])
 
   const { useListUsers } = useUsers()
-  const { data, isLoading } = useListUsers("employee", 1, 10, searchTerm, null)
-  const users = data?.users || []
+  const { data, isLoading } = useListUsers("", 1, 10, searchTerm, null)
+  const users = data?.users?.filter((user) => user.role !== "customer") || []
 
+  console.log("users", users)
   const { useAddApprovalFlow, useUpdateApprovalFlow } = useApprovalFlows()
 
   const { mutate: addApprovalFlow } = useAddApprovalFlow(() => {
