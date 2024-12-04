@@ -8,7 +8,7 @@ import { atom, useAtom } from "jotai"
 import { Plus, Trash2 } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
 
-import { departmentConfigs } from "@/types/api"
+import { departmentConfigs, mappingRole } from "@/types/api"
 import { User } from "@/types/auth"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
@@ -266,7 +266,11 @@ export default function EmployeeList() {
                         {employee?.department?.departmentName}
                       </TableCell>
                       <TableCell className="text-gray-700 text-base">
-                        {employee?.position}
+                        {
+                          mappingRole[
+                            employee?.role as keyof typeof mappingRole
+                          ]
+                        }
                       </TableCell>
                       <TableCell className="text-gray-700 text-base">
                         {employee.dateOfBirth}

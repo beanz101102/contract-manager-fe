@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { atom, useAtom } from "jotai"
-import { Eye, Filter, Pencil, Plus, Search, X } from "lucide-react"
+import { Plus, Search, X } from "lucide-react"
 
-import { ApprovalFlow, ApprovalFlowStep, ApprovalFlowsList } from "@/types/api"
+import { ApprovalFlowStep, ApprovalFlowsList } from "@/types/api"
 import { User } from "@/types/auth"
 import { useApprovalFlows } from "@/hooks/useApprovalFlows"
 import { useUsers } from "@/hooks/useUsers"
@@ -29,26 +29,10 @@ import { Label } from "@/components/ui/label"
 import { Loading } from "@/components/ui/loading"
 import NextImage from "@/components/ui/next-img"
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -58,32 +42,24 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-type ApprovalStep = {
-  id: string
-  name: string
-}
-
-const approvalSteps: ApprovalStep[] = [
-  { id: "1", name: "Pháp chế duyệt" },
-  { id: "2", name: "Phòng nhân sự" },
-  { id: "3", name: "Phòng giám đốc" },
-  { id: "4", name: "Phòng kế toán" },
-  { id: "5", name: "Phòng kinh doanh" },
-]
-
 const listApprovalFlows = atom<ApprovalFlowsList[]>([])
 
 export default function ContractApprovalFlow() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isOpenApprovalWorkflow, setIsOpenApprovalWorkflow] = useState(false)
+  const [selectedFlow, setSelectedFlow] = useState<ApprovalFlowsList | null>(
+    null
+  )
+  const [isOpenViewModal, setIsOpenViewModal] = useState(false)
+  const [isOpenEditModal, setIsOpenEditModal] = useState(false)
+
   const { useListApprovalFlows } = useApprovalFlows()
   const { data, isLoading } = useListApprovalFlows(searchTerm)
-
   const [approvalFlows, setApprovalFlows] = useAtom(listApprovalFlows)
 
   useEffect(() => {
     setApprovalFlows(data || [])
-  }, [data])
+  }, [data, setApprovalFlows])
 
   return (
     <div className="p-8 bg-white rounded-xl shadow-sm">
@@ -101,20 +77,7 @@ export default function ContractApprovalFlow() {
             className="pl-12 h-[42px] w-full rounded-md bg-white border-[#4BC5BE] focus:ring-2 focus:ring-[#4BC5BE]/20"
           />
           <div className="absolute left-0 top-1/2 transform -translate-y-1/2 h-[42px] w-[42px] flex items-center justify-center bg-[#4BC5BE] rounded-l-md">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <Search className="h-5 w-5 text-white" />
           </div>
         </div>
 
@@ -177,14 +140,26 @@ export default function ContractApprovalFlow() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-3">
-                      <div className="cursor-pointer">
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setSelectedFlow(step)
+                          setIsOpenViewModal(true)
+                        }}
+                      >
                         <NextImage
                           src="/eye.png"
                           alt="eye"
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
                         />
                       </div>
-                      <div className="cursor-pointer">
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setSelectedFlow(step)
+                          setIsOpenEditModal(true)
+                        }}
+                      >
                         <NextImage
                           src="/edit.png"
                           alt="edit"
@@ -204,16 +179,98 @@ export default function ContractApprovalFlow() {
         isOpen={isOpenApprovalWorkflow}
         onOpenChange={setIsOpenApprovalWorkflow}
       />
+
+      <ApprovalWorkflowModal
+        isOpen={isOpenEditModal}
+        onOpenChange={setIsOpenEditModal}
+        mode="edit"
+        initialData={selectedFlow}
+      />
+
+      <ViewApprovalWorkflowModal
+        isOpen={isOpenViewModal}
+        onOpenChange={setIsOpenViewModal}
+        data={selectedFlow}
+      />
     </div>
+  )
+}
+
+const ViewApprovalWorkflowModal = ({
+  isOpen,
+  onOpenChange,
+  data,
+}: {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  data: ApprovalFlowsList | null
+}) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[800px] p-6">
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            Chi tiết luồng duyệt
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          <div>
+            <Label className="text-sm font-medium block mb-2">
+              Tên luồng duyệt
+            </Label>
+            <p className="text-gray-700">{data?.name}</p>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <h3 className="font-semibold mb-4">Danh sách bước duyệt</h3>
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="w-[80px] text-center">STT</TableHead>
+                  <TableHead>Phòng/Ban</TableHead>
+                  <TableHead>Người duyệt</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.steps?.map((step, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="text-center">
+                      {step.stepOrder}
+                    </TableCell>
+                    <TableCell>{step.department?.departmentName}</TableCell>
+                    <TableCell>{step.approver?.fullName}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        <DialogFooter className="border-t pt-4">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="border-gray-300 hover:bg-gray-100"
+          >
+            Đóng
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
 const ApprovalWorkflowModal = ({
   isOpen,
   onOpenChange,
+  mode = "create",
+  initialData = null,
 }: {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  mode?: "create" | "edit"
+  initialData?: ApprovalFlowsList | null
 }) => {
   const [openUserSelect, setOpenUserSelect] = useState<{
     [key: number]: boolean
@@ -241,6 +298,30 @@ const ApprovalWorkflowModal = ({
   const { data, isLoading } = useListUsers("employee", 1, 10, searchTerm, null)
   const users = data?.users || []
 
+  const { useAddApprovalFlow, useUpdateApprovalFlow } = useApprovalFlows()
+
+  const { mutate: addApprovalFlow } = useAddApprovalFlow(() => {
+    onOpenChange(false)
+  })
+
+  const { mutate: updateApprovalFlow } = useUpdateApprovalFlow(() => {
+    onOpenChange(false)
+  })
+
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      setName(initialData.name)
+      setApprovalSteps(
+        initialData.steps.map((step) => ({
+          step: step.stepOrder,
+          approvalType: "",
+          department: step.department?.departmentName || "",
+          approver: step.approver,
+        }))
+      )
+    }
+  }, [mode, initialData])
+
   const handleAddStep = () => {
     setApprovalSteps((prev) => [
       ...prev,
@@ -256,7 +337,6 @@ const ApprovalWorkflowModal = ({
   const handleRemoveStep = (stepIndex: number) => {
     setApprovalSteps((prev) => {
       const newSteps = prev.filter((_, index) => index !== stepIndex)
-      // Cập nhật lại số thứ tự các bước
       return newSteps.map((step, index) => ({
         ...step,
         step: index + 1,
@@ -264,28 +344,29 @@ const ApprovalWorkflowModal = ({
     })
   }
 
-  const { useAddApprovalFlow } = useApprovalFlows()
-  const { mutate: addApprovalFlow } = useAddApprovalFlow(() => {
-    onOpenChange(false)
-  })
-
   const handleSaveApprovalFlow = () => {
-    addApprovalFlow({
+    const payload = {
       name,
       steps: approvalSteps.map((step) => ({
         departmentId: step.approver?.department?.id,
         approverId: step.approver?.id,
         stepOrder: step.step,
       })) as ApprovalFlowStep[],
-    })
+    }
+
+    if (mode === "edit" && initialData) {
+      updateApprovalFlow({ ...payload, id: initialData.id })
+    } else {
+      addApprovalFlow(payload)
+    }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] p-6">
         <DialogHeader className="border-b pb-4">
-          <DialogTitle className="text-xl font-semibold flex items-center">
-            Cấu hình luồng duyệt
+          <DialogTitle className="text-xl font-semibold">
+            {mode === "edit" ? "Chỉnh sửa luồng duyệt" : "Thêm mới luồng duyệt"}
           </DialogTitle>
         </DialogHeader>
 
@@ -427,14 +508,14 @@ const ApprovalWorkflowModal = ({
               onClick={handleSaveApprovalFlow}
               className="bg-blue-500 hover:bg-blue-600 text-white"
             >
-              Lưu lại
+              {mode === "edit" ? "Cập nhật" : "Lưu lại"}
             </Button>
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
               className="border-gray-300 hover:bg-gray-100"
             >
-              Thoát
+              Đóng
             </Button>
           </div>
         </DialogFooter>
