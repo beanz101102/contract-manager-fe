@@ -13,6 +13,7 @@ const useNotifications = () => {
         )
         return response.data
       },
+      refetchInterval: 5000,
     })
   }
 

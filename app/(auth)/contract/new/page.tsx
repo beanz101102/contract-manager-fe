@@ -158,7 +158,7 @@ export default function ContractForm() {
   const { useAddContract } = useContracts()
 
   const { mutate: addContract } = useAddContract(() => {
-    router.back()
+    router.push("contract/personal")
   })
 
   const { useListApprovalFlows } = useApprovalFlows()
