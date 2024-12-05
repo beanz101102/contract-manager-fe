@@ -358,9 +358,12 @@ const ApprovalWorkflowModal = ({
     })
   }
 
+  const { user } = useAuth()
+
   const handleSaveApprovalFlow = () => {
     const payload = {
       name,
+      id: user?.id || 0,
       steps: approvalSteps.map((step) => ({
         departmentId: step.approver?.department?.id,
         approverId: step.approver?.id,
