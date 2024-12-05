@@ -30,6 +30,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 // Helper function to generate months array
 const generateMonthsArray = () => {
@@ -203,7 +210,7 @@ export default function ContractDashboard() {
                   </Popover>
                 </div>
 
-                {/* <div>
+                <div>
                   <label className="block text-sm font-medium mb-2">
                     Trạng thái
                   </label>
@@ -249,7 +256,7 @@ export default function ContractDashboard() {
                       <SelectItem value="all">All</SelectItem>
                     </SelectContent>
                   </Select>
-                </div> */}
+                </div>
               </div>
             </div>
           </div>
