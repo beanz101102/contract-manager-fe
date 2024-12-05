@@ -7,6 +7,7 @@ import { ArrowLeft, CalendarIcon } from "lucide-react"
 
 import { Gender, departmentConfigs } from "@/types/api"
 import { cn } from "@/lib/utils"
+import { useDepartment } from "@/hooks/useDepartment"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -32,6 +33,8 @@ export default function EditEmployeeInformationForm() {
   const { id } = useParams()
   const { useUserDetails } = useUsers()
   const { data: user } = useUserDetails(Number(id))
+  const { useListDepartments } = useDepartment()
+  const { data: departments } = useListDepartments()
 
   const [formData, setFormData] = useState({
     code: "",
@@ -114,12 +117,10 @@ export default function EditEmployeeInformationForm() {
       idIssuePlace: formData.idIssuePlace || undefined,
       phoneNumber: formData.phoneNumber,
       email: formData.email,
-      department:
-        departmentConfigs.find((config) => config.label === formData.department)
-          ?.value || 0,
+      department: departments?.[0]?.id || 0,
       position: formData.position,
       passwordHash: formData.passwordHash,
-      role: "employee",
+      role: "customer",
       id: user?.id,
     })
   }
@@ -387,70 +388,16 @@ export default function EditEmployeeInformationForm() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-black" htmlFor="department">
-                Phòng ban (*)
-              </Label>
-              <Select
-                value={formData.department}
-                onValueChange={(value) =>
-                  handleSelectChange("department")(value)
-                }
-              >
-                <SelectTrigger className="rounded text-black" id="department">
-                  <SelectValue placeholder="Chọn phòng ban" />
-                </SelectTrigger>
-                <SelectContent
-                  style={{
-                    border: "1px solid #0000004D",
-                  }}
-                  className="rounded text-black"
-                >
-                  {departmentConfigs?.map((department) => (
-                    <SelectItem value={department.label.toString()}>
-                      {department.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
               <Label className="text-black" htmlFor="position">
                 Chức vụ (*)
               </Label>
               <Input
                 value={formData.position}
+                disabled
                 onChange={handleInputChange("position")}
                 className="bg-white rounded text-black"
                 id="position"
                 placeholder="Chức vụ"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="account">
-                Tài khoản (*)
-              </Label>
-              <Input
-                value={formData.username}
-                onChange={handleInputChange("username")}
-                className="bg-white rounded text-black"
-                id="account"
-                placeholder="Tài khoản"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="password">
-                Mật khẩu (*)
-              </Label>
-              <Input
-                value={formData.passwordHash}
-                onChange={handleInputChange("passwordHash")}
-                className="bg-white rounded text-black"
-                id="password"
-                type="password"
-                placeholder="Mật khẩu"
               />
             </div>
           </div>

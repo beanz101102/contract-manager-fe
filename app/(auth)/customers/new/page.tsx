@@ -10,6 +10,7 @@ import * as z from "zod"
 
 import { EmployeeFormData, departmentConfigs } from "@/types/api"
 import { cn } from "@/lib/utils"
+import { useDepartment } from "@/hooks/useDepartment"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -52,6 +53,8 @@ export default function CustomerInformationForm() {
   const router = useRouter()
   const { useAddUser } = useUsers()
   const { mutate: addUser } = useAddUser()
+  const { useListDepartments } = useDepartment()
+  const { data: departments } = useListDepartments()
 
   const {
     register,
@@ -68,7 +71,12 @@ export default function CustomerInformationForm() {
   const onSubmit = (data: CustomerFormData) => {
     const payload = {
       ...data,
-      department: 1,
+      department: departments?.[0]?.id,
+      dateOfBirth: data.birthDate || null,
+      placeOfBirth: data.birthPlace,
+      idIssueDate: data.issueDate || null,
+      idIssuePlace: data.issuePlace || null,
+      phoneNumber: data.phone,
       role: "customer",
       position: "Khách hàng",
       passwordHash: "",
