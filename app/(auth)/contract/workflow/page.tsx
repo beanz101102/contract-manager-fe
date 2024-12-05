@@ -55,9 +55,10 @@ export default function ContractApprovalFlow() {
   const [isOpenEditModal, setIsOpenEditModal] = useState(false)
   const { user } = useAuth()
 
-  const { useListApprovalFlows } = useApprovalFlows()
+  const { useListApprovalFlows, useDeleteApprovalFlow } = useApprovalFlows()
   const { data, isLoading } = useListApprovalFlows(searchTerm)
   const [approvalFlows, setApprovalFlows] = useAtom(listApprovalFlows)
+  const { mutate: deleteApprovalFlow } = useDeleteApprovalFlow()
 
   useEffect(() => {
     setApprovalFlows(data || [])
@@ -157,21 +158,27 @@ export default function ContractApprovalFlow() {
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
                         />
                       </div>
-                      {(user?.role === "admin" || user?.role === "manager") && (
-                        <div
-                          className="cursor-pointer"
-                          onClick={() => {
-                            setSelectedFlow(step)
-                            setIsOpenEditModal(true)
-                          }}
-                        >
-                          <NextImage
-                            src="/edit.png"
-                            alt="edit"
-                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
-                          />
-                        </div>
-                      )}
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setSelectedFlow(step)
+                          setIsOpenEditModal(true)
+                        }}
+                      >
+                        <NextImage
+                          src="/edit.png"
+                          alt="edit"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                      </div>
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                          deleteApprovalFlow(step.id)
+                        }}
+                      >
+                        <NextImage src="/trash.png" alt="trash" />
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>

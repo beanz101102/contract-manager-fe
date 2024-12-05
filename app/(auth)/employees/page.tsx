@@ -288,7 +288,7 @@ export default function EmployeeList() {
                         {employee.email}
                       </TableCell>
                       <TableCell className="text-gray-700 text-base">
-                        {employee.email}
+                        {employee.username}
                         <br />
                         *************
                       </TableCell>

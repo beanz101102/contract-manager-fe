@@ -1,3 +1,4 @@
+import { useAuth } from "@/contexts/auth-context"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
@@ -6,14 +7,18 @@ import { api } from "@/lib/axios"
 
 export const useApprovalFlows = () => {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
 
   const useListApprovalFlows = (name?: string) => {
     return useQuery({
-      queryKey: ["approval-flows", name],
+      queryKey: ["approval-flows", name, user?.id],
       queryFn: async () => {
         const params = new URLSearchParams()
         if (name) {
           params.append("name", name)
+        }
+        if (user?.id) {
+          params.append("userId", user.id.toString())
         }
         const response = await api.post<ApprovalFlowsList[]>(
           `/api/approval_flow?${params}`
@@ -36,7 +41,7 @@ export const useApprovalFlows = () => {
         onSuccess && onSuccess()
       },
       onError: (error: any) => {
-        toast.error("Lỗi khi thêm luồng duyệt: " + error.message)
+        toast.error(error?.response?.data?.message)
       },
     })
   }
@@ -53,7 +58,24 @@ export const useApprovalFlows = () => {
         onSuccess && onSuccess()
       },
       onError: (error: any) => {
-        toast.error("Lỗi khi cập nhật luồng duyệt: " + error.message)
+        toast.error(error?.response?.data?.message)
+      },
+    })
+  }
+
+  const useDeleteApprovalFlow = (onSuccess?: () => void) => {
+    return useMutation({
+      mutationFn: async (id: number) => {
+        const response = await api.post(`/api/approval_flow/delete`, { id })
+        return response.data
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["approval-flows"] })
+        toast.success("Xóa luồng duyệt thành công")
+        onSuccess && onSuccess()
+      },
+      onError: (error: any) => {
+        toast.error(error?.response?.data?.message)
       },
     })
   }
@@ -62,5 +84,6 @@ export const useApprovalFlows = () => {
     useListApprovalFlows,
     useAddApprovalFlow,
     useUpdateApprovalFlow,
+    useDeleteApprovalFlow,
   }
 }

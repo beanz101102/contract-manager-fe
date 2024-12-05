@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import DetailContract from "@/components/DetailContract"
 import EditRequestModal from "@/components/modals/EditRequestModal"
 
 const contractListAtom = atom<ContractList[]>([])
@@ -43,6 +44,8 @@ export default function ContractSigning() {
 
   const [contractList, setContractList] = useAtom(contractListAtom)
   const [hasMore, setHasMore] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
+  const [contractId, setContractId] = useState<number | null>(null)
 
   useEffect(() => {
     if (contracts) {
@@ -228,11 +231,18 @@ export default function ContractSigning() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-3 items-center">
-                        <NextImage
-                          src="/eye.png"
-                          alt="eye"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                        />
+                        <div
+                          onClick={() => {
+                            setContractId(contract.id)
+                            setIsOpen(true)
+                          }}
+                        >
+                          <NextImage
+                            src="/eye.png"
+                            alt="eye"
+                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          />
+                        </div>
                         <Link href={`/contract/sign/${contract.id}`}>
                           <Button>Ký hợp đồng</Button>
                         </Link>
@@ -250,6 +260,11 @@ export default function ContractSigning() {
         isOpen={isOpenEditModal}
         onOpenChange={setIsOpenEditModal}
         selectedEmployees={selectedEmployees}
+      />
+      <DetailContract
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        id={contractId || 0}
       />
     </div>
   )
