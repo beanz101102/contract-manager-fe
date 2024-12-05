@@ -34,6 +34,8 @@ const SignatureManagementInterface = () => {
   const [isOpenDigitalSignature, setIsOpenDigitalSignature] = useState(false)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [isOpenPreview, setIsOpenPreview] = useState(false)
 
   const { useListSignatures, useDeleteSignature } = useUserSignatures()
   const { data: signaturesData } = useListSignatures()
@@ -63,6 +65,11 @@ const SignatureManagementInterface = () => {
         </Button>
       </div>
 
+      <ImagePreviewDialog
+        previewImage={previewImage}
+        isOpen={isOpenPreview}
+        onOpenChange={setIsOpenPreview}
+      />
       <InfiniteScroll
         dataLength={listSignature?.length}
         next={() => setPage(page + 1)}
@@ -126,11 +133,21 @@ const SignatureManagementInterface = () => {
                       {sig.user?.position}
                     </TableCell>
                     <TableCell>
-                      <NextImage
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${sig?.signatureImagePath}`}
-                        alt="Signature"
-                        className="w-16 h-16 object-contain"
-                      />
+                      <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setPreviewImage(
+                            `${process.env.NEXT_PUBLIC_API_URL}${sig?.signatureImagePath}`
+                          )
+                          setIsOpenPreview(true)
+                        }}
+                      >
+                        <NextImage
+                          src={`${process.env.NEXT_PUBLIC_API_URL}${sig?.signatureImagePath}`}
+                          alt="Signature"
+                          className="w-16 h-16 object-contain hover:opacity-80 transition-opacity"
+                        />
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-4">
@@ -487,6 +504,35 @@ const DigitalSignatureModal = ({
             </Button>
           </div>
         </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const ImagePreviewDialog = ({
+  isOpen,
+  onOpenChange,
+  previewImage,
+}: {
+  previewImage: string | null
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+}) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[800px] p-6">
+        <DialogHeader>
+          <DialogTitle>Xem chữ ký</DialogTitle>
+        </DialogHeader>
+        {previewImage && (
+          <div className="flex justify-center">
+            <NextImage
+              src={previewImage}
+              alt="Signature Preview"
+              className="max-w-full max-h-[600px] object-contain"
+            />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )
