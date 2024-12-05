@@ -62,6 +62,9 @@ const formSchema = z.object({
   approvalFlow: z.string().min(1, "Vui lòng chọn luồng duyệt"),
 })
 
+// Add this type to track signer types
+type SignerType = "internal" | "customer"
+
 export default function ContractForm() {
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
@@ -78,6 +81,7 @@ export default function ContractForm() {
   }>({})
   const [searchSignerTerm, setSearchSignerTerm] = useState("")
   const [selectedSigners, setSelectedSigners] = useState<User[]>([])
+  const [signerTypes, setSignerTypes] = useState<SignerType[]>(["internal"]) // First signer must be internal
 
   const { useListUsers } = useUsers()
   const { data, isLoading } = useListUsers("customer", 1, 10, searchTerm, null)
@@ -158,7 +162,7 @@ export default function ContractForm() {
   const { useAddContract } = useContracts()
 
   const { mutate: addContract } = useAddContract(() => {
-    router.push("contract/personal")
+    router.push("/contract/personal")
   })
 
   const { useListApprovalFlows } = useApprovalFlows()
@@ -523,13 +527,25 @@ export default function ContractForm() {
                                         className="text-sm text-gray-700"
                                       >
                                         {potentialSigners
-                                          ?.filter(
-                                            (user) =>
-                                              !selectedSigners.some(
+                                          ?.filter((user) => {
+                                            // Don't show already selected users
+                                            if (
+                                              selectedSigners.some(
                                                 (selected) =>
                                                   selected.id === user.id
                                               )
-                                          )
+                                            ) {
+                                              return false
+                                            }
+
+                                            // For first signer (index 0), only show internal users
+                                            if (selectedSigners.length === 0) {
+                                              return user.role !== "customer"
+                                            }
+
+                                            // For subsequent signers, show all users
+                                            return true
+                                          })
                                           .map((user: User) => (
                                             <CommandItem
                                               key={user.id}
@@ -540,9 +556,22 @@ export default function ContractForm() {
                                                   ...prev,
                                                   user,
                                                 ])
+                                                setSignerTypes((prev) => [
+                                                  ...prev,
+                                                  user.role === "customer"
+                                                    ? "customer"
+                                                    : "internal",
+                                                ])
                                               }}
                                             >
                                               {user.fullName}
+                                              <span className="ml-2 text-sm text-gray-500">
+                                                (
+                                                {user.role === "customer"
+                                                  ? "Khách hàng"
+                                                  : "Nội bộ"}
+                                                )
+                                              </span>
                                             </CommandItem>
                                           ))}
                                       </CommandGroup>

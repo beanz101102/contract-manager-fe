@@ -118,8 +118,12 @@ const DetailContract = ({
                           }
                         </TableCell>
                         <TableCell>
-                          {process?.approver?.department?.departmentName ??
-                            process?.signer?.department?.departmentName}
+                          {((process?.approver?.role ??
+                            process?.signer?.role) === "customer"
+                            ? "--"
+                            : process?.approver?.department?.departmentName ??
+                              process?.signer?.department?.departmentName) ||
+                            "--"}
                         </TableCell>
                         <TableCell>
                           {process?.status === "pending"
