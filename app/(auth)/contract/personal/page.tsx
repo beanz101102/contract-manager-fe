@@ -1,16 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
-import lodash from "lodash"
 import { Download, Plus, Send, Trash2 } from "lucide-react"
-import ReactPaginate from "react-paginate"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
-import { ContractList, mapiContractStatus2 } from "@/types/api"
-import { useContracts } from "@/hooks/useContracts"
+import DetailContract from "@/components/DetailContract"
+import { PaginationDemo } from "@/components/Pagination"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -31,8 +29,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import DetailContract from "@/components/DetailContract"
-import { PaginationDemo } from "@/components/Pagination"
+import { useContracts } from "@/hooks/useContracts"
+import { ContractList, mapiContractStatus2 } from "@/types/api"
 
 const contractListAtom = atom<ContractList[]>([])
 
