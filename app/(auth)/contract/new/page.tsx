@@ -54,7 +54,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ApprovalWorkflowModal } from "../workflow/page"
+import ApprovalWorkflowModal from "@/components/ApprovalWorkflowModal"
 
 // Create new plugin instance
 
