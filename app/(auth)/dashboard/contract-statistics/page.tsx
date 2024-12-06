@@ -21,6 +21,7 @@ import {
 } from "recharts"
 
 import { useContracts } from "@/hooks/useContracts"
+import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -57,12 +58,19 @@ export default function ContractDashboard() {
     from: new Date(new Date().getFullYear(), 0, 1), // Start of current year
     to: new Date(), // Current time
   })
+  const [creatorId, setCreatorId] = React.useState<string>("all")
+  const [customerId, setCustomerId] = React.useState<string>("all")
 
   const { useAdvancedStatistics } = useContracts()
+  const { useListUsers } = useUsers()
+  const { data: creators } = useListUsers("employee", 1, 100)
+  const { data: customers } = useListUsers("customer", 1, 100)
   const { data, isLoading } = useAdvancedStatistics({
     startTime: date.from.getTime(),
     endTime: date.to.getTime(),
     status: status === "all" ? undefined : status,
+    createdById: creatorId === "all" ? undefined : Number(creatorId),
+    customerId: customerId === "all" ? undefined : Number(customerId),
   })
 
   const pieData = React.useMemo(() => {
@@ -215,14 +223,14 @@ export default function ContractDashboard() {
                     Trạng thái
                   </label>
                   <Select
-                    defaultValue="all"
+                    value={status}
                     onValueChange={(value) => setStatus(value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="all">Tất cả</SelectItem>
                       <SelectItem value="completed">Đã hoàn thành</SelectItem>
                       <SelectItem value="pending">Đang ký</SelectItem>
                       <SelectItem value="cancelled">Bị hủy</SelectItem>
@@ -234,12 +242,20 @@ export default function ContractDashboard() {
                   <label className="block text-sm font-medium mb-2">
                     Người tạo
                   </label>
-                  <Select defaultValue="all">
+                  <Select 
+                    value={creatorId}
+                    onValueChange={(value) => setCreatorId(value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select creator" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="all">Tất cả</SelectItem>
+                      {creators?.users?.map((creator) => (
+                        <SelectItem key={creator.id} value={creator.id.toString()}>
+                          {creator.fullName}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -248,12 +264,20 @@ export default function ContractDashboard() {
                   <label className="block text-sm font-medium mb-2">
                     Khách hàng
                   </label>
-                  <Select defaultValue="all">
+                  <Select 
+                    value={customerId}
+                    onValueChange={(value) => setCustomerId(value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select customer" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="all">Tất cả</SelectItem>
+                      {customers?.users?.map((customer) => (
+                        <SelectItem key={customer.id} value={customer.id.toString()}>
+                          {customer.fullName}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -312,13 +336,13 @@ export default function ContractDashboard() {
                   <Legend />
                   <Bar
                     dataKey="contracts"
-                    name="Count of số hợp đồng"
+                    name="Số hợp đồng"
                     fill="#60a5fa"
                   />
                   <Line
                     type="monotone"
                     dataKey="completed"
-                    name="SoLuongHopDongHoanThanhTheoThang"
+                    name="Số lượng hợp đồng theo tháng"
                     stroke="#2563eb"
                   />
                 </ComposedChart>
