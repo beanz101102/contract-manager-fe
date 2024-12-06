@@ -25,7 +25,7 @@ export const useApprovalFlows = () => {
         )
         return response.data
       },
-      refetchInterval: 10000,
+      refetchInterval: 5000,
     })
   }
 

@@ -177,7 +177,11 @@ export default function ContractApprovalFlow() {
                           deleteApprovalFlow(step.id)
                         }}
                       >
-                        <NextImage src="/trash.png" alt="trash" />
+                        <NextImage
+                          src="/trash.png"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          alt="trash"
+                        />
                       </div>
                     </div>
                   </TableCell>
@@ -358,9 +362,12 @@ const ApprovalWorkflowModal = ({
     })
   }
 
+  const { user } = useAuth()
+
   const handleSaveApprovalFlow = () => {
     const payload = {
       name,
+      id: user?.id || 0,
       steps: approvalSteps.map((step) => ({
         departmentId: step.approver?.department?.id,
         approverId: step.approver?.id,

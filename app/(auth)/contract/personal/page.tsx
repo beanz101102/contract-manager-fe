@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
+import lodash from "lodash"
 import { Download, Plus, Send, Trash2 } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
 
@@ -47,13 +48,15 @@ export default function IndividualManagement() {
   } = useContracts()
   const [page, setPage] = useState(1)
   const { user } = useAuth()
-  const { data: contracts, isLoading } = useAllContracts(
-    searchTerm,
-    page,
-    10,
-    null,
-    user?.id
-  )
+  const {
+    data: contracts,
+    isLoading,
+    refetch,
+  } = useAllContracts(searchTerm, page, 10, null, user?.id)
+
+  useEffect(() => {
+    refetch()
+  }, [])
 
   const [contractList, setContractList] = useAtom(contractListAtom)
   const [hasMore, setHasMore] = useState(true)
@@ -64,7 +67,7 @@ export default function IndividualManagement() {
       if (page === 1) {
         setContractList(contracts)
       } else {
-        setContractList((prev) => [...prev, ...contracts])
+        setContractList((prev) => lodash.uniqBy([...prev, ...contracts], "id"))
       }
     }
   }, [contracts, page])

@@ -31,6 +31,7 @@ export const useDepartment = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["departments"] })
         toast.success("Thêm phòng ban thành công")
+        router.push("/department")
         onDone?.()
       },
       onError: (error: any) => {

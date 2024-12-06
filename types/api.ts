@@ -61,6 +61,7 @@ export type ApprovalFlowStep = {
 export interface ApprovalFlow {
   name: string
   steps: ApprovalFlowStep[]
+  id: number
 }
 
 export interface ContractSignature {
