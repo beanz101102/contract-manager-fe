@@ -278,7 +278,7 @@ const ViewApprovalWorkflowModal = ({
   )
 }
 
-const ApprovalWorkflowModal = ({
+export const ApprovalWorkflowModal = ({
   isOpen,
   onOpenChange,
   mode = "create",
@@ -315,7 +315,6 @@ const ApprovalWorkflowModal = ({
   const { data, isLoading } = useListUsers("", 1, 10, searchTerm, null)
   const users = data?.users?.filter((user) => user.role !== "customer") || []
 
-  console.log("users", users)
   const { useAddApprovalFlow, useUpdateApprovalFlow } = useApprovalFlows()
 
   const { mutate: addApprovalFlow } = useAddApprovalFlow(() => {
@@ -330,10 +329,11 @@ const ApprovalWorkflowModal = ({
     if (mode === "edit" && initialData) {
       setName(initialData.name)
       setApprovalSteps(
-        initialData.steps.map((step) => ({
+        initialData.steps.map((step: any) => ({
           step: step.stepOrder,
           approvalType: "",
           department: step.department?.departmentName || "",
+          departmentId: step.department?.id,
           approver: step.approver,
         }))
       )
@@ -368,8 +368,8 @@ const ApprovalWorkflowModal = ({
     const payload = {
       name,
       id: user?.id || 0,
-      steps: approvalSteps.map((step) => ({
-        departmentId: step.approver?.department?.id,
+      steps: approvalSteps.map((step: any) => ({
+        departmentId: step.departmentId ?? step.approver?.department?.id,
         approverId: step.approver?.id,
         stepOrder: step.step,
       })) as ApprovalFlowStep[],
@@ -381,6 +381,8 @@ const ApprovalWorkflowModal = ({
       addApprovalFlow(payload)
     }
   }
+
+  console.log('approvalSteps', approvalSteps)
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -442,7 +444,7 @@ const ApprovalWorkflowModal = ({
                     </TableCell>
                     <TableCell>Trực tiếp</TableCell>
                     <TableCell>
-                      {step.approver?.department?.departmentName || "--"}
+                      {step.approver?.department?.departmentName || step?.department || "--"}
                     </TableCell>
                     <TableCell>
                       <Popover

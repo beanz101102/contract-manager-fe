@@ -46,6 +46,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { ApprovalWorkflowModal } from "../workflow/page"
 
 // Create new plugin instance
 
@@ -82,7 +91,8 @@ export default function ContractForm() {
   const [searchSignerTerm, setSearchSignerTerm] = useState("")
   const [selectedSigners, setSelectedSigners] = useState<User[]>([])
   const [signerTypes, setSignerTypes] = useState<SignerType[]>(["internal"]) // First signer must be internal
-
+  const [selectedApprovalFlow, setSelectedApprovalFlow] = useState<any>(null)
+  const [isOpenCreateFlow, setIsOpenCreateFlow] = useState(false)
   const { useListUsers } = useUsers()
   const { data, isLoading } = useListUsers("customer", 1, 10, searchTerm, null)
 
@@ -169,6 +179,10 @@ export default function ContractForm() {
   const { data: approvalFlowsData, isLoading: isLoadingFlows } =
     useListApprovalFlows(searchFlowTerm)
   const approvalFlows = approvalFlowsData || []
+
+  // Thêm mutation để update approval flow
+  const { useUpdateApprovalFlow } = useApprovalFlows()
+  const { mutate: updateApprovalFlow } = useUpdateApprovalFlow()
 
   return (
     <div className="container mx-auto py-6 bg-white rounded-[10px] border-none shadow-lg">
@@ -449,10 +463,22 @@ export default function ContractForm() {
                           </DialogHeader>
 
                           <div className="py-4 space-y-6">
-                            <div>
-                              <Label className="text-sm font-medium text-gray-700">
-                                Luồng duyệt
-                              </Label>
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-center">
+                                <Label className="text-sm font-medium text-gray-700">
+                                  Luồng duyệt
+                                </Label>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setIsOpenCreateFlow(true)}
+                                  className="bg-teal-500 hover:bg-teal-600 text-white"
+                                >
+                                  <Plus className="w-4 h-4 mr-2" />
+                                  Tạo luồng duyệt mới
+                                </Button>
+                              </div>
+
                               <Command className="border border-gray-200 rounded-md mt-2 bg-white">
                                 <CommandInput
                                   placeholder="Tìm kiếm luồng duyệt..."
@@ -480,6 +506,7 @@ export default function ContractForm() {
                                             "approvalFlow",
                                             flow.id.toString()
                                           )
+                                          setSelectedApprovalFlow(flow)
                                         }}
                                       >
                                         <div className="flex flex-col gap-1">
@@ -492,6 +519,128 @@ export default function ContractForm() {
                                   </CommandGroup>
                                 </CommandList>
                               </Command>
+
+                              {selectedApprovalFlow && (
+                                <div className="border rounded-lg p-4 mt-4">
+                                  <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-semibold">Danh sách bước duyệt</h3>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setSelectedApprovalFlow((prev: any) => ({
+                                          ...prev,
+                                          steps: [...prev.steps, {
+                                            stepOrder: prev.steps.length + 1,
+                                            department: null,
+                                            approver: null
+                                          }]
+                                        }))
+                                      }}
+                                      className="bg-teal-500 hover:bg-teal-600 text-white"
+                                    >
+                                      <Plus className="w-4 h-4 mr-2" />
+                                      Thêm bước duyệt
+                                    </Button>
+                                  </div>
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow className="bg-gray-50">
+                                        <TableHead className="w-[80px] text-center">STT</TableHead>
+                                        <TableHead>Phòng/Ban</TableHead>
+                                        <TableHead>Người duyệt</TableHead>
+                                        <TableHead className="w-[100px] text-center">Thao tác</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {selectedApprovalFlow.steps?.map((step: any, index: number) => (
+                                        <TableRow key={index}>
+                                          <TableCell className="text-center">
+                                            {step.stepOrder}
+                                          </TableCell>
+                                          <TableCell>{step.department?.departmentName || "--"}</TableCell>
+                                          <TableCell>
+                                            <Popover>
+                                              <PopoverTrigger asChild>
+                                                <Button
+                                                  variant="outline2"
+                                                  role="combobox"
+                                                  className="w-full justify-between bg-white"
+                                                >
+                                                  {step.approver?.fullName || "Chọn người duyệt"}
+                                                  <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                              </PopoverTrigger>
+                                              <PopoverContent className="w-[400px] p-0">
+                                                <Command>
+                                                  <CommandInput
+                                                    placeholder="Tìm kiếm người duyệt..."
+                                                    value={searchSignerTerm}
+                                                    onValueChange={setSearchSignerTerm}
+                                                  />
+                                                  <CommandEmpty>
+                                                    {isLoadingSigners ? "Đang tải..." : "Không tìm thấy người duyệt"}
+                                                  </CommandEmpty>
+                                                  <CommandList>
+                                                    <CommandGroup heading="Danh sách người duyệt">
+                                                      {potentialSigners?.map((user: User) => (
+                                                        <CommandItem
+                                                          key={user.id}
+                                                          value={user.fullName}
+                                                          onSelect={() => {
+                                                            setSelectedApprovalFlow((prev: any) => ({
+                                                              ...prev,
+                                                              steps: prev.steps.map((s: any, i: number) => 
+                                                                i === index ? {
+                                                                  ...s,
+                                                                  approver: user,
+                                                                  department: user.department
+                                                                } : s
+                                                              )
+                                                            }))
+                                                          }}
+                                                        >
+                                                          <div className="flex flex-col">
+                                                            <span>{user.fullName}</span>
+                                                            <span className="text-sm text-gray-500">
+                                                              {user.department?.departmentName || "Chưa có phòng ban"}
+                                                            </span>
+                                                          </div>
+                                                        </CommandItem>
+                                                      ))}
+                                                    </CommandGroup>
+                                                  </CommandList>
+                                                </Command>
+                                              </PopoverContent>
+                                            </Popover>
+                                          </TableCell>
+                                          <TableCell className="text-center">
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => {
+                                                setSelectedApprovalFlow((prev: any) => ({
+                                                  ...prev,
+                                                  steps: prev.steps.filter((s: any, i: number) => i !== index)
+                                                }))
+                                              }}
+                                              className="hover:bg-gray-100 h-8 w-8 p-0"
+                                            >
+                                              <X className="h-4 w-4 text-gray-500" />
+                                            </Button>
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </div>
+                              )}
+
+                              <ApprovalWorkflowModal
+                                isOpen={isOpenCreateFlow}
+                                onOpenChange={setIsOpenCreateFlow}
+                                mode="create"
+                              />
                             </div>
 
                             <div className="space-y-4">
@@ -627,7 +776,27 @@ export default function ContractForm() {
                                   return
                                 }
 
-                                setOpenFlowDialog(false)
+                                // Nếu có chỉnh sửa luồng duyệt, lưu luồng mới
+                                if (selectedApprovalFlow) {
+                                  const payload = {
+                                    id: selectedApprovalFlow.id,
+                                    name: selectedApprovalFlow.name,
+                                    steps: selectedApprovalFlow.steps.map((step: any) => ({
+                                      departmentId: step.department?.id,
+                                      approverId: step.approver?.id,
+                                      stepOrder: step.stepOrder,
+                                    }))
+                                  }
+                                  
+                                  updateApprovalFlow(payload, {
+                                    onSuccess: () => {
+                                      // Refresh lại danh sách luồng duyệt nếu cần
+                                      setOpenFlowDialog(false)
+                                    }
+                                  })
+                                } else {
+                                  setOpenFlowDialog(false)
+                                }
                               }}
                             >
                               Xác nhận
@@ -680,8 +849,6 @@ export default function ContractForm() {
                   file: pdfFile,
                 }
 
-                console.log("payload", payload)
-
                 addContract(payload as any)
               }}
             >
@@ -694,7 +861,7 @@ export default function ContractForm() {
           <div className="aspect-[1/1.4] bg-muted rounded-lg flex items-center justify-center overflow-auto">
             {pdfFile ? (
               <object
-                data={URL.createObjectURL(pdfFile)}
+                data={URL.createObjectURL(pdfFile) + "#toolbar=0"}
                 type="application/pdf"
                 className="w-full h-full"
               >
