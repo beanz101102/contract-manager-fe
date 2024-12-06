@@ -20,7 +20,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import NextImage from "@/components/ui/next-img"
 import { Textarea } from "@/components/ui/textarea"
-import LayoutApp from "@/components/layouts/LayoutApp"
 
 export default function ContractForm() {
   const params = useParams()

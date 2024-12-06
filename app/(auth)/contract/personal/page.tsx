@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
 import lodash from "lodash"
 import { Download, Plus, Send, Trash2 } from "lucide-react"
-import InfiniteScroll from "react-infinite-scroll-component"
+import ReactPaginate from "react-paginate"
 
 import { ContractList, mapiContractStatus2 } from "@/types/api"
 import { useContracts } from "@/hooks/useContracts"
@@ -32,6 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import DetailContract from "@/components/DetailContract"
+import { PaginationDemo } from "@/components/Pagination"
 
 const contractListAtom = atom<ContractList[]>([])
 
@@ -63,12 +64,7 @@ export default function IndividualManagement() {
 
   useEffect(() => {
     if (contracts) {
-      setHasMore(contracts.length >= 10)
-      if (page === 1) {
-        setContractList(contracts)
-      } else {
-        setContractList((prev) => lodash.uniqBy([...prev, ...contracts], "id"))
-      }
+      setContractList(contracts.contracts)
     }
   }, [contracts, page])
 
@@ -175,155 +171,156 @@ export default function IndividualManagement() {
       </div>
 
       <div className="overflow-x-auto">
-        <InfiniteScroll
-          dataLength={contractList?.length || 0}
-          next={() => setPage(page + 1)}
-          hasMore={hasMore}
-          loader={null}
-          className="min-w-full"
-        >
-          <Table className="min-w-[1200px] w-full">
-            <TableHeader>
-              <TableRow className="hover:bg-gray-50 bg-gray-100">
-                <TableHead className="w-[50px]">
-                  <Checkbox
-                    checked={selectedEmployees.length === contracts?.length}
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
-                <TableHead className="w-[60px] text-gray-700 font-semibold">
-                  STT
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Số hợp đồng
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Ngày tạo hợp đồng
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Phòng ban
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Mã khách
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Thao tác
-                </TableHead>
+        <Table className="min-w-[1200px] w-full">
+          <TableHeader>
+            <TableRow className="hover:bg-gray-50 bg-gray-100">
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectedEmployees.length === contractList?.length}
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead className="w-[60px] text-gray-700 font-semibold">
+                STT
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Số hợp đồng
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Ngày tạo hợp đồng
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Trạng thái
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Phòng ban
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Mã khách
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Thao tác
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {contractList?.length === 0 ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={8} className="text-center py-16">
+                  <div className="flex flex-col items-center gap-3">
+                    {isLoading ? (
+                      <Loading />
+                    ) : (
+                      <>
+                        <NextImage
+                          src="/empty-state.png"
+                          alt="No data"
+                          className="w-[200px] h-[200px] opacity-50"
+                        />
+                        <p className="text-gray-500 text-lg">
+                          Không có dữ liệu hợp đồng
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contractList?.length === 0 ? (
-                <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={8} className="text-center py-16">
-                    <div className="flex flex-col items-center gap-3">
-                      {isLoading ? (
-                        <Loading />
-                      ) : (
-                        <>
-                          <NextImage
-                            src="/empty-state.png"
-                            alt="No data"
-                            className="w-[200px] h-[200px] opacity-50"
-                          />
-                          <p className="text-gray-500 text-lg">
-                            Không có dữ liệu hợp đồng
-                          </p>
-                        </>
-                      )}
-                    </div>
+            ) : (
+              contractList?.map((contract, index) => (
+                <TableRow
+                  key={contract.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedEmployees.includes(contract.id)}
+                      onCheckedChange={() => handleSelectOne(contract.id)}
+                    />
                   </TableCell>
-                </TableRow>
-              ) : (
-                contractList?.map((contract, index) => (
-                  <TableRow
-                    key={contract.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedEmployees.includes(contract.id)}
-                        onCheckedChange={() => handleSelectOne(contract.id)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {index + 1}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {contract.contractNumber}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {dayjs(contract.createdAt).format("DD/MM/YYYY")}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className="px-3 py-1 rounded-full text-sm font-medium"
-                        style={{
-                          ...mapiContractStatus2[
-                            contract.status as keyof typeof mapiContractStatus2
-                          ].color,
+                  <TableCell className="text-gray-700 text-base">
+                    {(page - 1) * 10 + index + 1}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-base">
+                    {contract.contractNumber}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-base">
+                    {dayjs(contract.createdAt).format("DD/MM/YYYY")}
+                  </TableCell>
+                  <TableCell>
+                    <span
+                      className="px-3 py-1 rounded-full text-sm font-medium"
+                      style={{
+                        ...mapiContractStatus2[
+                          contract.status as keyof typeof mapiContractStatus2
+                        ].color,
+                      }}
+                    >
+                      {
+                        mapiContractStatus2[
+                          contract.status as keyof typeof mapiContractStatus2
+                        ].label
+                      }
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-base">
+                    {contract.createdBy?.department?.departmentName}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-base">
+                    {contract.customer.code}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-3 items-center">
+                      <div
+                        onClick={() => {
+                          setContract(contract)
+                          setIsOpenContractInfo(true)
                         }}
+                        className="cursor-pointer"
                       >
-                        {
-                          mapiContractStatus2[
-                            contract.status as keyof typeof mapiContractStatus2
-                          ].label
-                        }
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {contract.createdBy?.department?.departmentName}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-base">
-                      {contract.customer.code}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-3 items-center">
-                        <div
-                          onClick={() => {
-                            setContract(contract)
-                            setIsOpenContractInfo(true)
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <NextImage
-                            src="/eye.png"
-                            alt="eye"
-                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                          />
-                        </div>
-                        {/* <NextImage
+                        <NextImage
+                          src="/eye.png"
+                          alt="eye"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                        />
+                      </div>
+                      {/* <NextImage
                           src="/mail.png"
                           alt="mail"
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                         /> */}
-                        <div
-                          onClick={() => {
-                            router.push(`/contract/edit/${contract.id}`)
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <NextImage
-                            src="/edit.png"
-                            alt="edit"
-                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                          />
-                        </div>
-                        {/* <NextImage
+                      <div
+                        onClick={() => {
+                          router.push(`/contract/edit/${contract.id}`)
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <NextImage
+                          src="/edit.png"
+                          alt="edit"
+                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                        />
+                      </div>
+                      {/* <NextImage
                           src="/setting.png"
                           alt="setting"
                           className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                         /> */}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </InfiniteScroll>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+        {contractList?.length > 0 && (
+          <div className="flex justify-end mt-4 w-fit  ml-auto">
+            <PaginationDemo
+              currentPage={page}
+              totalPages={contracts?.totalPages ?? 1}
+              onChangePage={setPage}
+            />
+          </div>
+        )}
       </div>
 
       <DetailContract
