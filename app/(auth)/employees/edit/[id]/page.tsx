@@ -149,418 +149,342 @@ export default function EditEmployeeInformationForm() {
   }
 
   return (
-    <Card className="w-full bg-white rounded-[10px] border-none">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-b-[#675D5D]">
-        <CardTitle className="text-2xl font-bold text-black">
-          Chỉnh sửa thông tin nhân viên
-        </CardTitle>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="flex items-center bg-[#F3F6F9] text-[#AAAAAA] font-semibold border-none h-[40px] rounded text-lg"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
-          </Button>
-          <Button
-            onClick={form.handleSubmit(onSubmit)}
-            className="bg-[#4BC5BE] hover:bg-[#2ea39d] rounded text-white font-semibold"
-          >
-            Lưu thông tin
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4 mt-10">
-          <div className="flex space-x-4">
-            <div className="w-1/3">
-              <div className="w-32 h-32 bg-gray-200 rounded-md flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="w-2/3 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-black" htmlFor="code">
-                    Mã nhân viên (*)
-                  </Label>
-                  <Input
-                    {...form.register("code")}
-                    style={{ border: "1px solid #0000004D" }}
-                    className={cn("bg-white rounded text-black", {
-                      "border-red-500": form.formState.errors.code,
-                    })}
-                    placeholder="Mã nhân viên"
-                  />
-                  {form.formState.errors.code && (
-                    <p className="text-red-500 text-sm">
-                      {form.formState.errors.code.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-black" htmlFor="fullName">
-                    Họ và tên (*)
-                  </Label>
-                  <Input
-                    {...form.register("fullName")}
-                    style={{ border: "1px solid #0000004D" }}
-                    className={cn("bg-white rounded text-black", {
-                      "border-red-500": form.formState.errors.fullName,
-                    })}
-                    placeholder="Họ và tên"
-                  />
-                  {form.formState.errors.fullName && (
-                    <p className="text-red-500 text-sm">
-                      {form.formState.errors.fullName.message}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-black" htmlFor="birthPlace">
-                    Nơi sinh (*)
-                  </Label>
-                  <Input
-                    {...form.register("birthPlace")}
-                    style={{ border: "1px solid #0000004D" }}
-                    className={cn("bg-white rounded text-black", {
-                      "border-red-500": form.formState.errors.birthPlace,
-                    })}
-                    placeholder="Nơi sinh"
-                  />
-                  {form.formState.errors.birthPlace && (
-                    <p className="text-red-500 text-sm">
-                      {form.formState.errors.birthPlace.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="address">
-                Địa chỉ (*)
-              </Label>
-              <Input
-                {...form.register("address")}
-                style={{ border: "1px solid #0000004D" }}
-                className={cn("bg-white rounded text-black", {
-                  "border-red-500": form.formState.errors.address,
-                })}
-                placeholder="Địa chỉ"
-              />
-              {form.formState.errors.address && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.address.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="gender">
-                Giới tính (*)
-              </Label>
-              <Select
-                onValueChange={(value) =>
-                  form.setValue("gender", value as "Nam" | "Nữ" | "Khác")
-                }
-                value={form.watch("gender")}
+    <div className="container max-w-[1200px] mx-auto p-4 md:p-6">
+      <Card className="bg-white rounded-lg shadow-lg border-none">
+        <CardHeader className="space-y-0 p-4 md:p-6 border-b">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <CardTitle className="text-xl md:text-2xl font-bold text-gray-900">
+              Chỉnh sửa thông tin nhân viên
+            </CardTitle>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.back()}
+                className="flex items-center bg-gray-50 text-gray-600 border-none h-10"
               >
-                <SelectTrigger
-                  style={{ border: "1px solid #0000004D" }}
-                  className={cn("rounded text-black", {
-                    "border-red-500": form.formState.errors.gender,
-                  })}
-                >
-                  <SelectValue placeholder="Chọn giới tính" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Nam">Nam</SelectItem>
-                  <SelectItem value="Nữ">Nữ</SelectItem>
-                  <SelectItem value="Khác">Khác</SelectItem>
-                </SelectContent>
-              </Select>
-              {form.formState.errors.gender && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.gender.message}
-                </p>
-              )}
+                <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại
+              </Button>
+              <Button
+                onClick={form.handleSubmit(onSubmit)}
+                className="bg-teal-500 hover:bg-teal-600 text-white h-10"
+              >
+                Lưu thông tin
+              </Button>
             </div>
           </div>
+        </CardHeader>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="birthDate">
-                Ngày sinh (*)
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline2"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !birthDate && "text-muted-foreground"
-                    )}
+        <CardContent className="p-4 md:p-6">
+          <div className="space-y-6">
+            {/* Profile Section */}
+            <div className="grid grid-cols-1 md:grid-cols-[200px,1fr] gap-6">
+              <div className="w-32 md:w-full mx-auto">
+                <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-16 w-16 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {birthDate ? format(birthDate, "dd/MM/yyyy") : "Chọn ngày"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={birthDate}
-                    onSelect={onBirthDateChange}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              {form.formState.errors.birthDate && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.birthDate.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="idNumber">
-                Số CCCD (*)
-              </Label>
-              <Input
-                {...form.register("idNumber")}
-                style={{ border: "1px solid #0000004D" }}
-                className={cn("bg-white rounded text-black", {
-                  "border-red-500": form.formState.errors.idNumber,
-                })}
-                placeholder="Số CCCD"
-              />
-              {form.formState.errors.idNumber && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.idNumber.message}
-                </p>
-              )}
-            </div>
-          </div>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="issueDate">
-                Ngày cấp (*)
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline2"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !issueDate && "text-muted-foreground"
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-gray-700">Mã nhân viên (*)</Label>
+                    <Input
+                      {...form.register("code")}
+                      className={cn("bg-white border-gray-300", {
+                        "border-red-500": form.formState.errors.code,
+                      })}
+                      placeholder="Mã nhân viên"
+                    />
+                    {form.formState.errors.code && (
+                      <p className="text-red-500 text-sm">
+                        {form.formState.errors.code.message}
+                      </p>
                     )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {issueDate ? format(issueDate, "dd/MM/yyyy") : "Chọn ngày"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={issueDate}
-                    onSelect={onIssueDateChange}
-                    initialFocus
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-gray-700">Họ và tên (*)</Label>
+                    <Input
+                      {...form.register("fullName")}
+                      className="bg-white border-gray-300"
+                      placeholder="Họ và tên"
+                    />
+                    {form.formState.errors.fullName && (
+                      <p className="text-red-500 text-sm">
+                        {form.formState.errors.fullName.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-gray-700">Nơi sinh (*)</Label>
+                    <Input
+                      {...form.register("birthPlace")}
+                      className="bg-white border-gray-300"
+                      placeholder="Nơi sinh"
+                    />
+                    {form.formState.errors.birthPlace && (
+                      <p className="text-red-500 text-sm">
+                        {form.formState.errors.birthPlace.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Personal Information Section */}
+            <div className="space-y-6 p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">
+                Thông tin cá nhân
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Địa chỉ (*)</Label>
+                  <Input
+                    {...form.register("address")}
+                    className="bg-white border-gray-300"
+                    placeholder="Địa chỉ"
                   />
-                </PopoverContent>
-              </Popover>
-              {form.formState.errors.issueDate && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.issueDate.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="issuePlace">
-                Nơi cấp (*)
-              </Label>
-              <Input
-                {...form.register("issuePlace")}
-                style={{ border: "1px solid #0000004D" }}
-                className={cn("bg-white rounded text-black", {
-                  "border-red-500": form.formState.errors.issuePlace,
-                })}
-                placeholder="Nơi cấp"
-              />
-              {form.formState.errors.issuePlace && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.issuePlace.message}
-                </p>
-              )}
-            </div>
-          </div>
+                  {form.formState.errors.address && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.address.message}
+                    </p>
+                  )}
+                </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="phone">
-                Số điện thoại (*)
-              </Label>
-              <Input
-                {...form.register("phone")}
-                style={{ border: "1px solid #0000004D" }}
-                className={cn("bg-white rounded text-black", {
-                  "border-red-500": form.formState.errors.phone,
-                })}
-                placeholder="Số điện thoại"
-              />
-              {form.formState.errors.phone && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.phone.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="email">
-                Email (*)
-              </Label>
-              <Input
-                {...form.register("email")}
-                style={{ border: "1px solid #0000004D" }}
-                className={cn("bg-white rounded text-black", {
-                  "border-red-500": form.formState.errors.email,
-                })}
-                type="email"
-                placeholder="Email"
-              />
-              {form.formState.errors.email && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.email.message}
-                </p>
-              )}
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Giới tính (*)</Label>
+                  <Select
+                    onValueChange={(value) =>
+                      form.setValue("gender", value as "Nam" | "Nữ" | "Khác")
+                    }
+                    value={form.watch("gender")}
+                  >
+                    <SelectTrigger className="bg-white border-gray-300">
+                      <SelectValue placeholder="Chọn giới tính" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Nam">Nam</SelectItem>
+                      <SelectItem value="Nữ">Nữ</SelectItem>
+                      <SelectItem value="Khác">Khác</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.gender && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.gender.message}
+                    </p>
+                  )}
+                </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="department">
-                Phòng ban (*)
-              </Label>
-              <Select
-                onValueChange={(value) => form.setValue("department", value)}
-                value={form.watch("department")}
-              >
-                <SelectTrigger
-                  style={{ border: "1px solid #0000004D" }}
-                  className={cn("rounded text-black", {
-                    "border-red-500": form.formState.errors.department,
-                  })}
-                >
-                  <SelectValue placeholder="Chọn phòng ban" />
-                </SelectTrigger>
-                <SelectContent>
-                  {departments?.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.departmentName}>
-                      {dept.departmentName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.department && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.department.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="position">
-                Chức vụ (*)
-              </Label>
-              <Select
-                onValueChange={(value) => form.setValue("position", value)}
-                value={form.watch("position")}
-              >
-                <SelectTrigger
-                  style={{ border: "1px solid #0000004D" }}
-                  className={cn("rounded text-black", {
-                    "border-red-500": form.formState.errors.position,
-                  })}
-                >
-                  <SelectValue placeholder="Chọn chức vụ" />
-                </SelectTrigger>
-                <SelectContent>
-                  {positionConfigs
-                    .filter((pos) => {
-                      if (currentUser?.role === "admin") return true
-                      if (currentUser?.role === "manager")
-                        return pos.value === "employee"
-                      return false
-                    })
-                    .map((pos) => (
-                      <SelectItem key={pos.value} value={pos.value}>
-                        {pos.label}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.position && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.position.message}
-                </p>
-              )}
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Ngày sinh (*)</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-white border-gray-300",
+                          !birthDate && "text-gray-500"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {birthDate
+                          ? format(birthDate, "dd/MM/yyyy")
+                          : "Chọn ngày"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={birthDate}
+                        onSelect={onBirthDateChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {form.formState.errors.birthDate && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.birthDate.message}
+                    </p>
+                  )}
+                </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="account">
-                Tài khoản (*)
-              </Label>
-              <Input
-                {...form.register("account")}
-                style={{ border: "1px solid #0000004D" }}
-                className={cn("bg-white rounded text-black", {
-                  "border-red-500": form.formState.errors.account,
-                })}
-                placeholder="Tài khoản"
-              />
-              {form.formState.errors.account && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.account.message}
-                </p>
-              )}
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Số CCCD (*)</Label>
+                  <Input
+                    {...form.register("idNumber")}
+                    className="bg-white border-gray-300"
+                    placeholder="Số CCCD"
+                  />
+                  {form.formState.errors.idNumber && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.idNumber.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Ngày cấp (*)</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-white border-gray-300",
+                          !issueDate && "text-gray-500"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {issueDate
+                          ? format(issueDate, "dd/MM/yyyy")
+                          : "Chọn ngày"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={issueDate}
+                        onSelect={onIssueDateChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {form.formState.errors.issueDate && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.issueDate.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Nơi cấp (*)</Label>
+                  <Input
+                    {...form.register("issuePlace")}
+                    className="bg-white border-gray-300"
+                    placeholder="Nơi cấp"
+                  />
+                  {form.formState.errors.issuePlace && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.issuePlace.message}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label className="text-black" htmlFor="password">
-                Mật khẩu (*)
-              </Label>
-              <Input
-                {...form.register("password")}
-                style={{ border: "1px solid #0000004D" }}
-                className={cn("bg-white rounded text-black", {
-                  "border-red-500": form.formState.errors.password,
-                })}
-                type="password"
-                placeholder="Mật khẩu"
-              />
-              {form.formState.errors.password && (
-                <p className="text-red-500 text-sm">
-                  {form.formState.errors.password.message}
-                </p>
-              )}
+
+            {/* Work Information Section */}
+            <div className="space-y-6 p-4 md:p-6 bg-gray-50 rounded-lg border border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">
+                Thông tin công việc
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Phòng ban (*)</Label>
+                  <Select
+                    onValueChange={(value) =>
+                      form.setValue("department", value)
+                    }
+                    value={form.watch("department")}
+                  >
+                    <SelectTrigger className="bg-white border-gray-300">
+                      <SelectValue placeholder="Chọn phòng ban" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments?.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.departmentName}>
+                          {dept.departmentName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.department && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.department.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Chức vụ (*)</Label>
+                  <Select
+                    onValueChange={(value) => form.setValue("position", value)}
+                    value={form.watch("position")}
+                  >
+                    <SelectTrigger className="bg-white border-gray-300">
+                      <SelectValue placeholder="Chọn chức vụ" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {positionConfigs
+                        .filter((pos) => {
+                          if (currentUser?.role === "admin") return true
+                          if (currentUser?.role === "manager")
+                            return pos.value === "employee"
+                          return false
+                        })
+                        .map((pos) => (
+                          <SelectItem key={pos.value} value={pos.value}>
+                            {pos.label}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.position && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.position.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Tài khoản (*)</Label>
+                  <Input
+                    {...form.register("account")}
+                    className="bg-white border-gray-300"
+                    placeholder="Tài khoản"
+                  />
+                  {form.formState.errors.account && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.account.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Mật khẩu (*)</Label>
+                  <Input
+                    {...form.register("password")}
+                    className="bg-white border-gray-300"
+                    type="password"
+                    placeholder="Mật khẩu"
+                  />
+                  {form.formState.errors.password && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.password.message}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

@@ -81,11 +81,13 @@ export default function ContractSearch() {
   }
 
   return (
-    <div className="p-8 bg-white rounded-xl shadow-sm">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Cá nhân quản lý</h1>
+    <div className="p-4 md:p-8 bg-white rounded-xl shadow-sm">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
+        Cá nhân quản lý
+      </h1>
 
-      <div className="flex justify-between mb-6">
-        <div className="relative w-[280px]">
+      <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4 md:mb-6">
+        <div className="relative w-full md:w-[280px]">
           <Input
             type="text"
             placeholder="Mã/Số hợp đồng"
@@ -142,7 +144,7 @@ export default function ContractSearch() {
           <TableBody>
             {contractList?.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-16">
+                <TableCell colSpan={8} className="text-center py-12 md:py-16">
                   <div className="flex flex-col items-center gap-3">
                     {isLoading ? (
                       <Loading />
@@ -151,9 +153,9 @@ export default function ContractSearch() {
                         <NextImage
                           src="/empty-state.png"
                           alt="No data"
-                          className="w-[200px] h-[200px] opacity-50"
+                          className="w-[160px] h-[160px] md:w-[200px] md:h-[200px] opacity-50"
                         />
-                        <p className="text-gray-500 text-lg">
+                        <p className="text-gray-500 text-base md:text-lg">
                           Không có dữ liệu hợp đồng
                         </p>
                       </>
@@ -167,18 +169,18 @@ export default function ContractSearch() {
                   key={contract.id}
                   className="hover:bg-gray-50 transition-colors"
                 >
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {index + 1}
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {contract.contractNumber}
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {dayjs(contract.createdAt).format("DD/MM/YYYY")}
                   </TableCell>
                   <TableCell>
                     <span
-                      className="px-3 py-1 rounded-full text-sm font-medium"
+                      className="px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium"
                       style={{
                         ...mapiContractStatus2[
                           contract.status as keyof typeof mapiContractStatus2
@@ -192,24 +194,25 @@ export default function ContractSearch() {
                       }
                     </span>
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {contract.createdBy?.department?.departmentName}
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {contract.customer.code}
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-3 items-center">
+                    <div className="flex gap-2 md:gap-3 items-center">
                       <div
                         onClick={() => {
                           setContractId(contract.id)
                           setIsOpen(true)
                         }}
+                        className="cursor-pointer"
                       >
                         <NextImage
                           src="/eye.png"
                           alt="eye"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
                         />
                       </div>
                     </div>
@@ -220,7 +223,7 @@ export default function ContractSearch() {
           </TableBody>
         </Table>
         {contractList?.length > 0 && (
-          <div className="flex justify-end mt-4 w-fit  ml-auto">
+          <div className="flex justify-center md:justify-end mt-4 w-full md:w-fit md:ml-auto">
             <PaginationDemo
               currentPage={page}
               totalPages={contracts?.totalPages ?? 1}

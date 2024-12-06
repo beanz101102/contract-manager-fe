@@ -80,30 +80,32 @@ export default function ContractSigning() {
   }
 
   return (
-    <div className="bg-white rounded-lg p-6">
-      <h1 className="text-2xl font-bold mb-4">Ký hợp đồng</h1>
-      <div className="flex justify-between mb-4">
-        <div className="relative">
+    <div className="bg-white rounded-lg p-4 md:p-6">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">
+        Ký hợp đồng
+      </h1>
+      <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4 md:mb-6">
+        <div className="relative w-full md:w-auto">
           <Input
             type="text"
             placeholder="Mã/ Số hợp đồng"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-white rounded"
+            className="bg-white rounded w-full md:w-[280px]"
             style={{
               border: "1px solid #D9D9D9",
             }}
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
-            className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
+            className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
             onClick={() => setIsOpenEditModal(true)}
           >
-            <Pencil className="w-4 h-4" /> Yêu cầu sửa
+            <Pencil className="w-4 h-4 md:w-5 md:h-5 mr-2" /> Yêu cầu sửa
           </Button>
-          <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
-            <Download className="w-4 h-4" /> Tải
+          <Button className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+            <Download className="w-4 h-4 md:w-5 md:h-5 mr-2" /> Tải
           </Button>
         </div>
       </div>
@@ -149,7 +151,7 @@ export default function ContractSigning() {
           <TableBody>
             {contractList?.length === 0 ? (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={8} className="text-center py-16">
+                <TableCell colSpan={8} className="text-center py-12 md:py-16">
                   <div className="flex flex-col items-center gap-3">
                     {isLoading ? (
                       <Loading />
@@ -158,9 +160,9 @@ export default function ContractSigning() {
                         <NextImage
                           src="/empty-state.png"
                           alt="No data"
-                          className="w-[200px] h-[200px] opacity-50"
+                          className="w-[160px] h-[160px] md:w-[200px] md:h-[200px] opacity-50"
                         />
-                        <p className="text-gray-500 text-lg">
+                        <p className="text-gray-500 text-base md:text-lg">
                           Không có dữ liệu hợp đồng
                         </p>
                       </>
@@ -181,18 +183,18 @@ export default function ContractSigning() {
                       disabled={contract.signedUserIds.includes(user?.id || 0)}
                     />
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {index + 1}
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {contract.contractNumber}
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {dayjs(contract.createdAt).format("DD/MM/YYYY")}
                   </TableCell>
                   <TableCell>
                     <span
-                      className="px-3 py-1 rounded-full text-sm font-medium"
+                      className="px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium"
                       style={{
                         ...mapiContractStatus[
                           contract.signedUserIds.includes(user?.id || 0)
@@ -210,28 +212,31 @@ export default function ContractSigning() {
                       }
                     </span>
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {contract.createdBy?.department?.departmentName}
                   </TableCell>
-                  <TableCell className="text-gray-700 text-base">
+                  <TableCell className="text-gray-700 text-sm md:text-base">
                     {contract.customer.code}
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-3 items-center">
+                    <div className="flex gap-2 md:gap-3 items-center">
                       <div
                         onClick={() => {
                           setContractId(contract.id)
                           setIsOpen(true)
                         }}
+                        className="cursor-pointer"
                       >
                         <NextImage
                           src="/eye.png"
                           alt="eye"
-                          className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
                         />
                       </div>
                       <Link href={`/contract/sign/${contract.id}`}>
-                        <Button>Ký hợp đồng</Button>
+                        <Button className="text-sm md:text-base">
+                          Ký hợp đồng
+                        </Button>
                       </Link>
                     </div>
                   </TableCell>
@@ -241,7 +246,7 @@ export default function ContractSigning() {
           </TableBody>
         </Table>
         {contractList?.length > 0 && (
-          <div className="flex justify-end mt-4 w-fit  ml-auto">
+          <div className="flex justify-center md:justify-end mt-4 w-full md:w-fit md:ml-auto">
             <PaginationDemo
               currentPage={page}
               totalPages={contracts?.totalPages ?? 1}
@@ -251,15 +256,16 @@ export default function ContractSigning() {
         )}
       </div>
 
+      <DetailContract
+        id={contractId || 0}
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+      />
+
       <EditRequestModal
         isOpen={isOpenEditModal}
         onOpenChange={setIsOpenEditModal}
         selectedEmployees={selectedEmployees}
-      />
-      <DetailContract
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-        id={contractId || 0}
       />
     </div>
   )

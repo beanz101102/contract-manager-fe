@@ -78,13 +78,13 @@ export default function CustomerList() {
   }
 
   return (
-    <div className="p-8 bg-white rounded-xl shadow-sm">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">
+    <div className="p-4 md:p-8 bg-white rounded-xl shadow-sm">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
         Danh sách khách hàng
       </h1>
 
-      <div className="flex justify-between mb-6">
-        <div className="relative w-[280px]">
+      <div className="flex flex-col md:flex-row md:justify-between gap-4 md:gap-6 mb-4 md:mb-6">
+        <div className="relative w-full md:w-[280px]">
           <Input
             type="text"
             placeholder="Mã/ Tên khách hàng"
@@ -110,14 +110,14 @@ export default function CustomerList() {
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <Link href="/customers/new">
-            <Button className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
+        <div className="flex gap-2 md:gap-3">
+          <Link href="/customers/new" className="flex-1 md:flex-none">
+            <Button className="w-full md:w-auto bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
               <Plus className="w-4 h-4 mr-2" /> Thêm mới
             </Button>
           </Link>
           <Button
-            className="bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            className="flex-1 md:flex-none bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
             disabled={selectedEmployees.length === 0}
             onClick={() => deleteUser(selectedEmployees)}
           >
@@ -134,7 +134,7 @@ export default function CustomerList() {
           loader={null}
           className="min-w-full"
         >
-          <Table className="min-w-[1600px] w-full">
+          <Table className="min-w-[1200px] w-full">
             <TableHeader>
               <TableRow className="hover:bg-gray-50 bg-gray-100">
                 <TableHead className="w-[50px]">
@@ -180,14 +180,17 @@ export default function CustomerList() {
             <TableBody>
               {listUsersCustomers.length === 0 ? (
                 <TableRow className="hover:bg-transparent">
-                  <TableCell colSpan={11} className="text-center py-16">
-                    <div className="flex flex-col items-center gap-4">
+                  <TableCell
+                    colSpan={11}
+                    className="text-center py-12 md:py-16"
+                  >
+                    <div className="flex flex-col items-center gap-3">
                       <NextImage
                         src="/empty-state.png"
                         alt="No data"
-                        className="w-[240px] h-[240px] opacity-40"
+                        className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] opacity-40"
                       />
-                      <p className="text-gray-500 text-base">
+                      <p className="text-gray-500 text-sm md:text-base">
                         Không có dữ liệu khách hàng
                       </p>
                     </div>
@@ -205,35 +208,35 @@ export default function CustomerList() {
                         onCheckedChange={() => handleSelectOne(customer.id)}
                       />
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {index + 1}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.code}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.fullName}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.dateOfBirth}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.gender}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.idNumber}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.phoneNumber}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.email}
                     </TableCell>
-                    <TableCell className="text-gray-700 text-base">
+                    <TableCell className="text-gray-700 text-sm md:text-base">
                       {customer.address}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-3 justify-center">
+                      <div className="flex gap-2 md:gap-3 justify-center">
                         <div
                           className="cursor-pointer"
                           onClick={() =>
@@ -243,7 +246,7 @@ export default function CustomerList() {
                           <NextImage
                             src="/edit.png"
                             alt="edit"
-                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                            className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
                           />
                         </div>
                         <div
@@ -253,7 +256,7 @@ export default function CustomerList() {
                           <NextImage
                             src="/trash.png"
                             alt="trash"
-                            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity"
+                            className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
                           />
                         </div>
                       </div>

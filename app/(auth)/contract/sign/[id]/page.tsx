@@ -52,56 +52,64 @@ export default function ContractForm() {
 
   return (
     <>
-      <div className="flex min-h-screen">
-        <div className="w-[30%] min-h-screen bg-white p-6 border-r">
+      <div className="flex flex-col md:flex-row min-h-screen">
+        <div className="w-full md:w-[30%] min-h-[auto] md:min-h-screen bg-white p-4 md:p-6 border-b md:border-r">
           <Button
             variant="ghost"
             onClick={() => router.back()}
-            className="flex items-center gap-2 mb-8 hover:bg-gray-100"
+            className="flex items-center gap-2 mb-4 md:mb-8 hover:bg-gray-100"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
             Quay lại
           </Button>
 
-          <div className="space-y-8">
-            <div className="flex items-center gap-4">
-              <span className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <i className="text-primary text-xl font-semibold">i</i>
+          <div className="space-y-6 md:space-y-8">
+            <div className="flex items-center gap-3 md:gap-4">
+              <span className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <i className="text-primary text-lg md:text-xl font-semibold">
+                  i
+                </i>
               </span>
-              <h2 className="font-semibold text-xl">Thông tin hợp đồng</h2>
+              <h2 className="font-semibold text-lg md:text-xl">
+                Thông tin hợp đồng
+              </h2>
             </div>
 
-            <Card className="p-8 bg-white border-gray-200">
-              <div className="space-y-6">
-                <div className="grid gap-2">
+            <Card className="p-4 md:p-8 bg-white border-gray-200">
+              <div className="space-y-4 md:space-y-6">
+                <div className="grid gap-1.5 md:gap-2">
                   <Label className="text-sm font-medium text-gray-600">
                     Ngày lập
                   </Label>
-                  <div className="text-base text-gray-900">25/07/2024</div>
+                  <div className="text-sm md:text-base text-gray-900">
+                    25/07/2024
+                  </div>
                 </div>
 
-                <div className="grid gap-2">
+                <div className="grid gap-1.5 md:gap-2">
                   <Label className="text-sm font-medium text-gray-600">
                     Công ty
                   </Label>
-                  <div className="text-base text-gray-900">
+                  <div className="text-sm md:text-base text-gray-900">
                     CÔNG TY CỔ PHẦN PHÁT TRIỂN BẤT ĐỘNG SẢN PHÁT ĐẠT
                   </div>
                 </div>
 
-                <div className="grid gap-2">
+                <div className="grid gap-1.5 md:gap-2">
                   <Label className="text-sm font-medium text-gray-600">
                     Mã số thuế
                   </Label>
-                  <div className="text-base text-gray-900">0314955586</div>
+                  <div className="text-sm md:text-base text-gray-900">
+                    0314955586
+                  </div>
                 </div>
 
-                <div className="grid gap-2">
+                <div className="grid gap-1.5 md:gap-2">
                   <Label className="text-sm font-medium text-gray-600">
                     Ghi chú
                   </Label>
                   <Textarea
-                    className="min-h-[120px] resize-none bg-white border-gray-200 text-gray-900 focus:border-primary focus:ring-primary"
+                    className="min-h-[100px] md:min-h-[120px] resize-none bg-white border-gray-200 text-gray-900 focus:border-primary focus:ring-primary text-sm md:text-base"
                     placeholder="Nhập ghi chú..."
                   />
                 </div>
@@ -109,24 +117,24 @@ export default function ContractForm() {
             </Card>
           </div>
 
-          <div className="flex flex-col gap-4 mt-8">
-            <Button className="w-full py-6 text-base font-medium">
-              <Send className="mr-3 h-5 w-5" />
+          <div className="flex flex-col gap-3 md:gap-4 mt-6 md:mt-8">
+            <Button className="w-full py-4 md:py-6 text-sm md:text-base font-medium">
+              <Send className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5" />
               Gửi phản hồi
             </Button>
-            <Button className="w-full py-6 text-base font-medium">
-              <Download className="mr-3 h-5 w-5" />
+            <Button className="w-full py-4 md:py-6 text-sm md:text-base font-medium">
+              <Download className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5" />
               Tải về
             </Button>
             <Button
-              className="w-full py-6 text-base font-medium"
+              className="w-full py-4 md:py-6 text-sm md:text-base font-medium"
               onClick={handleSign}
             >
               Xác nhận ký
             </Button>
           </div>
         </div>
-        <div className="flex-1 bg-gray-50 w-[70%]">
+        <div className="flex-1 bg-gray-50 w-full md:w-[70%] min-h-screen">
           <AppPDF
             url={`${process.env.NEXT_PUBLIC_API_URL}${data?.pdfFilePath}`}
             setFile={setFile}
@@ -135,27 +143,30 @@ export default function ContractForm() {
       </div>
 
       <Dialog open={showOtpModal} onOpenChange={setShowOtpModal}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px] p-4 md:p-6">
           <DialogHeader>
-            <DialogTitle>Xác nhận ký hợp đồng</DialogTitle>
+            <DialogTitle className="text-lg md:text-xl">
+              Xác nhận ký hợp đồng
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Mã OTP</Label>
+              <Label className="text-sm md:text-base">Mã OTP</Label>
               <Input
                 type="text"
                 placeholder="Nhập mã OTP"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
+                className="text-sm md:text-base"
               />
             </div>
 
-            <div className="text-sm text-gray-500">
+            <div className="text-xs md:text-sm text-gray-500">
               Mã OTP đã được gửi đến email của bạn.
               <Button
                 variant="link"
-                className="px-1 text-primary"
+                className="px-1 text-primary text-xs md:text-sm"
                 onClick={() => sendOtp({ email: user?.email ?? "" })}
               >
                 Gửi lại mã
@@ -163,17 +174,23 @@ export default function ContractForm() {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-2 md:gap-3">
             <Button
               variant="outline"
               onClick={() => {
                 setShowOtpModal(false)
                 setOtp("")
               }}
+              className="text-sm md:text-base"
             >
               Hủy
             </Button>
-            <Button onClick={handleConfirmSign}>Xác nhận</Button>
+            <Button
+              onClick={handleConfirmSign}
+              className="text-sm md:text-base"
+            >
+              Xác nhận
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

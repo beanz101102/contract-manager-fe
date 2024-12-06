@@ -110,11 +110,13 @@ export default function IndividualManagement() {
   const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
 
   return (
-    <div className="p-8 bg-white rounded-xl shadow-sm">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">Cá nhân quản lý</h1>
+    <div className="p-4 md:p-8 bg-white rounded-xl shadow-sm">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
+        Cá nhân quản lý
+      </h1>
 
-      <div className="flex justify-between mb-6">
-        <div className="relative w-[280px]">
+      <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-6">
+        <div className="relative w-full md:w-[280px]">
           <Input
             type="text"
             placeholder="Mã/Số hợp đồng"
@@ -140,9 +142,9 @@ export default function IndividualManagement() {
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 md:gap-3">
           <Button
-            className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            className="flex-1 md:flex-none bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
             onClick={() => router.push("/contract/new")}
           >
             <Plus className="w-4 h-4 mr-2" /> Thêm mới
@@ -154,17 +156,17 @@ export default function IndividualManagement() {
                 userId: user?.id ?? 0,
               })
             }
-            className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            className="flex-1 md:flex-none bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
           >
             <Send className="w-4 h-4 mr-2" /> Gửi duyệt
           </Button>
           <Button
-            className="bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            className="flex-1 md:flex-none bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
             onClick={() => setShowCancelModal(true)}
           >
             <Trash2 className="w-4 h-4 mr-2" /> Hủy
           </Button>
-          <Button className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
+          <Button className="flex-1 md:flex-none bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
             <Download className="w-4 h-4 mr-2" /> Tải
           </Button>
         </div>
@@ -313,7 +315,7 @@ export default function IndividualManagement() {
           </TableBody>
         </Table>
         {contractList?.length > 0 && (
-          <div className="flex justify-end mt-4 w-fit  ml-auto">
+          <div className="flex justify-center md:justify-end mt-4 w-full md:w-fit md:ml-auto">
             <PaginationDemo
               currentPage={page}
               totalPages={contracts?.totalPages ?? 1}

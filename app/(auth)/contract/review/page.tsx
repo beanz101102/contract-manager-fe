@@ -95,35 +95,35 @@ export default function ContractApproval() {
 
   return (
     <>
-      <div className="bg-white rounded-lg p-6">
-        <h1 className="text-2xl font-bold mb-4">Duyệt hợp đồng</h1>
-        <div className="flex justify-between mb-4">
-          <div className="relative">
+      <div className="bg-white rounded-lg p-4 md:p-6">
+        <h1 className="text-xl md:text-2xl font-bold mb-4">Duyệt hợp đồng</h1>
+        <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-4">
+          <div className="relative w-full md:w-auto">
             <Input
               type="text"
               placeholder="Mã/ Số hợp đồng"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-white rounded"
+              className="bg-white rounded w-full"
               style={{
                 border: "1px solid #D9D9D9",
               }}
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
-              className="bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
+              className="flex-1 md:flex-none bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
               onClick={() => setIsOpen(true)}
             >
               <Check className="w-4 h-4" /> Duyệt hợp đồng
             </Button>
             <Button
-              className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
+              className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
               onClick={() => setIsOpenEditRequest(true)}
             >
               <Pencil className="w-4 h-4" /> Yêu cầu sửa
             </Button>
-            <Button className="bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+            <Button className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
               <Download className="w-4 h-4" /> Tải
             </Button>
           </div>
@@ -268,7 +268,7 @@ export default function ContractApproval() {
           </Table>
         </div>
         {contractList?.length > 0 && (
-          <div className="flex justify-end mt-4 w-fit  ml-auto">
+          <div className="flex justify-center md:justify-end mt-4 w-full md:w-fit md:ml-auto">
             <PaginationDemo
               currentPage={page}
               totalPages={contracts?.totalPages ?? 1}
@@ -330,20 +330,20 @@ const ModalConfirm = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] !rounded-xl bg-white shadow-lg">
-        <DialogHeader className="flex flex-col items-center pb-6 border-b">
+      <DialogContent className="sm:max-w-[700px] !rounded-xl bg-white shadow-lg p-4 md:p-6">
+        <DialogHeader className="flex flex-col items-center pb-4 md:pb-6 border-b">
           <div className="bg-emerald-100 rounded-full p-3 mb-4">
-            <Info className="text-emerald-600 h-7 w-7" />
+            <Info className="text-emerald-600 h-6 w-6 md:h-7 md:w-7" />
           </div>
-          <DialogTitle className="text-2xl font-semibold text-gray-900">
+          <DialogTitle className="text-xl md:text-2xl font-semibold text-gray-900 text-center">
             Xác nhận duyệt hợp đồng
           </DialogTitle>
-          <p className="text-gray-500 mt-2 text-center">
+          <p className="text-gray-500 mt-2 text-center text-sm md:text-base">
             Vui lòng kiểm tra và nhập nhận xét cho các hợp đồng được chọn
           </p>
         </DialogHeader>
 
-        <div className="max-h-[400px] overflow-y-auto my-6">
+        <div className="max-h-[300px] md:max-h-[400px] overflow-y-auto my-4 md:my-6">
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
@@ -390,11 +390,11 @@ const ModalConfirm = ({
           </Table>
         </div>
 
-        <DialogFooter className="flex justify-center gap-3 pt-6 border-t">
+        <DialogFooter className="flex flex-col md:flex-row justify-center gap-3 pt-4 md:pt-6 border-t">
           <Button
             onClick={() => onOpenChange(false)}
             variant="outline"
-            className="min-w-[120px] bg-white hover:bg-gray-50 border-gray-200"
+            className="w-full md:w-auto min-w-[120px] bg-white hover:bg-gray-50 border-gray-200"
           >
             Hủy bỏ
           </Button>
@@ -403,7 +403,7 @@ const ModalConfirm = ({
               handleApprove()
               onOpenChange(false)
             }}
-            className="min-w-[120px] bg-emerald-500 hover:bg-emerald-600 text-white"
+            className="w-full md:w-auto min-w-[120px] bg-emerald-500 hover:bg-emerald-600 text-white"
           >
             Xác nhận duyệt
           </Button>
