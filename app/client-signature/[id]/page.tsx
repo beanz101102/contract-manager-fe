@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import AppPDF from "@/src/App"
-import { ArrowLeft, Download, Send } from "lucide-react"
+import { ArrowLeft, Download, Menu, Send } from "lucide-react"
 
 import { useContracts } from "@/hooks/useContracts"
 import { useUsers } from "@/hooks/useUsers"
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import NextImage from "@/components/ui/next-img"
 import { Textarea } from "@/components/ui/textarea"
 import LayoutApp from "@/components/layouts/LayoutApp"
 
@@ -55,7 +56,28 @@ export default function ContractForm() {
   }
 
   return (
-    <LayoutApp>
+    <>
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <div
+          className="h-[100px] w-full flex items-center px-5"
+          style={{
+            background: "linear-gradient(90deg, #36989D 0%, #3C5F60 100%)",
+          }}
+        >
+          <div className="flex items-center justify-center cursor-pointer">
+            <NextImage
+              src="/img/logo.png"
+              alt="logo"
+              width={32}
+              height={32}
+              className="w-[160px]"
+            />
+          </div>
+          <p className="text-white text-3xl pl-10 font-bold hidden lg:block">
+            CÔNG TY CP PHÁT TRIỂN BĐS PHÁT ĐẠT
+          </p>
+        </div>
+      </div>
       <div className="flex min-h-screen">
         <div className="w-[30%] min-h-screen bg-white p-6 border-r">
           <Button
@@ -180,6 +202,6 @@ export default function ContractForm() {
           </DialogContent>
         </Dialog>
       </div>
-    </LayoutApp>
+    </>
   )
 }
