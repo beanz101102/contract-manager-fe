@@ -262,6 +262,7 @@ export const useContracts = () => {
         contractId: number
         signerId: number
         file: File
+        otp: string
       }) => {
         const formData = new FormData()
         formData.append("file", payload.file)
@@ -416,6 +417,21 @@ export const useContracts = () => {
     })
   }
 
+  const useSendOtp = () => {
+    return useMutation({
+      mutationFn: async (payload: { email: string }) => {
+        const response = await api.post("/api/contract/send-otp", payload)
+        return response.data
+      },
+      onSuccess: () => {
+        toast.success("Gửi OTP thành công")
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.message)
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -433,5 +449,6 @@ export const useContracts = () => {
     useContractsInRange,
     useCustomerReport,
     useAdvancedStatistics,
+    useSendOtp,
   }
 }
