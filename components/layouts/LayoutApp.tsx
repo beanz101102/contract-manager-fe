@@ -1,11 +1,11 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { atom, useAtom } from "jotai"
 import { uniqBy } from "lodash"
-import { Bell, User } from "lucide-react"
+import { Bell, Menu, User } from "lucide-react"
 
 import useNotifications from "@/hooks/useNotifications"
 import {
@@ -13,23 +13,50 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 
+import NextImage from "../ui/next-img"
 import SidebarMenu from "./Header"
 
 const LayoutApp = ({ children }: { children: React.ReactNode }) => {
+  const [isSidebarOpen, setSidebarOpen] = useState(false)
+
   return (
     <div className="flex min-h-screen w-full">
-      <div className="h-screen fixed">
+      <div className="hidden lg:block h-screen fixed">
         <SidebarMenu />
       </div>
-      <div className="flex pl-[280px] flex-col flex-1 overflow-hidden">
+
+      <div className="lg:hidden">
+        <Sheet open={isSidebarOpen} onOpenChange={setSidebarOpen}>
+          <SheetContent side="left" className="max-w-[280px]">
+            <SidebarMenu />
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <div className="flex lg:pl-[280px] flex-col flex-1 overflow-hidden">
         <div
           className="h-[100px] w-full flex items-center justify-between px-5"
           style={{
             background: "linear-gradient(90deg, #36989D 0%, #3C5F60 100%)",
           }}
         >
-          <p className="text-white text-3xl font-bold">
+          <div className="flex items-center justify-center cursor-pointer lg:hidden">
+            <NextImage
+              src="/img/logo.png"
+              alt="logo"
+              width={32}
+              height={32}
+              className="w-[160px]"
+            />
+            <Menu
+              size={24}
+              className="text-white lg:hidden ml-2"
+              onClick={() => setSidebarOpen(true)}
+            />
+          </div>
+          <p className="text-white text-3xl font-bold hidden lg:block">
             CÔNG TY CP PHÁT TRIỂN BĐS PHÁT ĐẠT
           </p>
 

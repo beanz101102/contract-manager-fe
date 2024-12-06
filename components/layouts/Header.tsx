@@ -18,7 +18,7 @@ import NextImage from "../ui/next-img"
 export default function SidebarMenu() {
   const router = useRouter()
   return (
-    <div className="flex flex-col h-screen bg-white border-r border-gray-200 w-[280px]">
+    <div className="flex flex-col h-screen bg-white lg:border-r lg:border-gray-200 lg:w-[280px]">
       <div className="py-3 px-4 border-b border-gray-200">
         <div
           className="flex items-center justify-center cursor-pointer"
