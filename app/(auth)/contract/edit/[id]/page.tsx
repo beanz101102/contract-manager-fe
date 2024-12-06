@@ -701,6 +701,7 @@ export default function EditContractPage() {
                   pdfFile
                     ? URL.createObjectURL(pdfFile)
                     : `${process.env.NEXT_PUBLIC_API_URL}${contractDetail?.pdfFilePath}`
+                  + "#toolbar=0"
                 }
                 type="application/pdf"
                 className="w-full h-full"
