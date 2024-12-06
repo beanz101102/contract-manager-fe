@@ -7,8 +7,16 @@ import AppPDF from "@/src/App"
 import { ArrowLeft, Download, Send } from "lucide-react"
 
 import { useContracts } from "@/hooks/useContracts"
+import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import LayoutApp from "@/components/layouts/LayoutApp"
@@ -20,18 +28,30 @@ export default function ContractForm() {
   const { data } = useContractDetail(Number(params.id))
   const searchParams = useSearchParams()
   const tokenUser = Number(searchParams.get("token")?.split("kh_")[1] ?? 0)
-
+  const [showOtpModal, setShowOtpModal] = useState(false)
+  const [otp, setOtp] = useState("")
+  const { useSendOtp } = useContracts()
+  const { mutate: sendOtp } = useSendOtp()
   const { useSignContract } = useContracts()
   const { mutate: signContract } = useSignContract()
-  const { user } = useAuth()
   const [file, setFile] = useState<File | null>(null)
+  const { useUserDetails } = useUsers()
+  const { data: userDetails } = useUserDetails(tokenUser)
 
   const handleSign = () => {
+    setShowOtpModal(true)
+    sendOtp({ email: userDetails?.email ?? "" })
+  }
+
+  const handleConfirmSign = () => {
     signContract({
       contractId: Number(params.id),
       signerId: tokenUser ?? 0,
       file: file ?? new File([], ""),
+      otp: otp,
     })
+    setShowOtpModal(false)
+    setOtp("")
   }
 
   return (
@@ -116,6 +136,49 @@ export default function ContractForm() {
             setFile={setFile}
           />
         </div>
+        <Dialog open={showOtpModal} onOpenChange={setShowOtpModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Xác nhận ký hợp đồng</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Mã OTP</Label>
+                <Input
+                  type="text"
+                  placeholder="Nhập mã OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+              </div>
+
+              <div className="text-sm text-gray-500">
+                Mã OTP đã được gửi đến email của bạn.
+                <Button
+                  variant="link"
+                  className="px-1 text-primary"
+                  onClick={() => sendOtp({ email: userDetails?.email ?? "" })}
+                >
+                  Gửi lại mã
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowOtpModal(false)
+                  setOtp("")
+                }}
+              >
+                Hủy
+              </Button>
+              <Button onClick={handleConfirmSign}>Xác nhận</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </LayoutApp>
   )
