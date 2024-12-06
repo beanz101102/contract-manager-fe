@@ -268,6 +268,7 @@ export const useContracts = () => {
         formData.append("file", payload.file)
         formData.append("contractId", payload.contractId.toString())
         formData.append("signerId", payload.signerId.toString())
+        formData.append("otp", payload.otp)
 
         const response = await api.post("/api/contract/sign", formData, {
           headers: {
