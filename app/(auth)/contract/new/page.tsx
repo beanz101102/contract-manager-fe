@@ -453,45 +453,58 @@ export default function ContractForm() {
                               <Label className="text-sm font-medium text-gray-700">
                                 Luồng duyệt
                               </Label>
-                              <Command className="border border-gray-200 rounded-md mt-2 bg-white">
-                                <CommandInput
-                                  placeholder="Tìm kiếm luồng duyệt..."
-                                  value={searchFlowTerm}
-                                  onValueChange={setSearchFlowTerm}
-                                  className="border-none focus:ring-0 text-gray-700"
-                                />
-                                <CommandEmpty className="py-4 text-sm text-gray-500 text-center">
-                                  {isLoadingFlows
-                                    ? "Đang tải..."
-                                    : "Không tìm thấy luồng duyệt"}
-                                </CommandEmpty>
-                                <CommandList>
-                                  <CommandGroup
-                                    heading="Danh sách luồng duyệt"
-                                    className="text-sm text-gray-500"
+
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className="h-10 w-full justify-between bg-white hover:bg-gray-50 border-gray-200"
                                   >
-                                    {approvalFlows?.map((flow) => (
-                                      <CommandItem
-                                        key={flow.id}
-                                        value={flow.name}
-                                        className="hover:bg-gray-50 cursor-pointer py-3 px-4"
-                                        onSelect={() => {
-                                          form.setValue(
-                                            "approvalFlow",
-                                            flow.id.toString()
-                                          )
-                                        }}
+                                    Chọn luồng duyệt
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[400px] p-0 shadow-lg border border-gray-200">
+                                  <Command className="border border-gray-200 rounded-md mt-2 bg-white">
+                                    <CommandInput
+                                      placeholder="Tìm kiếm luồng duyệt..."
+                                      value={searchFlowTerm}
+                                      onValueChange={setSearchFlowTerm}
+                                      className="border-none focus:ring-0 text-gray-700"
+                                    />
+                                    <CommandEmpty className="py-4 text-sm text-gray-500 text-center">
+                                      {isLoadingFlows
+                                        ? "Đang tải..."
+                                        : "Không tìm thấy luồng duyệt"}
+                                    </CommandEmpty>
+                                    <CommandList>
+                                      <CommandGroup
+                                        heading="Danh sách luồng duyệt"
+                                        className="text-sm text-gray-500"
                                       >
-                                        <div className="flex flex-col gap-1">
-                                          <span className="font-medium text-gray-700">
-                                            {flow.name}
-                                          </span>
-                                        </div>
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
+                                        {approvalFlows?.map((flow) => (
+                                          <CommandItem
+                                            key={flow.id}
+                                            value={flow.name}
+                                            className="hover:bg-gray-50 cursor-pointer py-3 px-4"
+                                            onSelect={() => {
+                                              form.setValue(
+                                                "approvalFlow",
+                                                flow.id.toString()
+                                              )
+                                            }}
+                                          >
+                                            <div className="flex flex-col gap-1">
+                                              <span className="font-medium text-gray-700">
+                                                {flow.name}
+                                              </span>
+                                            </div>
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
                             </div>
 
                             <div className="space-y-4">

@@ -1,3 +1,4 @@
+import { usePathname, useRouter } from "next/navigation"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
@@ -36,6 +37,8 @@ interface UpdateContractPayload {
 
 export const useContracts = () => {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const pathname = usePathname()
 
   // Get all contracts
   const useAllContracts = (
@@ -280,6 +283,11 @@ export const useContracts = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["contracts"] })
         toast.success("Ký hợp đồng thành công")
+        if (pathname.includes("client-signature")) {
+          router.push(pathname + "/success")
+        } else {
+          router.push(`/contract/personal`)
+        }
       },
       onError: (error: any) => {
         toast.error(error.response.data.message)
