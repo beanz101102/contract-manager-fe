@@ -83,8 +83,12 @@ export const useContracts = () => {
 
         const response = await api.post<{
           data: ContractList[]
+          totalPages: number
         }>(`/api/contract?${params}`)
-        return response.data?.data
+        return {
+          contracts: response.data.data,
+          totalPages: response.data.totalPages,
+        }
       },
       refetchInterval: 5000,
     })
