@@ -54,8 +54,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
-
-import { ApprovalWorkflowModal } from "../workflow/page"
+import ApprovalWorkflowModal from "@/components/ApprovalWorkflowModal"
 
 // Create new plugin instance
 
