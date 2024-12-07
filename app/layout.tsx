@@ -2,6 +2,7 @@
 
 import "@/styles/globals.css"
 import { Metadata } from "next"
+import { Viewport } from "next/dist/lib/metadata/types/extra-types"
 import { AuthProvider } from "@/contexts/auth-context"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
@@ -26,6 +27,15 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  // Also supported by less commonly used
+  // interactiveWidget: 'resizes-visual',
+}
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
