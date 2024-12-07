@@ -480,6 +480,20 @@ export default function EditEmployeeInformationForm() {
                     </p>
                   )}
                 </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Email (*)</Label>
+                  <Input
+                    {...form.register("email")}
+                    className="bg-white border-gray-300"
+                    placeholder="Email"
+                  />
+                  {form.formState.errors.email && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
