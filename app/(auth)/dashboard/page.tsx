@@ -35,7 +35,6 @@ export default function DashboardPage() {
       mapiContractStatus.ready_to_sign.label,
       mapiContractStatus.cancelled.label,
       mapiContractStatus.completed.label,
-      mapiContractStatus.rejected.label,
     ],
     datasets: [
       {
@@ -45,7 +44,6 @@ export default function DashboardPage() {
           statistics.details.ready_to_sign.count,
           statistics.details.cancelled.count,
           statistics.details.completed.count,
-          statistics.details.rejected.count,
         ],
         backgroundColor: [
           mapiContractStatus.draft.color.backgroundColor,
@@ -53,7 +51,6 @@ export default function DashboardPage() {
           mapiContractStatus.ready_to_sign.color.backgroundColor,
           mapiContractStatus.cancelled.color.backgroundColor,
           mapiContractStatus.completed.color.backgroundColor,
-          mapiContractStatus.rejected.color.backgroundColor,
         ],
         borderColor: [
           mapiContractStatus.draft.color.color,
@@ -61,7 +58,6 @@ export default function DashboardPage() {
           mapiContractStatus.ready_to_sign.color.color,
           mapiContractStatus.cancelled.color.color,
           mapiContractStatus.completed.color.color,
-          mapiContractStatus.rejected.color.color,
         ],
         borderWidth: 1,
       },

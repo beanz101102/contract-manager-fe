@@ -134,7 +134,7 @@ export default function CustomerList() {
           loader={null}
           className="min-w-full"
         >
-          <Table className="min-w-[1200px] w-full">
+          <Table className="min-w-[1600px] w-full">
             <TableHeader>
               <TableRow className="hover:bg-gray-50 bg-gray-100">
                 <TableHead className="w-[50px]">
