@@ -22,8 +22,8 @@ export default function Dashboard() {
         {/* Overlay layer */}
         <div className="absolute inset-0 bg-[#98A5B2D4]"></div>
 
-        <div className="mx-auto max-w-4xl w-full relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="mx-auto max-w-4xl w-full relative z-10 px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-6">
             {[
               {
                 title: "Hợp đồng",
@@ -99,25 +99,28 @@ export default function Dashboard() {
               },
             ].map((item, index) =>
               item?.disabled ? (
-                <div key={index} className="flex flex-col items-center gap-2">
+                <div
+                  key={index}
+                  className="flex flex-col items-center gap-1 sm:gap-2"
+                >
                   <NextImage
                     src={`/${item.icon}.png`}
                     alt={item.title}
-                    className="h-[100px] w-[100px]"
+                    className="h-[60px] w-[60px] sm:h-[80px] sm:w-[80px] md:h-[100px] md:w-[100px]"
                   />
-                  <span className="text-sm font-medium text-center text-white">
+                  <span className="text-xs sm:text-sm font-medium text-center text-white">
                     {item.title}
                   </span>
                 </div>
               ) : (
                 <Link href={item.href} key={index}>
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-1 sm:gap-2">
                     <NextImage
                       src={`/${item.icon}.png`}
                       alt={item.title}
-                      className="h-[100px] w-[100px]"
+                      className="h-[60px] w-[60px] sm:h-[80px] sm:w-[80px] md:h-[100px] md:w-[100px]"
                     />
-                    <span className="text-sm font-medium text-center text-white">
+                    <span className="text-xs sm:text-sm font-medium text-center text-white">
                       {item.title}
                     </span>
                   </div>
