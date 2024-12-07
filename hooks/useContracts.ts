@@ -233,6 +233,7 @@ export const useContracts = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["contracts"] })
         toast.success("Gửi duyệt hợp đồng thành công")
+        router.push("/contract/review")
       },
       onError: (error: any) => {
         toast.error(error.response.data.message)

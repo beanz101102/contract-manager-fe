@@ -18,7 +18,7 @@ export const useUsers = () => {
 
   // Get list users
   const useListUsers = (
-    role?: "admin" | "employee" | "customer" | "manager" | "",
+    role?: ("admin" | "employee" | "customer" | "manager" | "")[] | null,
     page: number = 1,
     limit: number = 10,
     text?: string,
@@ -27,19 +27,19 @@ export const useUsers = () => {
     return useQuery({
       queryKey: ["users", role, page, limit, text, departmentId],
       queryFn: async () => {
-        const params = new URLSearchParams()
-
-        role && params.append("role", role)
-        params.append("page", page.toString())
-        params.append("limit", limit.toString())
-        if (text) params.append("text", text)
-        if (departmentId) params.append("departmentId", departmentId.toString())
+        const payload = {
+          role,
+          page,
+          limit,
+          text,
+          departmentId,
+        }
         const response = await api.post<{
           users: User[]
           total: number
           lastPage: number
           page: number
-        }>(`/api/user/listUsers?${params.toString()}`)
+        }>("/api/user/listUsers", payload)
         return response.data
       },
       refetchInterval: 10000,

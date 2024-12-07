@@ -10,6 +10,7 @@ import InfiniteScroll from "react-infinite-scroll-component"
 
 import { departmentConfigs, mappingRole } from "@/types/api"
 import { User } from "@/types/auth"
+import { useDepartment } from "@/hooks/useDepartment"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -41,14 +42,15 @@ export default function EmployeeList() {
   const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
   const { user } = useAuth()
-
+  const { useListDepartments } = useDepartment()
+  const { data: departments } = useListDepartments()
   const { useListUsers, useDeleteUser } = useUsers()
   const { data: employees, isLoading } = useListUsers(
-    "employee",
-    1,
+    user?.role === "admin" ? ["employee", "manager"] : ["employee"],
+    page,
     10,
     searchTerm,
-    departmentConfigs?.find((d) => d.label === department)?.value || null
+    departments?.find((d) => d.departmentName === department)?.id || null
   )
   const { mutate: deleteUser } = useDeleteUser(() => {
     setSelectedEmployees([])
@@ -102,9 +104,9 @@ export default function EmployeeList() {
               </SelectTrigger>
               <SelectContent className="rounded-md">
                 <SelectItem value="all">Tất cả</SelectItem>
-                {departmentConfigs.map((department) => (
-                  <SelectItem key={department.value} value={department.label}>
-                    {department.label}
+                {departments?.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.departmentName}>
+                    {dept.departmentName}
                   </SelectItem>
                 ))}
               </SelectContent>

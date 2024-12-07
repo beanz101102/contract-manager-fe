@@ -8,9 +8,9 @@ const useNotifications = () => {
     return useQuery<Notification[]>({
       queryKey: ["notifications", userId],
       queryFn: async () => {
-        const response = await api.get<Notification[]>(
-          `/api/notifications?id=${userId}`
-        )
+        const response = await api.post<Notification[]>(`/api/notifications`, {
+          userId,
+        })
         return response.data
       },
       refetchInterval: 5000,

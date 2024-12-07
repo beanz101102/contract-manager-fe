@@ -94,18 +94,24 @@ export default function ContractForm() {
   const [selectedApprovalFlow, setSelectedApprovalFlow] = useState<any>(null)
   const [isOpenCreateFlow, setIsOpenCreateFlow] = useState(false)
   const { useListUsers } = useUsers()
-  const { data, isLoading } = useListUsers("customer", 1, 10, searchTerm, null)
+  const { data, isLoading } = useListUsers(
+    ["customer"],
+    1,
+    10,
+    searchTerm,
+    null
+  )
 
   const customers = data?.users || []
 
   const { useListUsers: useListEmployees } = useUsers()
   const { data: employeesData, isLoading: isLoadingEmployees } =
-    useListEmployees("employee", 1, 10, searchTerm, null)
+    useListEmployees(["employee"], 1, 10, searchTerm, null)
   const users = employeesData?.users || []
 
   const { useListUsers: useListSigners } = useUsers()
   const { data: signersData, isLoading: isLoadingSigners } = useListSigners(
-    "",
+    null,
     1,
     10,
     searchSignerTerm,

@@ -28,8 +28,7 @@ import { Textarea } from "@/components/ui/textarea"
 export default function DepartmentPage() {
   const { useListDepartments, useUpdateDepartment, useDeleteDepartment } =
     useDepartment()
-  const { mutate: updateDepartment, isPending: isUpdating } =
-    useUpdateDepartment()
+
   const { mutate: deleteDepartment, isPending: isDeleting } =
     useDeleteDepartment()
   const { data: departments, isLoading } = useListDepartments()
@@ -40,6 +39,10 @@ export default function DepartmentPage() {
   const [selectedDepartment, setSelectedDepartment] =
     useState<DepartmentList | null>(null)
 
+  const { mutate: updateDepartment, isPending: isUpdating } =
+    useUpdateDepartment(() => {
+      setIsEditModalOpen(false)
+    })
   useEffect(() => {
     if (selectedDepartment) {
       setName(selectedDepartment.departmentName)
@@ -55,60 +58,65 @@ export default function DepartmentPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Danh sách phòng ban</h1>
       </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>STT</TableHead>
-            <TableHead>Tên phòng ban</TableHead>
-            <TableHead>Mô tả</TableHead>
-            <TableHead>Ngày tạo</TableHead>
-            <TableHead>Ngày cập nhật</TableHead>
-            <TableHead>Thao tác</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {departments?.map((dept, index) => (
-            <TableRow key={dept.id}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell className="font-medium">
-                {dept.departmentName}
-              </TableCell>
-              <TableCell>{dept.description}</TableCell>
-              <TableCell>
-                {new Date(dept.createdAt).toLocaleDateString("vi-VN")}
-              </TableCell>
-              <TableCell>
-                {new Date(dept.updatedAt).toLocaleDateString("vi-VN")}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedDepartment(dept)
-                      setIsEditModalOpen(true)
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedDepartment(dept)
-                      setIsDeleteModalOpen(true)
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className=" w-full overflow-x-auto">
+        <div className="min-w-[1000px]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>STT</TableHead>
+                <TableHead>Tên phòng ban</TableHead>
+                <TableHead>Mô tả</TableHead>
+                <TableHead>Ngày tạo</TableHead>
+                <TableHead>Ngày cập nhật</TableHead>
+                <TableHead>Thao tác</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {departments?.map((dept, index) => (
+                <TableRow key={dept.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell className="font-medium">
+                    {dept.departmentName}
+                  </TableCell>
+                  <TableCell>
+                    <p className="max-w-[200px] truncate">{dept.description}</p>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(dept.createdAt).toLocaleDateString("vi-VN")}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(dept.updatedAt).toLocaleDateString("vi-VN")}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedDepartment(dept)
+                          setIsEditModalOpen(true)
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedDepartment(dept)
+                          setIsDeleteModalOpen(true)
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
 
       {/* Edit Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>

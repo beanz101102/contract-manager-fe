@@ -82,18 +82,24 @@ export default function EditContractPage() {
     useContractDetail(Number(id))
 
   const { useListUsers } = useUsers()
-  const { data, isLoading } = useListUsers("customer", 1, 10, searchTerm, null)
+  const { data, isLoading } = useListUsers(
+    ["customer"],
+    1,
+    10,
+    searchTerm,
+    null
+  )
 
   const customers = data?.users || []
 
   const { useListUsers: useListEmployees } = useUsers()
   const { data: employeesData, isLoading: isLoadingEmployees } =
-    useListEmployees("employee", 1, 10, searchTerm, null)
+    useListEmployees(["employee"], 1, 10, searchTerm, null)
   const users = employeesData?.users || []
 
   const { useListUsers: useListSigners } = useUsers()
   const { data: signersData, isLoading: isLoadingSigners } = useListSigners(
-    "employee",
+    ["employee"],
     1,
     10,
     searchSignerTerm,

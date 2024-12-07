@@ -3,21 +3,11 @@
 import { useEffect, useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { atom, useAtom } from "jotai"
-import { Plus, Search, X } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 
-import { ApprovalFlowStep, ApprovalFlowsList } from "@/types/api"
-import { User } from "@/types/auth"
+import { ApprovalFlowsList } from "@/types/api"
 import { useApprovalFlows } from "@/hooks/useApprovalFlows"
-import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
 import {
   Dialog,
   DialogContent,
@@ -29,11 +19,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loading } from "@/components/ui/loading"
 import NextImage from "@/components/ui/next-img"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import {
   Table,
   TableBody,
@@ -85,14 +70,12 @@ export default function ContractApprovalFlow() {
           </div>
         </div>
 
-        {(user?.role === "admin" || user?.role === "manager") && (
-          <Button
-            className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
-            onClick={() => setIsOpenApprovalWorkflow(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" /> Thêm mới
-          </Button>
-        )}
+        <Button
+          className="bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
+          onClick={() => setIsOpenApprovalWorkflow(true)}
+        >
+          <Plus className="w-4 h-4 mr-2" /> Thêm mới
+        </Button>
       </div>
 
       <div className="overflow-x-auto">

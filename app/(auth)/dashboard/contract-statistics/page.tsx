@@ -63,8 +63,8 @@ export default function ContractDashboard() {
 
   const { useAdvancedStatistics } = useContracts()
   const { useListUsers } = useUsers()
-  const { data: creators } = useListUsers("employee", 1, 100)
-  const { data: customers } = useListUsers("customer", 1, 100)
+  const { data: creators } = useListUsers(["employee"], 1, 100)
+  const { data: customers } = useListUsers(["customer"], 1, 100)
   const { data, isLoading } = useAdvancedStatistics({
     startTime: date.from.getTime(),
     endTime: date.to.getTime(),
@@ -242,7 +242,7 @@ export default function ContractDashboard() {
                   <label className="block text-sm font-medium mb-2">
                     Người tạo
                   </label>
-                  <Select 
+                  <Select
                     value={creatorId}
                     onValueChange={(value) => setCreatorId(value)}
                   >
@@ -252,7 +252,10 @@ export default function ContractDashboard() {
                     <SelectContent>
                       <SelectItem value="all">Tất cả</SelectItem>
                       {creators?.users?.map((creator) => (
-                        <SelectItem key={creator.id} value={creator.id.toString()}>
+                        <SelectItem
+                          key={creator.id}
+                          value={creator.id.toString()}
+                        >
                           {creator.fullName}
                         </SelectItem>
                       ))}
@@ -264,7 +267,7 @@ export default function ContractDashboard() {
                   <label className="block text-sm font-medium mb-2">
                     Khách hàng
                   </label>
-                  <Select 
+                  <Select
                     value={customerId}
                     onValueChange={(value) => setCustomerId(value)}
                   >
@@ -274,7 +277,10 @@ export default function ContractDashboard() {
                     <SelectContent>
                       <SelectItem value="all">Tất cả</SelectItem>
                       {customers?.users?.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id.toString()}>
+                        <SelectItem
+                          key={customer.id}
+                          value={customer.id.toString()}
+                        >
                           {customer.fullName}
                         </SelectItem>
                       ))}
@@ -334,11 +340,7 @@ export default function ContractDashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar
-                    dataKey="contracts"
-                    name="Số hợp đồng"
-                    fill="#60a5fa"
-                  />
+                  <Bar dataKey="contracts" name="Số hợp đồng" fill="#60a5fa" />
                   <Line
                     type="monotone"
                     dataKey="completed"

@@ -11,7 +11,7 @@ export const useDepartment = () => {
 
   const useListDepartments = () => {
     return useQuery<DepartmentList[]>({
-      queryKey: ["department"],
+      queryKey: ["departments"],
       queryFn: async () => {
         const response = await api.post<DepartmentList[]>("/api/department")
         return response.data

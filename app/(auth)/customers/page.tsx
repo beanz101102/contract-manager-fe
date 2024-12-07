@@ -35,7 +35,7 @@ export default function CustomerList() {
 
   const { useListUsers, useDeleteUser } = useUsers()
   const { data: employees } = useListUsers(
-    "customer",
+    ["customer"],
     1,
     10,
     searchTerm,
