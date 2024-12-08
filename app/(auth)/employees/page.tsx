@@ -150,7 +150,7 @@ export default function EmployeeList() {
           </div>
         </div>
 
-        {(user?.role === "admin" || user?.role === "manager") && (
+        {user?.role === "admin" && (
           <div className="flex gap-2 md:gap-3">
             <Link href="/employees/new" className="flex-1 md:flex-none">
               <Button className="w-full md:w-auto bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
@@ -223,9 +223,11 @@ export default function EmployeeList() {
                   <TableHead className="text-gray-700 font-semibold">
                     Tài khoản và mật khẩu
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
-                    Thao tác
-                  </TableHead>
+                  {user?.role === "admin" && (
+                    <TableHead className="text-gray-700 font-semibold">
+                      Thao tác
+                    </TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -310,27 +312,29 @@ export default function EmployeeList() {
                         <br />
                         *************
                       </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2 md:gap-3">
-                          <Link href={`/employees/edit/${employee.id}`}>
-                            <NextImage
-                              src="/edit.png"
-                              alt="edit"
-                              className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
-                            />
-                          </Link>
-                          <div
-                            onClick={() => deleteUser([employee.id])}
-                            className="cursor-pointer"
-                          >
-                            <NextImage
-                              src="/trash.png"
-                              alt="trash"
-                              className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
-                            />
+                      {user?.role === "admin" && (
+                        <TableCell>
+                          <div className="flex gap-2 md:gap-3">
+                            <Link href={`/employees/edit/${employee.id}`}>
+                              <NextImage
+                                src="/edit.png"
+                                alt="edit"
+                                className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
+                              />
+                            </Link>
+                            <div
+                              onClick={() => deleteUser([employee.id])}
+                              className="cursor-pointer"
+                            >
+                              <NextImage
+                                src="/trash.png"
+                                alt="trash"
+                                className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </TableCell>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))
                 )}

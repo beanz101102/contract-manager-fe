@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -123,6 +123,12 @@ export default function EmployeeRegistrationForm() {
       },
     })
   }
+
+  useEffect(() => {
+    if (user?.role !== "admin") {
+      router.push("/employees")
+    }
+  }, [user])
 
   return (
     <div className="container max-w-[1200px] mx-auto p-4 md:p-6">
