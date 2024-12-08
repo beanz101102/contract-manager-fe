@@ -525,11 +525,11 @@ const ImagePreviewDialog = ({
           <DialogTitle>Xem chữ ký</DialogTitle>
         </DialogHeader>
         {previewImage && (
-          <div className="flex justify-center">
+          <div className="flex justify-center w-[320px] h-[320px] mx-auto">
             <NextImage
               src={previewImage}
               alt="Signature Preview"
-              className="max-w-full max-h-[600px] object-contain"
+              className="w-[320px] h-[320px] object-contain"
             />
           </div>
         )}

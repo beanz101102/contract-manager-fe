@@ -1,4 +1,5 @@
 import { usePathname, useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
@@ -39,7 +40,7 @@ export const useContracts = () => {
   const queryClient = useQueryClient()
   const router = useRouter()
   const pathname = usePathname()
-
+  const { user } = useAuth()
   // Get all contracts
   const useAllContracts = (
     contractNumber?: string,
@@ -324,8 +325,11 @@ export const useContracts = () => {
     return useQuery({
       queryKey: ["contract-statistics"],
       queryFn: async () => {
-        const response = await api.get<ContractStatistics>(
-          "/api/contract/statistics"
+        const response = await api.post<ContractStatistics>(
+          "/api/contract/statistics",
+          {
+            userId: user?.id,
+          }
         )
         return response.data
       },
