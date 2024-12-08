@@ -45,7 +45,11 @@ export default function EmployeeList() {
   const { useListDepartments } = useDepartment()
   const { data: departments } = useListDepartments()
   const { useListUsers, useDeleteUser } = useUsers()
-  const { data: employees, isLoading } = useListUsers(
+  const {
+    data: employees,
+    isLoading,
+    refetch,
+  } = useListUsers(
     user?.role === "admin" ? ["employee", "manager"] : ["employee"],
     page,
     10,
@@ -56,6 +60,11 @@ export default function EmployeeList() {
     setSelectedEmployees([])
     setPage(1)
   })
+
+  useEffect(() => {
+    setPage(1)
+    refetch()
+  }, [])
 
   const [listUsersEmployees, setListUsersEmployees] = useAtom(
     listUsersEmployeesAtom
@@ -104,11 +113,13 @@ export default function EmployeeList() {
               </SelectTrigger>
               <SelectContent className="rounded-md">
                 <SelectItem value="all">Tất cả</SelectItem>
-                {departments?.map((dept) => (
-                  <SelectItem key={dept.id} value={dept.departmentName}>
-                    {dept.departmentName}
-                  </SelectItem>
-                ))}
+                {departments
+                  ?.filter((e) => e.departmentName !== "Giám đốc")
+                  .map((dept) => (
+                    <SelectItem key={dept.id} value={dept.departmentName}>
+                      {dept.departmentName}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/select"
 
 const employeeSchema = z.object({
-  code: z.string().min(1, "Mã nhân viên là bắt buộc"),
   fullName: z.string().min(1, "Họ và tên là bắt buộc"),
   birthPlace: z.string().min(1, "Nơi sinh là bắt buộc"),
   address: z.string().min(1, "Địa chỉ là bắt buộc"),
@@ -72,7 +71,6 @@ export default function EditEmployeeInformationForm() {
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      code: "",
       fullName: "",
       birthPlace: "",
       address: "",
@@ -93,7 +91,6 @@ export default function EditEmployeeInformationForm() {
   useEffect(() => {
     if (user) {
       form.reset({
-        code: user.code || "",
         fullName: user.fullName || "",
         birthPlace: user.placeOfBirth || "",
         address: user.address || "",
@@ -116,7 +113,6 @@ export default function EditEmployeeInformationForm() {
 
   const onSubmit = (values: EmployeeFormValues) => {
     updateUser({
-      code: values.code,
       username: values.account,
       fullName: values.fullName,
       placeOfBirth: values.birthPlace,
@@ -198,24 +194,6 @@ export default function EditEmployeeInformationForm() {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-gray-700">Mã nhân viên (*)</Label>
-                    <Input
-                      {...form.register("code")}
-                      className={cn("bg-white border-gray-300", {
-                        "border-red-500": form.formState.errors.code,
-                      })}
-                      placeholder="Mã nhân viên"
-                    />
-                    {form.formState.errors.code && (
-                      <p className="text-red-500 text-sm">
-                        {form.formState.errors.code.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-gray-700">Họ và tên (*)</Label>

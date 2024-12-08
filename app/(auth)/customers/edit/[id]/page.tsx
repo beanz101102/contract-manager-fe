@@ -37,7 +37,6 @@ export default function EditCustomerInformationForm() {
   const { data: departments } = useListDepartments()
 
   const [formData, setFormData] = useState({
-    code: "",
     fullName: "",
     gender: "",
     dateOfBirth: "",
@@ -61,7 +60,6 @@ export default function EditCustomerInformationForm() {
     if (user) {
       console.log("user?.gender", user?.gender)
       setFormData({
-        code: user.code || "",
         fullName: user.fullName || "",
         gender: user?.gender || "",
         dateOfBirth: user.dateOfBirth || "",
@@ -105,7 +103,6 @@ export default function EditCustomerInformationForm() {
 
   const handleUpdateUser = () => {
     updateUser({
-      code: formData.code,
       username: formData.username,
       fullName: formData.fullName,
       placeOfBirth: formData.placeOfBirth,
@@ -191,18 +188,6 @@ export default function EditCustomerInformationForm() {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-gray-700">Mã khách hàng (*)</Label>
-                    <Input
-                      value={formData.code}
-                      onChange={handleInputChange("code")}
-                      className="bg-white border-gray-300"
-                      placeholder="Mã khách hàng"
-                    />
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-gray-700">Họ và tên (*)</Label>

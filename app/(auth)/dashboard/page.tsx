@@ -81,41 +81,45 @@ export default function DashboardPage() {
 
       {/* Status Grid */}
       <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-        {Object.entries(statistics.details).map(([status, data]) => (
-          <div
-            key={status}
-            className="p-3 rounded-lg"
-            style={{
-              backgroundColor:
-                mapiContractStatus[status as keyof typeof mapiContractStatus]
-                  ?.color.backgroundColor,
-            }}
-          >
-            <p
-              className="text-sm"
+        {Object.entries(statistics.details)
+          .filter(([status]) => status !== "rejected")
+          .map(([status, data]) => (
+            <div
+              key={status}
+              className="p-3 rounded-lg"
               style={{
-                color:
+                backgroundColor:
                   mapiContractStatus[status as keyof typeof mapiContractStatus]
-                    ?.color.color,
+                    ?.color.backgroundColor,
               }}
             >
-              {
-                mapiContractStatus[status as keyof typeof mapiContractStatus]
-                  ?.label
-              }
-            </p>
-            <p
-              className="text-lg font-semibold"
-              style={{
-                color:
+              <p
+                className="text-sm"
+                style={{
+                  color:
+                    mapiContractStatus[
+                      status as keyof typeof mapiContractStatus
+                    ]?.color.color,
+                }}
+              >
+                {
                   mapiContractStatus[status as keyof typeof mapiContractStatus]
-                    ?.color.color,
-              }}
-            >
-              {data.count} ({data.percentage || "0%"})
-            </p>
-          </div>
-        ))}
+                    ?.label
+                }
+              </p>
+              <p
+                className="text-lg font-semibold"
+                style={{
+                  color:
+                    mapiContractStatus[
+                      status as keyof typeof mapiContractStatus
+                    ]?.color.color,
+                }}
+              >
+                {data.count} ({data.percentage || "0%"})
+              </p>
+            </div>
+          ))}
       </div>
     </div>
   )

@@ -75,7 +75,6 @@ export interface ContractSignature {
 export type Gender = "Nam" | "Nữ" | "Khác"
 
 export interface EmployeeFormData {
-  code: string // Mã nhân viên, tối đa 20 ký tự, unique
   fullName: string // Họ tên đầy đủ
   gender: Gender // Giới tính enum
   dateOfBirth?: string // Ngày sinh

@@ -32,7 +32,6 @@ import {
 
 // Add validation schema
 const customerSchema = z.object({
-  code: z.string().min(1, "Mã khách hàng là bắt buộc"),
   fullName: z.string().min(1, "Họ và tên là bắt buộc"),
   birthPlace: z.string().min(1, "Nơi sinh là bắt buộc"),
   address: z.string().min(1, "Địa chỉ là bắt buộc"),
@@ -149,24 +148,6 @@ export default function CustomerInformationForm() {
               </div>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-gray-700">Mã khách hàng (*)</Label>
-                    <Input
-                      {...register("code")}
-                      className={cn("bg-white border-gray-300", {
-                        "border-red-500": errors.code,
-                      })}
-                      placeholder="Mã khách hàng"
-                    />
-                    {errors.code && (
-                      <p className="text-red-500 text-sm">
-                        {errors.code.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-gray-700">Họ và tên (*)</Label>
