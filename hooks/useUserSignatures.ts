@@ -3,17 +3,26 @@ import { toast } from "react-hot-toast"
 
 import { SignatureList, UserSignature } from "@/types/api"
 import { api } from "@/lib/axios"
+import { useAuth } from "@/contexts/auth-context"
 
 export const useUserSignatures = () => {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
 
   const useListSignatures = () => {
     return useQuery({
-      queryKey: ["user-signatures"],
+      queryKey: ["user-signatures", user?.id],
       queryFn: async () => {
-        const response = await api.post<SignatureList[]>("/api/user_signature")
+        const params = new URLSearchParams()
+        if (user?.id) {
+          params.append("userId", user.id.toString())
+        }
+        const response = await api.post<SignatureList[]>(
+          `/api/user_signature?${params}`
+        )
         return response.data || []
       },
+      enabled: !!user?.id,
     })
   }
 
