@@ -22,6 +22,7 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      disabled={{ after: new Date() }}
       className={cn(
         "p-3 bg-white border !border-gray-200 rounded-md shadow-sm",
         className

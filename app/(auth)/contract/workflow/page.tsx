@@ -46,9 +46,23 @@ export default function ContractApprovalFlow() {
   const [approvalFlows, setApprovalFlows] = useAtom(listApprovalFlows)
   const { mutate: deleteApprovalFlow } = useDeleteApprovalFlow()
 
+  // Thêm state để track lần render của modal
+  const [editModalKey, setEditModalKey] = useState(0)
+
   useEffect(() => {
     setApprovalFlows(data || [])
   }, [data, setApprovalFlows])
+
+  const handleOpenEditModal = (flow: ApprovalFlowsList) => {
+    setSelectedFlow(flow)
+    setIsOpenEditModal(true)
+    // Tăng key mỗi lần mở modal
+    setEditModalKey(prev => prev + 1)
+  }
+
+  const handleCloseEditModal = () => {
+    setIsOpenEditModal(false)
+  }
 
   return (
     <div className="p-8 bg-white rounded-xl shadow-sm">
@@ -144,10 +158,7 @@ export default function ContractApprovalFlow() {
                       </div>
                       <div
                         className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedFlow(step)
-                          setIsOpenEditModal(true)
-                        }}
+                        onClick={() => handleOpenEditModal(step)}
                       >
                         <NextImage
                           src="/edit.png"
@@ -183,9 +194,10 @@ export default function ContractApprovalFlow() {
 
       <ApprovalWorkflowModal
         isOpen={isOpenEditModal}
-        onOpenChange={setIsOpenEditModal}
+        onOpenChange={handleCloseEditModal}
         mode="edit"
         initialData={selectedFlow}
+        key={`edit-modal-${editModalKey}`}
       />
 
       <ViewApprovalWorkflowModal
@@ -207,7 +219,12 @@ const ViewApprovalWorkflowModal = ({
   data: ApprovalFlowsList | null
 }) => {
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        onOpenChange(open)
+      }}
+    >
       <DialogContent className="sm:max-w-[800px] p-6">
         <DialogHeader className="border-b pb-4">
           <DialogTitle className="text-xl font-semibold">
