@@ -1,9 +1,9 @@
-import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import * as React from "react"
+import { DayPicker, useNavigation } from "react-day-picker"
 
-import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
@@ -13,6 +13,12 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(
+    { length: currentYear + 100 - 1900 }, 
+    (_, i) => 1900 + i
+  );
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -23,8 +29,8 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
+        caption: "flex justify-center pt-1 relative items-center gap-1",
+        caption_label: "text-sm font-medium cursor-pointer hover:bg-gray-100 rounded-md px-2 py-1",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
@@ -56,6 +62,79 @@ function Calendar({
       components={{
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        Caption: ({ displayMonth }: { displayMonth: Date }) => {
+          const { goToMonth } = useNavigation();
+          const [showYearPicker, setShowYearPicker] = React.useState(false);
+          
+          return (
+            <div className="relative">
+              <div className="flex items-center justify-center pt-1">
+                <div className="flex items-center gap-1">
+                  <div
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 !border !border-gray-200"
+                    )}
+                    onClick={() => {
+                      const prevMonth = new Date(displayMonth);
+                      prevMonth.setMonth(prevMonth.getMonth() - 1);
+                      goToMonth(prevMonth);
+                    }}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </div>
+                  
+                  <span 
+                    onClick={() => setShowYearPicker(!showYearPicker)}
+                    className="text-sm font-medium cursor-pointer hover:bg-gray-100 rounded-md px-2 py-1"
+                  >
+                    {displayMonth.toLocaleString('default', { month: 'long' })} {displayMonth.getFullYear()}
+                  </span>
+
+                  <div
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 !border !border-gray-200"
+                    )}
+                    onClick={() => {
+                      const nextMonth = new Date(displayMonth);
+                      nextMonth.setMonth(nextMonth.getMonth() + 1);
+                      goToMonth(nextMonth);
+                    }}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
+              
+              {showYearPicker && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 p-2 bg-white border border-gray-200 rounded-md shadow-lg z-50 w-64">
+                  <div className="grid grid-cols-3 gap-2 max-h-52 overflow-y-auto">
+                    {years.map((year) => (
+                      <button
+                        key={year}
+                        onClick={() => {
+                          const newDate = new Date(displayMonth);
+                          newDate.setFullYear(year);
+                          goToMonth(newDate);
+                          setShowYearPicker(false);
+                        }}
+                        className={cn(
+                          "px-2 py-1 text-sm rounded-md text-center",
+                          year === displayMonth.getFullYear()
+                            ? "bg-primary text-white"
+                            : "hover:bg-gray-100"
+                        )}
+                      >
+                        {year}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        },
       }}
       {...props}
     />
