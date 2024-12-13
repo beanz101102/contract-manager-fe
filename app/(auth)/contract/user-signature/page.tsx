@@ -365,8 +365,8 @@ const DigitalSignatureModal = ({
     if (canvas) {
       const rect = canvas.getBoundingClientRect()
       const touch = e.touches[0]
-      const x = touch.clientX - rect.left
-      const y = touch.clientY - rect.top
+      const x = (touch.clientX - rect.left) * (canvas.width / rect.width)
+      const y = (touch.clientY - rect.top) * (canvas.height / rect.height)
       setLastX(x)
       setLastY(y)
       setIsDrawing(true)
@@ -383,8 +383,8 @@ const DigitalSignatureModal = ({
     if (ctx && canvas) {
       const rect = canvas.getBoundingClientRect()
       const touch = e.touches[0]
-      const x = touch.clientX - rect.left
-      const y = touch.clientY - rect.top
+      const x = (touch.clientX - rect.left) * (canvas.width / rect.width)
+      const y = (touch.clientY - rect.top) * (canvas.height / rect.height)
 
       ctx.beginPath()
       ctx.moveTo(lastX, lastY)
@@ -469,6 +469,7 @@ const DigitalSignatureModal = ({
                   width={400}
                   height={350}
                   className="border rounded-lg bg-white cursor-crosshair"
+                  style={{ touchAction: 'none' }}
                   onMouseDown={handleStartDrawing}
                   onMouseMove={handleDrawing}
                   onMouseUp={handleEndDrawing}
