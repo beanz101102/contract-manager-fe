@@ -276,6 +276,7 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
                   data-testid="page"
                   compact
                   stacked={isMultiPage && !isLastPage}
+                  className="pdf-page"
                 >
                   <div style={{ position: "relative" }}>
                     <Page
