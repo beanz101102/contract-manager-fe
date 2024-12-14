@@ -101,7 +101,7 @@ export default function ContractForm() {
     searchTerm,
     null
   )
-
+  console.log('selectedApprovalFlow', selectedApprovalFlow)
   const customers = data?.users || []
 
   const { useListUsers: useListEmployees } = useUsers()
@@ -889,6 +889,7 @@ export default function ContractForm() {
                                         name: selectedApprovalFlow.name,
                                         steps: selectedApprovalFlow.steps.map(
                                           (step: any) => ({
+                                            id: step?.id,
                                             departmentId: step.department?.id,
                                             approverId: step.approver?.id,
                                             stepOrder: step.stepOrder,

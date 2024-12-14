@@ -61,7 +61,7 @@ const EditRequestModal = ({
               onChange={(e) => setReason(e.target.value)}
             />
           </div>
-          <div className="grid gap-2">
+          {/* <div className="grid gap-2">
             <Label htmlFor="file-upload" className="font-medium">
               Tệp đính kèm
             </Label>
@@ -76,7 +76,7 @@ const EditRequestModal = ({
                 (pdf, doc, docx, xlsx, xls, png, jpg, jpeg)
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
         <DialogFooter className="sm:justify-end">
           <Button
