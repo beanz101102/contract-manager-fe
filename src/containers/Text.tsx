@@ -148,6 +148,7 @@ export const Text = ({
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     if (textMode !== TextMode.COMMAND) return;
     event.preventDefault();
+    event.stopPropagation();
     const touch = event.touches[0];
     setMouseDown(true);
     setOperation(DragActions.MOVE);
@@ -157,6 +158,7 @@ export const Text = ({
   const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
     if (!mouseDown) return;
     event.preventDefault();
+    event.stopPropagation();
     const touch = event.touches[0];
     const movementX = touch.clientX - lastTouch.x;
     const movementY = touch.clientY - lastTouch.y;
@@ -179,6 +181,7 @@ export const Text = ({
 
   const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
     event.preventDefault();
+    event.stopPropagation();
     setMouseDown(false);
     if (operation === DragActions.MOVE) {
       updateTextAttachment({

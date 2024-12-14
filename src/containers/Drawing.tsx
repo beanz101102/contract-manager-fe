@@ -32,6 +32,7 @@ export const Drawing = ({
   const [operation, setOperation] = useState<DragActions>(DragActions.NO_MOVEMENT);
   const [dimmerActive, setDimmerActive] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [lastTouch, setLastTouch] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -41,6 +42,8 @@ export const Drawing = ({
   }, [svgRef, width, height]);
 
   const handleMousedown = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     setMouseDown(true);
     setOperation(DragActions.MOVE);
     setStartPos({ x: event.clientX, y: event.clientY });
@@ -115,6 +118,52 @@ export const Drawing = ({
     removeDrawing();
   };
 
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const touch = event.touches[0];
+    setMouseDown(true);
+    setOperation(DragActions.MOVE);
+    setLastTouch({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!mouseDown) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const touch = event.touches[0];
+    const movementX = touch.clientX - lastTouch.x;
+    const movementY = touch.clientY - lastTouch.y;
+
+    const { top, left } = getMovePosition(
+      positionLeft,
+      positionTop,
+      movementX,
+      movementY,
+      width,
+      height,
+      pageWidth,
+      pageHeight
+    );
+
+    setPositionTop(top);
+    setPositionLeft(left);
+    setLastTouch({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setMouseDown(false);
+    if (operation === DragActions.MOVE) {
+      updateDrawingAttachment({
+        x: positionLeft,
+        y: positionTop,
+      });
+    }
+    setOperation(DragActions.NO_MOVEMENT);
+  };
+
   return (
     <DrawingComponent
       stroke={stroke}
@@ -133,6 +182,9 @@ export const Drawing = ({
       handleMouseUp={handleMouseUp}
       positionLeft={positionLeft}
       positionTop={positionTop}
+      handleTouchStart={handleTouchStart}
+      handleTouchMove={handleTouchMove}
+      handleTouchEnd={handleTouchEnd}
     />
   );
 };

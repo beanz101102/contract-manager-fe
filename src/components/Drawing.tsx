@@ -22,6 +22,9 @@ interface Props {
   handleMouseMove: DragEventListener<HTMLDivElement>
   handleMouseOut: DragEventListener<HTMLDivElement>
   scale?: number
+  handleTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void
+  handleTouchMove: (e: React.TouchEvent<HTMLDivElement>) => void
+  handleTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void
 }
 export const Drawing: React.FC<Props> = ({
   dimmerActive,
@@ -41,6 +44,9 @@ export const Drawing: React.FC<Props> = ({
   handleMouseOut,
   handleMouseUp,
   onClick,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
 }) => {
   return (
     <div
@@ -48,6 +54,9 @@ export const Drawing: React.FC<Props> = ({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseOut={handleMouseOut}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={{
         position: "absolute",
         top: positionTop,
@@ -55,6 +64,10 @@ export const Drawing: React.FC<Props> = ({
         width,
         height,
         cursor: "move",
+        touchAction: "none",
+        zIndex: 100000,
+        WebkitUserSelect: "none",
+        userSelect: "none"
       }}
     >
       <Dimmer.Dimmable as={Div} dimmed={dimmerActive}>

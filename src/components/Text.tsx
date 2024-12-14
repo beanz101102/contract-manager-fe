@@ -58,8 +58,8 @@ export const Text: React.FC<Props> = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       style={{
+        position: "absolute",
         width,
-        border: 1,
         height,
         fontFamily,
         fontSize: size,
@@ -71,8 +71,10 @@ export const Text: React.FC<Props> = ({
         borderStyle: "solid",
         wordWrap: "break-word",
         padding: 0,
-        position: "relative",
-        touchAction: 'none',
+        touchAction: "none",
+        zIndex: 1000,
+        WebkitUserSelect: "none",
+        userSelect: "none"
       }}
     >
       <button

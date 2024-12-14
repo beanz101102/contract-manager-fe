@@ -66,6 +66,9 @@ export const Image: React.FC<Props> = ({
         height: height + 2,
         cursor: "move",
         touchAction: 'none',
+        zIndex: 1000,
+        WebkitUserSelect: "none",
+        userSelect: "none"
       }}
     >
       <Dimmer.Dimmable as={Div} size="medium" dimmed={dimmerActive}>

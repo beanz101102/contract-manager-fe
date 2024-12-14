@@ -25,7 +25,16 @@ export const Attachments: React.FC<Props> = ({
       updateAttachment(index, attachment)
 
   return attachments ? (
-    <>
+    <div style={{ 
+      position: "absolute", 
+      top: 0, 
+      left: 0, 
+      width: "100%", 
+      height: "100%",
+      touchAction: "none",
+      userSelect: "none",
+      WebkitUserSelect: "none"
+    }}>
       {attachments.length
         ? attachments.map((attachment, index) => {
             const key = `${pdfName}-${index}`
@@ -71,6 +80,6 @@ export const Attachments: React.FC<Props> = ({
             return null
           })
         : null}
-    </>
+    </div>
   ) : null
 }
