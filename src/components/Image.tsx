@@ -21,6 +21,9 @@ interface Props {
   handleMouseMove: DragEventListener<HTMLDivElement>
   handleMouseUp: DragEventListener<HTMLDivElement>
   handleImageScale: DragEventListener<HTMLDivElement>
+  handleTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void
+  handleTouchMove: (e: React.TouchEvent<HTMLDivElement>) => void
+  handleTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void
 }
 
 export const Image: React.FC<Props> = ({
@@ -38,6 +41,9 @@ export const Image: React.FC<Props> = ({
   cancelDelete,
   deleteImage,
   onClick,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
 }) => {
   return (
     <div
@@ -46,6 +52,9 @@ export const Image: React.FC<Props> = ({
       onMouseUp={handleMouseUp}
       onMouseOut={handleMouseOut}
       onDoubleClick={onClick}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={{
         position: "absolute",
         top: positionTop,
@@ -56,6 +65,7 @@ export const Image: React.FC<Props> = ({
         width: width + 2,
         height: height + 2,
         cursor: "move",
+        touchAction: 'none',
       }}
     >
       <Dimmer.Dimmable as={Div} size="medium" dimmed={dimmerActive}>

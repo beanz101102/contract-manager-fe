@@ -20,6 +20,9 @@ interface Props {
   handleMouseOut: DragEventListener<HTMLDivElement>
   onChangeText: (e: React.ChangeEvent<HTMLInputElement>) => void
   removeText: () => void
+  handleTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void
+  handleTouchMove: (e: React.TouchEvent<HTMLDivElement>) => void
+  handleTouchEnd: (e: React.TouchEvent<HTMLDivElement>) => void
 }
 
 export const Text: React.FC<Props> = ({
@@ -40,6 +43,9 @@ export const Text: React.FC<Props> = ({
   handleMouseUp,
   lineHeight,
   removeText,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
 }) => {
   return (
     <div
@@ -48,6 +54,9 @@ export const Text: React.FC<Props> = ({
       onMouseUp={handleMouseUp}
       onMouseOut={handleMouseOut}
       onDoubleClick={toggleEditMode}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       style={{
         width,
         border: 1,
@@ -63,6 +72,7 @@ export const Text: React.FC<Props> = ({
         wordWrap: "break-word",
         padding: 0,
         position: "relative",
+        touchAction: 'none',
       }}
     >
       <button

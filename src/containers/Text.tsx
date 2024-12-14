@@ -34,6 +34,7 @@ export const Text = ({
     DragActions.NO_MOVEMENT
   )
   const [textMode, setTextMode] = useState<TextMode>(TextMode.COMMAND)
+  const [lastTouch, setLastTouch] = useState({ x: 0, y: 0 })
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -144,6 +145,50 @@ export const Text = ({
     setContent(value)
   }
 
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (textMode !== TextMode.COMMAND) return;
+    event.preventDefault();
+    const touch = event.touches[0];
+    setMouseDown(true);
+    setOperation(DragActions.MOVE);
+    setLastTouch({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!mouseDown) return;
+    event.preventDefault();
+    const touch = event.touches[0];
+    const movementX = touch.clientX - lastTouch.x;
+    const movementY = touch.clientY - lastTouch.y;
+
+    const { top, left } = getMovePosition(
+      positionLeft,
+      positionTop,
+      movementX,
+      movementY,
+      width,
+      height,
+      pageWidth,
+      pageHeight
+    );
+
+    setPositionTop(top);
+    setPositionLeft(left);
+    setLastTouch({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setMouseDown(false);
+    if (operation === DragActions.MOVE) {
+      updateTextAttachment({
+        x: positionLeft,
+        y: positionTop,
+      });
+    }
+    setOperation(DragActions.NO_MOVEMENT);
+  };
+
   return (
     <Component
       text={content}
@@ -163,6 +208,9 @@ export const Text = ({
       handleMouseDown={handleMousedown}
       handleMouseMove={handleMouseMove}
       removeText={removeText}
+      handleTouchStart={handleTouchStart}
+      handleTouchMove={handleTouchMove}
+      handleTouchEnd={handleTouchEnd}
     />
   )
 }
