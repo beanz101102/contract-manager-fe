@@ -48,7 +48,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
-  department: z.string().min(1, "Vui lòng chọn phòng ban"),
+  department: z.string().min(1, "Vui lòng chọn phòng ban").optional(),
   creator: z.string().min(1, "Vui lòng nhập người tạo"),
   contractNumber: z.string().min(1, "Vui lòng nhập số hợp đồng"),
   customerName: z.string().min(1, "Vui lòng nhập tên khách hàng"),
@@ -168,11 +168,23 @@ export default function EditContractPage() {
       customerId: currentCustomer?.id || 0,
       contractType: "purchase",
       createdById: user?.id || 0,
-      signers: selectedSigners.map((signer) => signer?.id),
+      signers: JSON.stringify(selectedSigners.map((signer, idx) => ({userId: signer?.id, order: idx + 1}))),
       approvalTemplateId: parseInt(values.approvalFlow),
       note: values.notes,
       file: pdfFile,
     }
+
+    updateContract(
+      { ...payload } as any,
+      {
+        onSuccess: () => {
+          router.push('/contract/personal')
+        },
+        onError: (error) => {
+          console.error('Error updating contract:', error)
+        }
+      }
+    )
   }
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
