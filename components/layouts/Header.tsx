@@ -46,6 +46,7 @@ export default function SidebarMenu() {
 
 function DropdownMenu() {
   const { user } = useAuth()
+
   return (
     <div className="w-full">
       <Accordion type="multiple" className="w-full">
@@ -126,7 +127,7 @@ function DropdownMenu() {
                   Luồng duyệt hợp đồng
                 </li>
               </Link>
-              {(user?.role === "admin" || user?.role === "manager") && (
+              {(user?.role !== 'customer') && (
                 <Link href="/contract/user-signature">
                   <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                     Chữ ký cá nhân

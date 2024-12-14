@@ -103,6 +103,7 @@ export const Image: React.FC<Props> = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          userSelect: "none",
         }}
       >
         x

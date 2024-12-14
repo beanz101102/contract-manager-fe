@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import AppPDF from "@/src/App"
@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
 export default function ContractForm() {
+  const [isSaveFile, setIsSaveFile] = useState(false)
   const params = useParams()
   const { useContractDetail } = useContracts()
   const router = useRouter()
@@ -33,6 +34,14 @@ export default function ContractForm() {
   const [otp, setOtp] = useState("")
   const { useSendOtp } = useContracts()
   const { mutate: sendOtp } = useSendOtp()
+
+  useEffect(() => {
+    if (file) {
+      setIsSaveFile(true)
+    } else {
+      setIsSaveFile(false)
+    }
+  }, [file])
 
   const handleSign = () => {
     setShowOtpModal(true)
@@ -129,6 +138,7 @@ export default function ContractForm() {
             <Button
               className="w-full py-4 md:py-6 text-sm md:text-base font-medium"
               onClick={handleSign}
+              disabled={!isSaveFile}
             >
               Xác nhận ký
             </Button>

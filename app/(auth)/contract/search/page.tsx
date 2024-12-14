@@ -36,12 +36,13 @@ export default function ContractSearch() {
   const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [contractId, setContractId] = useState(0)
+  const userId = user?.position === 'Giám đốc' ? null : user?.id;
   const { data: contracts, isLoading } = useAllContracts(
     searchTerm,
     page,
     10,
     null,
-    user?.id,
+    userId, // view all contracts for Giám đốc
     "completed"
   )
 

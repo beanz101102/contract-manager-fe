@@ -104,6 +104,7 @@ export const Text: React.FC<Props> = ({
           margin: 0,
           backgroundColor: "transparent",
           cursor: mode === TextMode.COMMAND ? "move" : "text",
+          userSelect: "none",
         }}
         value={text}
       />

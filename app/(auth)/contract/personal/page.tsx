@@ -47,11 +47,12 @@ export default function IndividualManagement() {
   } = useContracts()
   const [page, setPage] = useState(1)
   const { user } = useAuth()
+  const userId = user?.position === 'Giám đốc' ? null : user?.id;
   const {
     data: contracts,
     isLoading,
     refetch,
-  } = useAllContracts(searchTerm, page, 10, null, user?.id)
+  } = useAllContracts(searchTerm, page, 10, null, userId)
 
   useEffect(() => {
     refetch()

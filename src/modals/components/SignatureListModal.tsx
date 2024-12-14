@@ -12,16 +12,17 @@ import NextImage from "@/components/ui/next-img"
 
 interface SignatureListModalProps {
   onSelect: (signatureUrl: string) => void
+  disabled: boolean
 }
 
-export const SignatureListModal = ({ onSelect }: SignatureListModalProps) => {
+export const SignatureListModal = ({ onSelect, disabled = false }: SignatureListModalProps) => {
   const { useListSignatures } = useUserSignatures()
   const { data: listSignature } = useListSignatures()
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Chọn chữ ký</Button>
+      <Button onClick={() => setOpen(true)} disabled={disabled}>Chọn chữ ký</Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[800px]">

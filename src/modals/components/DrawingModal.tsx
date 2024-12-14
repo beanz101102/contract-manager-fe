@@ -38,12 +38,10 @@ export const DrawingModal = ({ open, dismiss, confirm, drawing }: Props) => {
     setSvgY(y);
   }, [svgRef]);
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
+  const startDrawing = (clientX: number, clientY: number) => {
     setMouseDown(true);
-
-    const x = event.clientX - svgX;
-    const y = event.clientY - svgY;
+    const x = clientX - svgX;
+    const y = clientY - svgY;
     setMinX(Math.min(minX, x));
     setMaxX(Math.max(maxX, x));
     setMinY(Math.min(minY, y));
@@ -52,12 +50,10 @@ export const DrawingModal = ({ open, dismiss, confirm, drawing }: Props) => {
     setPaths([...paths, ['M', x, y]]);
   };
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
+  const draw = (clientX: number, clientY: number) => {
     if (!mouseDown) return;
-
-    const x = event.clientX - svgX;
-    const y = event.clientY - svgY;
+    const x = clientX - svgX;
+    const y = clientY - svgY;
     setMinX(Math.min(minX, x));
     setMaxX(Math.max(maxX, x));
     setMinY(Math.min(minY, y));
@@ -66,9 +62,42 @@ export const DrawingModal = ({ open, dismiss, confirm, drawing }: Props) => {
     setPaths([...paths, ['L', x, y]]);
   };
 
+  const stopDrawing = () => {
+    setMouseDown(false);
+  };
+
+  // Mouse event handlers
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    startDrawing(event.clientX, event.clientY);
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    draw(event.clientX, event.clientY);
+  };
+
   const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    setMouseDown(false);
+    stopDrawing();
+  };
+
+  // Touch event handlers
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const touch = event.touches[0];
+    startDrawing(touch.clientX, touch.clientY);
+  };
+
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const touch = event.touches[0];
+    draw(touch.clientX, touch.clientY);
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    stopDrawing();
   };
 
   const resetDrawingBoard = () => {
@@ -124,7 +153,7 @@ export const DrawingModal = ({ open, dismiss, confirm, drawing }: Props) => {
 
   return (
     <Modal size="small" dimmer="inverted" open={open} onClose={closeModal}>
-      <Modal.Header>Add your Drawing</Modal.Header>
+      <Modal.Header>Thêm chữ ký của bạn</Modal.Header>
       <Modal.Content>
         <Menu size="tiny">
           <Menu.Item header>Tools</Menu.Item>
@@ -187,12 +216,17 @@ export const DrawingModal = ({ open, dismiss, confirm, drawing }: Props) => {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{ touchAction: 'none' }}
         >
           <svg
             ref={svgRef}
             style={{
               width: '100%',
               height: '50vh',
+              touchAction: 'none',
             }}
           >
             <path

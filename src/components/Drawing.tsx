@@ -21,6 +21,7 @@ interface Props {
   handleMouseUp: DragEventListener<HTMLDivElement>
   handleMouseMove: DragEventListener<HTMLDivElement>
   handleMouseOut: DragEventListener<HTMLDivElement>
+  scale?: number
 }
 export const Drawing: React.FC<Props> = ({
   dimmerActive,
@@ -34,6 +35,7 @@ export const Drawing: React.FC<Props> = ({
   path,
   stroke,
   strokeWidth,
+  scale = 0.15,
   handleMouseDown,
   handleMouseMove,
   handleMouseOut,
@@ -71,18 +73,31 @@ export const Drawing: React.FC<Props> = ({
               background: "white",
               cursor: "pointer",
               zIndex: 1000,
+              userSelect: "none",
             }}
           >
             ×
           </button>
-          <svg ref={svgRef}>
+          <svg 
+            ref={svgRef}
+            width={width}
+            height={height}
+            viewBox={`0 0 ${width/scale} ${height/scale}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{
+              width: '100%',
+              height: '100%',
+              overflow: 'visible'
+            }}
+          >
             <path
-              strokeWidth={strokeWidth}
+              strokeWidth={strokeWidth || 2}
               strokeLinecap="round"
               strokeLinejoin="round"
-              stroke={stroke}
+              stroke={stroke || "#000"}
               fill="none"
               d={path}
+              transform={`scale(${scale})`}
             />
           </svg>
         </div>

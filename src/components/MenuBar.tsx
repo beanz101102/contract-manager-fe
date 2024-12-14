@@ -15,6 +15,7 @@ interface MenuBarProps {
   savingPdfStatus: boolean
   uploadNewPdf: () => void
   isPdfLoaded: boolean
+  isAttachmentActive: boolean
 }
 
 export const MenuBar: React.FC<MenuBarProps> = ({
@@ -27,9 +28,23 @@ export const MenuBar: React.FC<MenuBarProps> = ({
   savingPdfStatus,
   uploadNewPdf,
   isPdfLoaded,
+  isAttachmentActive = true,
 }) => {
+  const [isAdding, setIsAdding] = useState<'none' | 'signature' | 'drawing'>('none');
+
+  const handleAddImage = () => {
+    setIsAdding('drawing');
+    addImage();
+  }
+
+  const handleAddDrawing = () => {
+    setIsAdding('drawing');
+    addDrawing();
+  }
+
   const handleSignatureSelect = async (signatureUrl: string) => {
     try {
+      setIsAdding('signature');
       const response = await fetch(signatureUrl)
       const blob = await response.blob()
       const file = new File([blob], "signature.png", { type: "image/png" })
@@ -39,21 +54,36 @@ export const MenuBar: React.FC<MenuBarProps> = ({
     }
   }
 
+  // Reset trạng thái khi lưu
+  const handleSave = () => {
+    setIsAdding('none');
+    saveToServer();
+  }
+
   return (
     <div className="w-full bg-white border-b">
       <div className="mx-auto flex h-12 items-center justify-between px-4">
         {/* Left side */}
         <div className="flex items-center gap-2">
-          <Button onClick={() => addImage()}>
+          <Button 
+            onClick={handleAddImage}
+            disabled={isAdding !== 'none' && isAdding === 'signature' && isAttachmentActive}
+          >
             <Image className="h-4 w-4 mr-1.5" />
             Thêm hình ảnh
           </Button>
 
-          <Button onClick={addDrawing}>
+          <Button 
+            onClick={handleAddDrawing}
+            disabled={isAdding !== 'none' && isAdding === 'signature' && isAttachmentActive}
+          >
             <PenLine className="h-4 w-4 mr-1.5" />
             Chữ ký
           </Button>
-          <SignatureListModal onSelect={handleSignatureSelect} />
+          <SignatureListModal 
+            onSelect={handleSignatureSelect}
+            disabled={isAdding !== 'none' && isAdding === 'drawing' && isAttachmentActive}
+          />
         </div>
 
         {/* Right side */}
@@ -61,7 +91,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({
           variant="default"
           size="sm"
           className="bg-blue-500 hover:bg-blue-600 text-white"
-          onClick={saveToServer}
+          onClick={handleSave}
           disabled={savingPdfStatus}
         >
           <Save className="h-4 w-4 mr-1.5" />

@@ -3,7 +3,7 @@
 import React, { useEffect, useLayoutEffect, useState } from "react"
 
 import "semantic-ui-css/semantic.min.css"
-import { Button, Container, Grid, Segment } from "semantic-ui-react"
+import { Button, Grid, Segment } from "semantic-ui-react"
 
 import { Attachments } from "./components/Attachments"
 import { Empty } from "./components/Empty"
@@ -14,11 +14,9 @@ import { useAttachments } from "./hooks/useAttachments"
 import { Pdf, usePdf } from "./hooks/usePdf"
 import { UploadTypes, useUploader } from "./hooks/useUploader"
 import { DrawingModal } from "./modals/components/DrawingModal"
-import { HelpModal } from "./modals/components/HelpModal"
 import * as serviceWorker from "./serviceWorker"
 import { readAsDataURL, readAsImage } from "./utils/asyncReader"
 import { ggID } from "./utils/helpers"
-import { savePdfToServer } from "./utils/pdf"
 import { prepareAssets } from "./utils/prepareAssets"
 
 prepareAssets()
@@ -32,6 +30,7 @@ interface AppPDFProps {
 const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
   const [helpModalOpen, setHelpModalOpen] = useState(false)
   const [drawingModalOpen, setDrawingModalOpen] = useState(false)
+  const [isAttachmentActive, setIsAttachmentActive] = useState(false)
   const {
     file,
     initialize,
@@ -58,6 +57,14 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
     remove,
     setPageIndex,
   } = useAttachments()
+
+  useEffect(() => {
+    if (pageAttachments?.length > 0) {
+      setIsAttachmentActive(true)
+    } else {
+      setIsAttachmentActive(false)
+    }
+  }, [pageAttachments?.length])
 
   const initializePageAndAttachments = (pdfDetails: Pdf) => {
     initialize(pdfDetails)
@@ -102,23 +109,61 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
     addAttachment(newTextAttachment)
   }
 
+  const normalizePath = (path: string) => {
+    // Tách các điểm từ path
+    const points = path.split(/[MLZ]/).filter(Boolean)
+      .map(point => point.trim().split(',')
+      .map(coord => coord.split(' ').map(Number).filter(Boolean)))
+      .flat()
+      .filter(coord => coord.length === 2);
+
+    // Tìm giá trị min, max
+    let minX = Infinity, minY = Infinity;
+    let maxX = -Infinity, maxY = -Infinity;
+
+    points.forEach(([x, y]) => {
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    });
+
+    // Chuẩn hóa path
+    const normalizedPath = path.replace(/(\d+(\.\d+)?)\s+(\d+(\.\d+)?)/g, (match, x, _, y) => {
+      const newX = Number(x) - minX;
+      const newY = Number(y) - minY;
+      return `${newX} ${newY}`;
+    });
+
+    return {
+      path: normalizedPath,
+      width: maxX - minX,
+      height: maxY - minY
+    };
+  };
+
   const addDrawing = (drawing?: {
     width: number
     height: number
     path: string
   }) => {
-    if (!drawing) return
+    if (!drawing) return;
+
+    const SCALE_FACTOR = 0.15;
+    const normalized = normalizePath(drawing.path);
 
     const newDrawingAttachment: DrawingAttachment = {
       id: ggID(),
       type: AttachmentTypes.DRAWING,
-      ...drawing,
+      width: normalized.width * SCALE_FACTOR,
+      height: normalized.height * SCALE_FACTOR,
+      path: normalized.path,
       x: 0,
       y: 0,
       scale: 1,
-    }
-    addAttachment(newDrawingAttachment)
-  }
+    };
+    addAttachment(newDrawingAttachment);
+  };
 
   useLayoutEffect(() => setPageIndex(pageIndex), [pageIndex, setPageIndex])
 
@@ -203,6 +248,7 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
     <div className="w-full">
       {hiddenInputs}
       <MenuBar
+        isAttachmentActive={isAttachmentActive}
         openHelp={() => setHelpModalOpen(true)}
         saveToServer={handleSaveToServer}
         addText={addText}

@@ -113,11 +113,12 @@ export default function ContractForm() {
   const { data: signersData, isLoading: isLoadingSigners } = useListSigners(
     null,
     1,
-    10,
+    20,
     searchSignerTerm,
     null
   )
-  const potentialSigners = signersData?.users || []
+  // const potentialSigners = signersData?.users || []
+  const potentialSigners = signersData?.users?.filter((user) => user.role !== "customer") || []
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
