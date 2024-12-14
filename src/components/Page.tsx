@@ -41,7 +41,7 @@ export const Page = ({ page, dimensions, updateDimensions }: Props) => {
   }, [page, updateDimensions]);
 
   return (
-    <div>
+    <div className="pdf-page">
       <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );

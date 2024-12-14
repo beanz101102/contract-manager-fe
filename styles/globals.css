@@ -89,3 +89,8 @@
 .bg-green {
   background-color: #4bc5be;
 }
+.pdf-page {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
