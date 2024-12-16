@@ -67,7 +67,8 @@ export const Drawing: React.FC<Props> = ({
         touchAction: "none",
         zIndex: 100000,
         WebkitUserSelect: "none",
-        userSelect: "none"
+        userSelect: "none",
+        border: "1px dashed grey"
       }}
     >
       <Dimmer.Dimmable as={Div} dimmed={dimmerActive}>
@@ -113,6 +114,38 @@ export const Drawing: React.FC<Props> = ({
               transform={`scale(${scale})`}
             />
           </svg>
+          <div
+            data-direction="top-left"
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            style={{
+              position: "absolute",
+              cursor: "nwse-resize",
+              top: -5,
+              left: -5,
+              width: 10,
+              height: 10,
+              backgroundColor: "white",
+              border: "1px solid grey",
+            }}
+          />
+          <div
+            data-direction="bottom-right"
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            style={{
+              position: "absolute",
+              cursor: "nwse-resize",
+              bottom: -5,
+              right: -5,
+              width: 10,
+              height: 10,
+              backgroundColor: "white",
+              border: "1px solid grey",
+            }}
+          />
         </div>
       </Dimmer.Dimmable>
     </div>

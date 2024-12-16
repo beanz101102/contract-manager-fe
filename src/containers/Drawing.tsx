@@ -33,6 +33,7 @@ export const Drawing = ({
   const [dimmerActive, setDimmerActive] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [lastTouch, setLastTouch] = useState({ x: 0, y: 0 });
+  const [direction, setDirection] = useState<string[]>([]);
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -45,7 +46,14 @@ export const Drawing = ({
     event.preventDefault();
     event.stopPropagation();
     setMouseDown(true);
-    setOperation(DragActions.MOVE);
+    
+    const directions = event.currentTarget.dataset.direction;
+    if (directions) {
+      setDirection(directions.split('-'));
+      setOperation(DragActions.SCALE);
+    } else {
+      setOperation(DragActions.MOVE);
+    }
     setStartPos({ x: event.clientX, y: event.clientY });
   };
 
@@ -63,6 +71,35 @@ export const Drawing = ({
         setPositionLeft(newLeft);
         setPositionTop(newTop);
         setStartPos({ x: event.clientX, y: event.clientY });
+      } else if (operation === DragActions.SCALE) {
+        const minSize = 50;
+        let newWidth = currentWidth;
+        let newHeight = currentHeight;
+        let newLeft = positionLeft;
+        let newTop = positionTop;
+
+        if (direction.includes('top') || direction.includes('left')) {
+          if (direction.includes('left')) {
+            newWidth = Math.max(minSize, currentWidth - event.movementX);
+            newLeft = positionLeft + event.movementX;
+          }
+          if (direction.includes('top')) {
+            newHeight = Math.max(minSize, currentHeight - event.movementY);
+            newTop = positionTop + event.movementY;
+          }
+        } else {
+          newWidth = Math.max(minSize, currentWidth + event.movementX);
+          newHeight = Math.max(minSize, currentHeight + event.movementY);
+        }
+
+        if (newWidth >= minSize && newWidth <= pageWidth) {
+          setCurrentWidth(newWidth);
+          setPositionLeft(newLeft);
+        }
+        if (newHeight >= minSize && newHeight <= pageHeight) {
+          setCurrentHeight(newHeight);
+          setPositionTop(newTop);
+        }
       }
     }
   };
@@ -71,7 +108,7 @@ export const Drawing = ({
     event.preventDefault();
     setMouseDown(false);
 
-    if (operation === DragActions.MOVE) {
+    if (operation === DragActions.MOVE || operation === DragActions.SCALE) {
       updateDrawingAttachment({
         x: positionLeft,
         y: positionTop,
