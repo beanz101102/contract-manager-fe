@@ -306,11 +306,23 @@ const ModalConfirm = ({
   selectedEmployees: number[]
 }) => {
   const { user } = useAuth()
-  const { useApproveContract } = useContracts()
-  const { mutate: approveContract } = useApproveContract()
+  const { useApproveContract, useFeedbackContract } = useContracts()
+  const { mutate: feedbackContract } = useFeedbackContract()
   const [contractComments, setContractComments] = useState<{
     [key: number]: string
   }>({})
+
+  const { mutate: approveContract } = useApproveContract(() => {
+    selectedEmployees.forEach((id) => {
+      feedbackContract({
+        contractId: id,
+        name: user?.fullName || "",
+        content: contractComments[id] || "Duyệt hợp đồng",
+        tag: "approval_request",
+      })
+    })
+  })
+
   const [contractList] = useAtom(contractListAtom)
 
   const selectedContracts = contractList.filter((contract) =>
