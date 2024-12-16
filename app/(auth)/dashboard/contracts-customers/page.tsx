@@ -5,9 +5,11 @@ import Image from "next/image"
 import dayjs from "dayjs"
 import html2canvas from "html2canvas-pro"
 import jsPDF from "jspdf"
-import { Download } from "lucide-react"
+import { Download, Search } from "lucide-react"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 
 import { useContracts } from "@/hooks/useContracts"
+import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -30,16 +32,29 @@ export default function ContractsCustomers() {
     new Date(new Date().getFullYear(), 0, 1)
   )
   const [endDate, setEndDate] = useState<Date>(new Date())
+  const [searchTerm, setSearchTerm] = useState("")
+  const [open, setOpen] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
   const targetRef = useRef<HTMLDivElement>(null)
+
+  const { useListUsers } = useUsers()
+  const { data: customersData, isLoading } = useListUsers(
+    ["customer"],
+    1,
+    10,
+    searchTerm,
+    null
+  )
+  const customers = customersData?.users || []
 
   const { useCustomerReport } = useContracts()
   const { data } = useCustomerReport({
     startTime: startDate?.getTime() || 0,
     endTime: endDate?.getTime() || 0,
     status: "cancelled",
+    customerId: selectedCustomer?.id,
   })
-  const customers = data || []
-  console.log("datadatadatadatadatadatadata", customers)
+  const reportData = data || []
 
   const generatePDF = async () => {
     const element = targetRef.current
@@ -140,6 +155,69 @@ export default function ContractsCustomers() {
                     </PopoverContent>
                   </Popover>
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-gray-700">Khách hàng</span>
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline2"
+                        className="h-10 w-[200px] justify-between bg-white hover:bg-gray-50 border-gray-200 text-left font-normal"
+                        role="combobox"
+                      >
+                        {selectedCustomer
+                          ? selectedCustomer.fullName
+                          : "Chọn khách hàng"}
+                        <Search className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0 bg-white border border-gray-200 shadow-lg">
+                      <Command className="border-none bg-white">
+                        <CommandInput
+                          placeholder="Tìm kiếm khách hàng..."
+                          value={searchTerm}
+                          onValueChange={setSearchTerm}
+                          className="border-none focus:ring-0"
+                        />
+                        <CommandEmpty className="py-4 text-sm text-gray-500 text-center">
+                          {isLoading ? "Đang tải..." : "Không tìm thấy khách hàng"}
+                        </CommandEmpty>
+                        <CommandList>
+                          <CommandGroup heading="Gợi ý" className="text-sm text-gray-700">
+                              <CommandItem
+                                key={'all customers'}
+                                value={'Toàn bộ'}
+                                className="hover:bg-gray-50 cursor-pointer py-3 px-4"
+                                onSelect={() => {
+                                  setSelectedCustomer(null)
+                                  setOpen(false)
+                                }}
+                              >
+                                <span className="text-gray-700">
+                                  Toàn bộ
+                                </span>
+                              </CommandItem>
+                            {customers?.map((customer: any) => (
+                              <CommandItem
+                                key={customer?.id}
+                                value={customer?.fullName}
+                                className="hover:bg-gray-50 cursor-pointer py-3 px-4"
+                                onSelect={() => {
+                                  setSelectedCustomer(customer)
+                                  setOpen(false)
+                                }}
+                              >
+                                <span className="text-gray-700">
+                                  {customer?.fullName}
+                                </span>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div className="flex items-start gap-6 bg-gray-50/50 p-6 rounded-lg">
@@ -198,7 +276,7 @@ export default function ContractsCustomers() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {customers?.map((row, index) => (
+                    {reportData?.map((row, index) => (
                       <TableRow
                         key={row.customerId}
                         className="hover:bg-gray-50 transition-colors"
