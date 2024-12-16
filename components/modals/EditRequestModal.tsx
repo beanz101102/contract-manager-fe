@@ -34,6 +34,7 @@ const EditRequestModal = ({
       contractId: selectedEmployees[0],
       name: user?.fullName ?? "",
       content: reason,
+      tag: "revision_request",
     })
   })
 

@@ -43,6 +43,7 @@ export default function ContractForm() {
       contractId: Number(params.id),
       name: user?.fullName ?? "",
       content: content,
+      tag: "feedback",
     })
   }
 

@@ -457,6 +457,7 @@ export const useContracts = () => {
         contractId: number
         name: string
         content: string
+        tag: "revision_request" | "feedback"
       }) => {
         const response = await api.post("/api/contract/add-feedback", payload)
         return response.data
