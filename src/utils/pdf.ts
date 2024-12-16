@@ -153,17 +153,19 @@ export async function savePdfToServer(
   }
 
   const pagesProcesses = pdfDoc.getPages().map(async (page, pageIndex) => {
-    const pageObjects = objects[pageIndex]
+    const pageObjects = objects[pageIndex] || [] // Add default empty array
     // 'y' starts from bottom in PDFLib, use this to calculate y
     const pageHeight = page.getHeight()
     const embedProcesses = pageObjects.map(async (object: Attachment) => {
+      if (!object || !object.type) return () => {} // Handle undefined/null objects
+
       if (object.type === "image") {
         const { file, x, y, width, height } = object as ImageAttachment
         let img: any
         try {
-          if (file.type === "image/jpeg") {
+          if (file && file.type === "image/jpeg") {
             img = await pdfDoc.embedJpg(await readAsArrayBuffer(file))
-          } else {
+          } else if (file) {
             img = await pdfDoc.embedPng(await readAsArrayBuffer(file))
           }
           return () =>
@@ -209,7 +211,7 @@ export async function savePdfToServer(
             setLineJoin(LineJoinStyle.Round)
           )
 
-          const color = window.w3color(stroke!).toRgb()
+          const color = window.w3color(stroke || "#000000").toRgb() // Add default color
 
           page.drawSvgPath(path, {
             borderColor: rgb(
@@ -228,7 +230,7 @@ export async function savePdfToServer(
     })
     // embed objects in order
     const drawProcesses: any[] = await Promise.all(embedProcesses)
-    drawProcesses.forEach((p) => p())
+    drawProcesses.forEach((p) => p && p()) // Check if p exists before calling
   })
   await Promise.all(pagesProcesses)
   try {
