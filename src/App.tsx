@@ -202,16 +202,24 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
         onChange={uploadImage}
       />
     </>
-  )
-  const handleSaveToServer = async () => {
-    try {
-      const file = await newFile(allPageAttachments)
-      setFile(file || null)
-    } catch (error) {
-      console.error("Error saving file:", error)
-      setFile(null)
+  );
+
+  useEffect(() => {
+    const handleSaveToServer = async () => {
+      try {
+        const file = await newFile(allPageAttachments)
+        setFile(file || null)
+      } catch (error) {
+        console.error("Error saving file:", error)
+        setFile(null)
+      }
     }
-  }
+
+    if (allPageAttachments?.[0]?.length > 0) {
+      handleSaveToServer()
+    }
+  }, [allPageAttachments])
+
   const handleDownloadPdf = () => savePdf(allPageAttachments)
 
   const handleLoadPdfFromUrl = async (url: string) => {
@@ -265,7 +273,7 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
       <MenuBar
         isAttachmentActive={isAttachmentActive}
         openHelp={() => setHelpModalOpen(true)}
-        saveToServer={handleSaveToServer}
+        saveToServer={() => {}}
         addText={addText}
         addImage={handleAddImage}
         addDrawing={() => setDrawingModalOpen(true)}

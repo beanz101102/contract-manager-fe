@@ -87,7 +87,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({
         </div>
 
         {/* Right side */}
-        <Button
+        {/* <Button
           variant="default"
           size="sm"
           className="bg-blue-500 hover:bg-blue-600 text-white"
@@ -96,7 +96,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({
         >
           <Save className="h-4 w-4 mr-1.5" />
           {savingPdfStatus ? "Đang lưu..." : "Lưu"}
-        </Button>
+        </Button> */}
       </div>
     </div>
   )
