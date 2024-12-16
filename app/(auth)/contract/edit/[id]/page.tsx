@@ -164,6 +164,7 @@ export default function EditContractPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const payload = {
+      id: Number(id),
       contractNumber: values.contractNumber,
       customerId: currentCustomer?.id || 0,
       contractType: "purchase",
