@@ -63,7 +63,11 @@ export default function ContractDashboard() {
 
   const { useAdvancedStatistics } = useContracts()
   const { useListUsers } = useUsers()
-  const { data: creators } = useListUsers(["employee"], 1, 100)
+  const { data: creators } = useListUsers(
+    ["employee", "manager", "admin"],
+    1,
+    100
+  )
   const { data: customers } = useListUsers(["customer"], 1, 100)
   const { data, isLoading } = useAdvancedStatistics({
     startTime: date.from.getTime(),
