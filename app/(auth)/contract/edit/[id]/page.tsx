@@ -716,11 +716,11 @@ export default function EditContractPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-gray-700">
-                            Ghi chú
+                            Diễn giải
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              className="bg-white min-h-[80px] border-gray-300 rounded-md"
+                              className="bg-white text-gray-700 min-h-[80px] border-gray-300 rounded-md"
                               placeholder="Nhập ghi chú"
                               {...field}
                             />
