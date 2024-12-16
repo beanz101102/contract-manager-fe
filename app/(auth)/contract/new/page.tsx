@@ -101,7 +101,7 @@ export default function ContractForm() {
     searchTerm,
     null
   )
-  console.log('selectedApprovalFlow', selectedApprovalFlow)
+  console.log("selectedApprovalFlow", selectedApprovalFlow)
   const customers = data?.users || []
 
   const { useListUsers: useListEmployees } = useUsers()
@@ -117,8 +117,10 @@ export default function ContractForm() {
     searchSignerTerm,
     null
   )
+
+  console.log("signersData", signersData)
   // const potentialSigners = signersData?.users || []
-  const potentialSigners = signersData?.users?.filter((user) => user.role !== "customer") || []
+  const potentialSigners = signersData?.users
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -758,8 +760,8 @@ export default function ContractForm() {
                                         <Plus className="ml-2 h-4 w-4 shrink-0 text-gray-500" />
                                       </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-[400px] p-0 shadow-lg border border-gray-200">
-                                      <Command>
+                                    <PopoverContent className="w-[400px] overflow-y-auto p-0 shadow-lg border border-gray-200">
+                                      <Command className="overflow-y-auto">
                                         <CommandInput
                                           placeholder="Tìm kiếm người ký..."
                                           value={searchSignerTerm}
@@ -771,10 +773,10 @@ export default function ContractForm() {
                                             ? "Đang tải..."
                                             : "Không tìm thấy người ký"}
                                         </CommandEmpty>
-                                        <CommandList>
+                                        <CommandList className="overflow-y-auto">
                                           <CommandGroup
                                             heading="Danh sách người ký"
-                                            className="text-sm text-gray-700"
+                                            className="text-sm text-gray-700 h-[300px] overflow-y-auto"
                                           >
                                             {potentialSigners
                                               ?.filter((user) => {
