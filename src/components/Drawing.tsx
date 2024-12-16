@@ -68,7 +68,7 @@ export const Drawing: React.FC<Props> = ({
         zIndex: 100000,
         WebkitUserSelect: "none",
         userSelect: "none",
-        border: "1px dashed grey"
+        // border: "1px dashed grey"
       }}
     >
       <Dimmer.Dimmable as={Div} dimmed={dimmerActive}>
@@ -114,7 +114,7 @@ export const Drawing: React.FC<Props> = ({
               transform={`scale(${scale})`}
             />
           </svg>
-          <div
+          {/* <div
             data-direction="top-left"
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
@@ -145,7 +145,7 @@ export const Drawing: React.FC<Props> = ({
               backgroundColor: "white",
               border: "1px solid grey",
             }}
-          />
+          /> */}
         </div>
       </Dimmer.Dimmable>
     </div>
