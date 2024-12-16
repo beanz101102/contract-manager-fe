@@ -35,6 +35,7 @@ export default function DashboardPage() {
       mapiContractStatus.ready_to_sign.label,
       mapiContractStatus.cancelled.label,
       mapiContractStatus.completed.label,
+      mapiContractStatus.rejected.label,
     ],
     datasets: [
       {
@@ -44,6 +45,7 @@ export default function DashboardPage() {
           statistics.details.ready_to_sign.count,
           statistics.details.cancelled.count,
           statistics.details.completed.count,
+          statistics.details.rejected.count,
         ],
         backgroundColor: [
           mapiContractStatus.draft.color.backgroundColor,
@@ -51,6 +53,7 @@ export default function DashboardPage() {
           mapiContractStatus.ready_to_sign.color.backgroundColor,
           mapiContractStatus.cancelled.color.backgroundColor,
           mapiContractStatus.completed.color.backgroundColor,
+          "#F3F4F6",
         ],
         borderColor: [
           mapiContractStatus.draft.color.color,
@@ -58,6 +61,7 @@ export default function DashboardPage() {
           mapiContractStatus.ready_to_sign.color.color,
           mapiContractStatus.cancelled.color.color,
           mapiContractStatus.completed.color.color,
+          "#4B5563",
         ],
         borderWidth: 1,
       },
@@ -81,45 +85,50 @@ export default function DashboardPage() {
 
       {/* Status Grid */}
       <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-        {Object.entries(statistics.details)
-          .filter(([status]) => status !== "rejected")
-          .map(([status, data]) => (
-            <div
-              key={status}
-              className="p-3 rounded-lg"
+        {Object.entries(statistics.details).map(([status, data]) => (
+          <div
+            key={status}
+            className="p-3 rounded-lg"
+            style={{
+              backgroundColor:
+                status === "rejected"
+                  ? "#F3F4F6"
+                  : mapiContractStatus[
+                      status as keyof typeof mapiContractStatus
+                    ]?.color.backgroundColor,
+            }}
+          >
+            <p
+              className="text-sm"
               style={{
-                backgroundColor:
-                  mapiContractStatus[status as keyof typeof mapiContractStatus]
-                    ?.color.backgroundColor,
+                color:
+                  status === "rejected"
+                    ? "#4B5563"
+                    : mapiContractStatus[
+                        status as keyof typeof mapiContractStatus
+                      ]?.color.color,
               }}
             >
-              <p
-                className="text-sm"
-                style={{
-                  color:
-                    mapiContractStatus[
-                      status as keyof typeof mapiContractStatus
-                    ]?.color.color,
-                }}
-              >
-                {
-                  mapiContractStatus[status as keyof typeof mapiContractStatus]
-                    ?.label
-                }
-              </p>
-              <p
-                className="text-lg font-semibold"
-                style={{
-                  color:
-                    mapiContractStatus[
-                      status as keyof typeof mapiContractStatus
-                    ]?.color.color,
-                }}
-              >
-                {data.count} ({data.percentage || "0%"})
-              </p>
-            </div>
-          ))}
+              {
+                mapiContractStatus[status as keyof typeof mapiContractStatus]
+                  ?.label
+              }
+            </p>
+            <p
+              className="text-lg font-semibold"
+              style={{
+                color:
+                  status === "rejected"
+                    ? "#4B5563"
+                    : mapiContractStatus[
+                        status as keyof typeof mapiContractStatus
+                      ]?.color.color,
+              }}
+            >
+              {data.count} ({data.percentage || "0%"})
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   )
