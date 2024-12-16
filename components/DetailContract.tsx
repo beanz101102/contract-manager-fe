@@ -108,8 +108,21 @@ const DetailContract = ({
                     {listFeedback?.length > 0 ? (
                       listFeedback?.map((feedback: any, index: number) => (
                         <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                          <div className="font-medium text-gray-900">
-                            {feedback.name}
+                          <div className="flex justify-between items-center">
+                            <div className="font-medium text-gray-900">
+                              {feedback.name}
+                            </div>
+                            <div
+                              className={`text-sm px-2 py-1 rounded ${
+                                feedback.tag === "revision_request"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}
+                            >
+                              {feedback.tag === "revision_request"
+                                ? "Yêu cầu chỉnh sửa"
+                                : "Phản hồi"}
+                            </div>
                           </div>
                           <div className="mt-1 text-gray-600">
                             {feedback.content}
