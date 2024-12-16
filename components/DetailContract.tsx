@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table"
 
 import { Button } from "./ui/button"
-import { Dialog, DialogContent } from "./ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 
 const DetailContract = ({
   id,
@@ -25,11 +25,17 @@ const DetailContract = ({
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }) => {
-  const { useContractDetail } = useContracts()
+  const { useContractDetail, useListFeedbackContract } = useContracts()
   const { data } = useContractDetail(id)
   const [activeTab, setActiveTab] = useState("info")
 
   const listProcess = [...(data?.approvals ?? []), ...(data?.signers ?? [])]
+
+  const { data: listFeedbackRes } = useListFeedbackContract(id)
+  const listFeedback = (listFeedbackRes as any)?.feedback
+  const [showFeedback, setShowFeedback] = useState(false)
+
+  console.log("listFeedback", listFeedback)
 
   useEffect(() => {
     return () => {
@@ -79,11 +85,59 @@ const DetailContract = ({
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-gray-500">Diễn giải:</span>
-                    <span>{data?.note}</span>
+                    <div className="flex gap-2">
+                      <span className="text-gray-500">Diễn giải:</span>
+                      <Button
+                        variant="link"
+                        className="p-0 h-auto text-blue-600 hover:text-blue-800"
+                        onClick={() => setShowFeedback(true)}
+                      >
+                        Xem phản hồi
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <Dialog open={showFeedback} onOpenChange={setShowFeedback}>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Danh sách phản hồi</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    {listFeedback?.length > 0 ? (
+                      listFeedback?.map((feedback: any, index: number) => (
+                        <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <div className="font-medium text-gray-900">
+                              {feedback.name}
+                            </div>
+                            <div
+                              className={`text-sm px-2 py-1 rounded ${
+                                feedback.tag === "revision_request"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-blue-100 text-blue-700"
+                              }`}
+                            >
+                              {feedback.tag === "revision_request"
+                                ? "Yêu cầu chỉnh sửa"
+                                : "Phản hồi"}
+                            </div>
+                          </div>
+                          <div className="mt-1 text-gray-600">
+                            {feedback.content}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center text-gray-500">
+                        Chưa có phản hồi nào
+                      </div>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-3">Quá trình xử lý</h3>
                 <Table>

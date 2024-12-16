@@ -24,9 +24,19 @@ const EditRequestModal = ({
   selectedEmployees: number[]
 }) => {
   const { user } = useAuth()
-  const { useApproveContract } = useContracts()
-  const { mutate: rejectContract } = useApproveContract()
   const [reason, setReason] = useState("")
+
+  const { useApproveContract, useFeedbackContract } = useContracts()
+  const { mutate: feedbackContract } = useFeedbackContract(true)
+
+  const { mutate: rejectContract } = useApproveContract(() => {
+    feedbackContract({
+      contractId: selectedEmployees[0],
+      name: user?.fullName ?? "",
+      content: reason,
+      tag: "revision_request",
+    })
+  })
 
   const handleReject = () => {
     rejectContract({
@@ -37,6 +47,7 @@ const EditRequestModal = ({
       status: "rejected",
       approverId: user?.id || 0,
     })
+
     onOpenChange(false)
   }
 

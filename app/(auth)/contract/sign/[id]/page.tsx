@@ -25,6 +25,7 @@ export default function ContractForm() {
   const { useContractDetail } = useContracts()
   const router = useRouter()
   const { data } = useContractDetail(Number(params.id))
+  const [feedback, setFeedback] = useState("")
 
   const { useSignContract } = useContracts()
   const { mutate: signContract } = useSignContract()
@@ -34,6 +35,17 @@ export default function ContractForm() {
   const [otp, setOtp] = useState("")
   const { useSendOtp } = useContracts()
   const { mutate: sendOtp } = useSendOtp()
+  const { useFeedbackContract } = useContracts()
+  const { mutate: feedbackContract } = useFeedbackContract()
+
+  const handleFeedback = (content: string) => {
+    feedbackContract({
+      contractId: Number(params.id),
+      name: user?.fullName ?? "",
+      content: content,
+      tag: "feedback",
+    })
+  }
 
   useEffect(() => {
     if (file) {
@@ -91,6 +103,12 @@ export default function ContractForm() {
       // You might want to add some error handling here
     }
   }
+
+  useEffect(() => {
+    return () => {
+      setFeedback("")
+    }
+  }, [])
 
   return (
     <>
@@ -151,6 +169,8 @@ export default function ContractForm() {
                     Ghi chú
                   </Label>
                   <Textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
                     className="min-h-[100px] md:min-h-[120px] resize-none bg-white border-gray-200 text-gray-900 focus:border-primary focus:ring-primary text-sm md:text-base"
                     placeholder="Nhập ghi chú..."
                   />
@@ -160,7 +180,11 @@ export default function ContractForm() {
           </div>
 
           <div className="flex flex-col gap-3 md:gap-4 mt-6 md:mt-8">
-            <Button className="w-full py-4 md:py-6 text-sm md:text-base font-medium">
+            <Button
+              className="w-full py-4 md:py-6 text-sm md:text-base font-medium"
+              onClick={() => handleFeedback(feedback)}
+              disabled={feedback?.trim() === ""}
+            >
               <Send className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5" />
               Gửi phản hồi
             </Button>

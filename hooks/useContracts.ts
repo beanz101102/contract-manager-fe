@@ -242,7 +242,7 @@ export const useContracts = () => {
     })
   }
 
-  const useApproveContract = () => {
+  const useApproveContract = (onSuccess?: () => void) => {
     return useMutation({
       mutationFn: async (payload: {
         contracts: Array<{
@@ -258,6 +258,7 @@ export const useContracts = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["contracts"] })
         toast.success("Duyệt hợp đồng thành công")
+        onSuccess?.()
       },
       onError: (error: any) => {
         toast.error(error.response.data.message)
@@ -450,6 +451,42 @@ export const useContracts = () => {
     })
   }
 
+  const useFeedbackContract = (isNoToast?: boolean) => {
+    return useMutation({
+      mutationFn: async (payload: {
+        contractId: number
+        name: string
+        content: string
+        tag: "revision_request" | "feedback"
+      }) => {
+        const response = await api.post("/api/contract/add-feedback", payload)
+        return response.data
+      },
+      onSuccess: () => {
+        if (!isNoToast) {
+          toast.success("Gửi phản hồi thành công")
+        }
+      },
+      onError: (error: any) => {
+        if (!isNoToast) {
+          toast.error(error.response.data.message)
+        }
+      },
+    })
+  }
+
+  const useListFeedbackContract = (contractId: number) => {
+    return useQuery({
+      queryKey: ["get-feedback", contractId],
+      queryFn: async () => {
+        const response = await api.post(`/api/contract/get-feedback`, {
+          contractId,
+        })
+        return response.data
+      },
+    })
+  }
+
   return {
     useAllContracts,
     useContractDetail,
@@ -468,5 +505,7 @@ export const useContracts = () => {
     useCustomerReport,
     useAdvancedStatistics,
     useSendOtp,
+    useFeedbackContract,
+    useListFeedbackContract,
   }
 }
