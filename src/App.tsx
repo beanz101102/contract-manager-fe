@@ -111,46 +111,57 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
 
   const normalizePath = (path: string) => {
     // Tách các điểm từ path
-    const points = path.split(/[MLZ]/).filter(Boolean)
-      .map(point => point.trim().split(',')
-      .map(coord => coord.split(' ').map(Number).filter(Boolean)))
+    const points = path
+      .split(/[MLZ]/)
+      .filter(Boolean)
+      .map((point) =>
+        point
+          .trim()
+          .split(",")
+          .map((coord) => coord.split(" ").map(Number).filter(Boolean))
+      )
       .flat()
-      .filter(coord => coord.length === 2);
+      .filter((coord) => coord.length === 2)
 
     // Tìm giá trị min, max
-    let minX = Infinity, minY = Infinity;
-    let maxX = -Infinity, maxY = -Infinity;
+    let minX = Infinity,
+      minY = Infinity
+    let maxX = -Infinity,
+      maxY = -Infinity
 
     points.forEach(([x, y]) => {
-      minX = Math.min(minX, x);
-      minY = Math.min(minY, y);
-      maxX = Math.max(maxX, x);
-      maxY = Math.max(maxY, y);
-    });
+      minX = Math.min(minX, x)
+      minY = Math.min(minY, y)
+      maxX = Math.max(maxX, x)
+      maxY = Math.max(maxY, y)
+    })
 
     // Chuẩn hóa path
-    const normalizedPath = path.replace(/(\d+(\.\d+)?)\s+(\d+(\.\d+)?)/g, (match, x, _, y) => {
-      const newX = Number(x) - minX;
-      const newY = Number(y) - minY;
-      return `${newX} ${newY}`;
-    });
+    const normalizedPath = path.replace(
+      /(\d+(\.\d+)?)\s+(\d+(\.\d+)?)/g,
+      (match, x, _, y) => {
+        const newX = Number(x) - minX
+        const newY = Number(y) - minY
+        return `${newX} ${newY}`
+      }
+    )
 
     return {
       path: normalizedPath,
       width: maxX - minX,
-      height: maxY - minY
-    };
-  };
+      height: maxY - minY,
+    }
+  }
 
   const addDrawing = (drawing?: {
     width: number
     height: number
     path: string
   }) => {
-    if (!drawing) return;
+    if (!drawing) return
 
-    const SCALE_FACTOR = 0.15;
-    const normalized = normalizePath(drawing.path);
+    const SCALE_FACTOR = 0.15
+    const normalized = normalizePath(drawing.path)
 
     const newDrawingAttachment: DrawingAttachment = {
       id: ggID(),
@@ -161,9 +172,9 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
       x: 0,
       y: 0,
       scale: 1,
-    };
-    addAttachment(newDrawingAttachment);
-  };
+    }
+    addAttachment(newDrawingAttachment)
+  }
 
   useLayoutEffect(() => setPageIndex(pageIndex), [pageIndex, setPageIndex])
 
@@ -192,10 +203,14 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
       />
     </>
   )
-
   const handleSaveToServer = async () => {
-    const file = await newFile(allPageAttachments)
-    setFile(file || null)
+    try {
+      const file = await newFile(allPageAttachments)
+      setFile(file || null)
+    } catch (error) {
+      console.error("Error saving file:", error)
+      setFile(null)
+    }
   }
   const handleDownloadPdf = () => savePdf(allPageAttachments)
 

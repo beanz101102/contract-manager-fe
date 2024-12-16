@@ -62,7 +62,7 @@ export const usePdf = () => {
   }
 
   const newFile = async (attachments: Attachments[]) => {
-    if (isSaving || !file) return
+    if (isSaving || !file || !name) return
 
     setIsSaving(true)
     try {

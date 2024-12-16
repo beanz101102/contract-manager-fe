@@ -59,6 +59,39 @@ export default function ContractForm() {
     setOtp("")
   }
 
+  const handleDownload = async () => {
+    try {
+      if (file) {
+        // Download the signed file
+        const url = URL.createObjectURL(file)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `signed_contract_${params.id}.pdf` // You can customize the filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      } else if (data?.pdfFilePath) {
+        // Download the original PDF
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}${data.pdfFilePath}`
+        )
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `contract_${params.id}.pdf` // You can customize the filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error("Error downloading file:", error)
+      // You might want to add some error handling here
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col md:flex-row min-h-screen">
@@ -131,7 +164,10 @@ export default function ContractForm() {
               <Send className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5" />
               Gửi phản hồi
             </Button>
-            <Button className="w-full py-4 md:py-6 text-sm md:text-base font-medium">
+            <Button
+              className="w-full py-4 md:py-6 text-sm md:text-base font-medium"
+              onClick={handleDownload}
+            >
               <Download className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5" />
               Tải về
             </Button>
