@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useAuth } from "@/contexts/auth-context"
 import { Pencil, Trash2 } from "lucide-react"
 
 import { DepartmentList } from "@/types/api"
@@ -38,6 +39,7 @@ export default function DepartmentPage() {
   const [description, setDescription] = useState("")
   const [selectedDepartment, setSelectedDepartment] =
     useState<DepartmentList | null>(null)
+  const { user } = useAuth()
 
   const { mutate: updateDepartment, isPending: isUpdating } =
     useUpdateDepartment(() => {
@@ -68,7 +70,7 @@ export default function DepartmentPage() {
                 <TableHead>Mô tả</TableHead>
                 <TableHead>Ngày tạo</TableHead>
                 <TableHead>Ngày cập nhật</TableHead>
-                <TableHead>Thao tác</TableHead>
+                {user?.role === "admin" && <TableHead>Thao tác</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -87,30 +89,32 @@ export default function DepartmentPage() {
                   <TableCell>
                     {new Date(dept.updatedAt).toLocaleDateString("vi-VN")}
                   </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedDepartment(dept)
-                          setIsEditModalOpen(true)
-                        }}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedDepartment(dept)
-                          setIsDeleteModalOpen(true)
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  {user?.role === "admin" && (
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedDepartment(dept)
+                            setIsEditModalOpen(true)
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedDepartment(dept)
+                            setIsDeleteModalOpen(true)
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
