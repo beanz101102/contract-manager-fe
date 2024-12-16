@@ -110,22 +110,32 @@ export const Image = ({
     event.preventDefault();
 
     if (mouseDown) {
+      const minSize = 50;
+      
       if (direction.includes('left')) {
-        setPositionLeft(positionLeft + event.movementX);
-        setCanvasWidth(canvasWidth - event.movementX);
+        const newWidth = Math.max(minSize, canvasWidth - event.movementX);
+        if (newWidth >= minSize) {
+          setPositionLeft(positionLeft + event.movementX);
+          setCanvasWidth(newWidth);
+        }
       }
 
       if (direction.includes('top')) {
-        setPositionTop(positionTop + event.movementY);
-        setCanvasHeight(canvasHeight - event.movementY);
+        const newHeight = Math.max(minSize, canvasHeight - event.movementY);
+        if (newHeight >= minSize) {
+          setPositionTop(positionTop + event.movementY);
+          setCanvasHeight(newHeight);
+        }
       }
 
       if (direction.includes('right')) {
-        setCanvasWidth(canvasWidth + event.movementX);
+        const newWidth = Math.max(minSize, canvasWidth + event.movementX);
+        setCanvasWidth(newWidth);
       }
 
       if (direction.includes('bottom')) {
-        setCanvasHeight(canvasHeight + event.movementY);
+        const newHeight = Math.max(minSize, canvasHeight + event.movementY);
+        setCanvasHeight(newHeight);
       }
     }
   };
