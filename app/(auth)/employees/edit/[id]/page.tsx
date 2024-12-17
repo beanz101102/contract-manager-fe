@@ -472,6 +472,20 @@ export default function EditEmployeeInformationForm() {
                     </p>
                   )}
                 </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700">Số điện thoại (*)</Label>
+                  <Input
+                    {...form.register("phone")}
+                    className="bg-white border-gray-300"
+                    placeholder="Số điện thoại"
+                  />
+                  {form.formState.errors.phone && (
+                    <p className="text-red-500 text-sm">
+                      {form.formState.errors.phone.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
