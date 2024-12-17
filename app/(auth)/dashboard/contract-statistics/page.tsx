@@ -79,35 +79,44 @@ export default function ContractDashboard() {
 
   const pieData = React.useMemo(() => {
     if (!data) return []
+    const summaryData = {
+      completed: data?.summary?.byStatus?.completed ?? 0,
+      pending_approval: data?.summary?.byStatus?.pending_approval ?? 0,
+      rejected: data?.summary?.byStatus?.rejected ?? 0,
+      draft: data?.summary?.byStatus?.draft ?? 0,
+      ready_to_sign: data?.summary?.byStatus?.ready_to_sign ?? 0,
+      cancelled: data?.summary?.byStatus?.cancelled ?? 0,
+    }
+
     return [
       {
-        name: "Hoàn thành",
-        value: data?.summary?.byStatus?.completed ?? 0,
+        name: summaryData?.completed !== 0 ? "Hoàn thành" : "",
+        value: summaryData?.completed ?? 0,
         color: "#4ade80", // green
       },
       {
-        name: "Chờ duyệt",
-        value: data?.summary?.byStatus?.pending_approval ?? 0,
+        name: summaryData?.pending_approval !== 0 ? "Chờ duyệt" : "",
+        value: summaryData?.pending_approval ?? 0,
         color: "#facc15", // yellow
       },
       {
-        name: "Từ chối",
-        value: data?.summary?.byStatus?.rejected ?? 0,
+        name: summaryData?.rejected !== 0 ? "Từ chối" : "",
+        value: summaryData?.rejected ?? 0,
         color: "#f43f5e", // rose
       },
       {
-        name: "Mới",
-        value: data?.summary?.byStatus?.draft ?? 0,
+        name: summaryData?.draft !== 0 ? "Mới" : "",
+        value: summaryData?.draft ?? 0,
         color: "#94a3b8", // slate
       },
       {
-        name: "Sẵn sàng ký",
-        value: data?.summary?.byStatus?.ready_to_sign ?? 0,
+        name: summaryData?.ready_to_sign !== 0 ? "Sẵn sàng ký" : "",
+        value: summaryData?.ready_to_sign ?? 0,
         color: "#60a5fa", // blue
       },
       {
-        name: "Đã hủy",
-        value: data?.summary?.byStatus?.cancelled ?? 0,
+        name: summaryData?.cancelled !== 0 ? "Đã hủy" : "",
+        value: summaryData?.cancelled ?? 0,
         color: "#f87171", // red
       },
     ]
@@ -250,8 +259,11 @@ export default function ContractDashboard() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Tất cả</SelectItem>
+                      <SelectItem value="draft">Mới</SelectItem>
                       <SelectItem value="completed">Đã hoàn thành</SelectItem>
-                      <SelectItem value="pending">Đang ký</SelectItem>
+                      <SelectItem value="pending_approval">Đợi duyệt</SelectItem>
+                      <SelectItem value="ready_to_sign">Đợi ký</SelectItem>
+                      <SelectItem value="rejected">Yêu cầu sửa</SelectItem>
                       <SelectItem value="cancelled">Bị hủy</SelectItem>
                     </SelectContent>
                   </Select>
