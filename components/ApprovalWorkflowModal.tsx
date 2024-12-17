@@ -90,7 +90,7 @@ const ApprovalWorkflowModal = ({
   }, [isOpen])
 
   const { useListUsers } = useUsers()
-  const { data, isLoading } = useListUsers(null, 1, 20, searchTerm, null)
+  const { data, isLoading } = useListUsers(null, 1, 2000, searchTerm, null)
   const users = data?.users?.filter((user) => user.role !== "customer") || []
 
   const { useAddApprovalFlow, useUpdateApprovalFlow } = useApprovalFlows()
@@ -262,27 +262,37 @@ const ApprovalWorkflowModal = ({
                             </CommandEmpty>
                             <CommandList>
                               <CommandGroup heading="Danh sách người duyệt">
-                                {users?.map((user: User) => (
-                                  <CommandItem
-                                    key={user.id}
-                                    value={user.fullName}
-                                    onSelect={() => {
-                                      setApprovalSteps((prev) =>
-                                        prev.map((s, i) =>
-                                          i === index
-                                            ? { ...s, approver: user }
-                                            : s
-                                        )
+                                {users
+                                  .filter(
+                                    (user: User) =>
+                                      // Filter out users that are already selected as approvers in any step
+                                      !approvalSteps.some(
+                                        (step) => step.approver?.id === user.id
                                       )
-                                      setOpenUserSelect((prev) => ({
-                                        ...prev,
-                                        [index]: false,
-                                      }))
-                                    }}
-                                  >
-                                    {user.fullName}
-                                  </CommandItem>
-                                ))}
+                                  )
+                                  .map((user: User) => (
+                                    <CommandItem
+                                      key={user.id}
+                                      value={user.fullName}
+                                      onSelect={() => {
+                                        setApprovalSteps((prev) =>
+                                          prev.map((s, i) =>
+                                            i === index
+                                              ? { ...s, approver: user }
+                                              : s
+                                          )
+                                        )
+                                        setOpenUserSelect((prev) => ({
+                                          ...prev,
+                                          [index]: false,
+                                        }))
+                                      }}
+                                    >
+                                      <p className="text-sm text-gray-700">
+                                        {user.fullName}
+                                      </p>
+                                    </CommandItem>
+                                  ))}
                               </CommandGroup>
                             </CommandList>
                           </Command>

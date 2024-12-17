@@ -1,10 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context"
 import AppPDF from "@/src/App"
-import { ArrowLeft, Download, Menu, Send } from "lucide-react"
+import { ArrowLeft, Download, Send } from "lucide-react"
 
 import { useContracts } from "@/hooks/useContracts"
 import { useUsers } from "@/hooks/useUsers"
@@ -23,6 +22,8 @@ import { Textarea } from "@/components/ui/textarea"
 
 export default function ContractForm() {
   const params = useParams()
+  const [isSaveFile, setIsSaveFile] = useState(false)
+
   const { useContractDetail } = useContracts()
   const router = useRouter()
   const { data } = useContractDetail(Number(params.id))
@@ -52,6 +53,67 @@ export default function ContractForm() {
     })
     setShowOtpModal(false)
     setOtp("")
+  }
+
+  const handleDownload = async () => {
+    try {
+      if (file) {
+        // Download the signed file
+        const url = URL.createObjectURL(file)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `signed_contract_${params.id}.pdf` // You can customize the filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      } else if (data?.pdfFilePath) {
+        // Download the original PDF
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}${data.pdfFilePath}`
+        )
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `contract_${params.id}.pdf` // You can customize the filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error("Error downloading file:", error)
+      // You might want to add some error handling here
+    }
+  }
+
+  const [feedback, setFeedback] = useState("")
+
+  useEffect(() => {
+    if (file) {
+      setIsSaveFile(true)
+    } else {
+      setIsSaveFile(false)
+    }
+  }, [file])
+
+  useEffect(() => {
+    return () => {
+      setFeedback("")
+    }
+  }, [])
+
+  const { useFeedbackContract } = useContracts()
+  const { mutate: feedbackContract } = useFeedbackContract()
+
+  const handleFeedback = (content: string) => {
+    feedbackContract({
+      contractId: Number(params.id),
+      name: userDetails?.fullName ?? "",
+      content: content,
+      tag: "feedback",
+    })
   }
 
   return (
@@ -126,6 +188,8 @@ export default function ContractForm() {
                     Ghi chú
                   </Label>
                   <Textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
                     className="min-h-[120px] resize-none bg-white border-gray-200 text-gray-900 focus:border-primary focus:ring-primary"
                     placeholder="Nhập ghi chú..."
                   />
@@ -135,17 +199,25 @@ export default function ContractForm() {
           </div>
 
           <div className="flex flex-col gap-4 mt-8">
-            <Button className="w-full py-6 text-base font-medium">
+            <Button
+              className="w-full py-6 text-base font-medium"
+              onClick={() => handleFeedback(feedback)}
+              disabled={feedback?.trim() === ""}
+            >
               <Send className="mr-3 h-5 w-5" />
               Gửi phản hồi
             </Button>
-            <Button className="w-full py-6 text-base font-medium">
+            <Button
+              className="w-full py-6 text-base font-medium"
+              onClick={handleDownload}
+            >
               <Download className="mr-3 h-5 w-5" />
               Tải về
             </Button>
             <Button
               className="w-full py-6 text-base font-medium"
               onClick={handleSign}
+              disabled={!isSaveFile}
             >
               Xác nhận ký
             </Button>
