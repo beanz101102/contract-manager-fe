@@ -1,14 +1,14 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
 import { Download, Plus, Send, Trash2 } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
 
-import DetailContract from "@/components/DetailContract"
-import { PaginationDemo } from "@/components/Pagination"
+import { ContractList, mapiContractStatus2 } from "@/types/api"
+import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -29,8 +29,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useContracts } from "@/hooks/useContracts"
-import { ContractList, mapiContractStatus2 } from "@/types/api"
+import DetailContract from "@/components/DetailContract"
+import { PaginationDemo } from "@/components/Pagination"
 
 const contractListAtom = atom<ContractList[]>([])
 
@@ -47,7 +47,7 @@ export default function IndividualManagement() {
   } = useContracts()
   const [page, setPage] = useState(1)
   const { user } = useAuth()
-  const userId = user?.position === 'Giám đốc' ? null : user?.id;
+  const userId = user?.id
   const {
     data: contracts,
     isLoading,
