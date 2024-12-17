@@ -112,7 +112,7 @@ export default function ContractDashboard() {
         color: "#4ade80", // green
       },
       {
-        name: summaryData?.pending_approval !== 0 ? "Ch��� duyệt" : "",
+        name: summaryData?.pending_approval !== 0 ? "Chờ duyệt" : "",
         value: summaryData?.pending_approval ?? 0,
         color: "#facc15", // yellow
       },
@@ -219,10 +219,10 @@ export default function ContractDashboard() {
         </Button>
       </div>
       <div ref={targetRef}>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div>
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className='col-span-1'>
             <div className="grid gap-4 mb-6">
-              <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Thời gian
@@ -436,7 +436,7 @@ export default function ContractDashboard() {
             </div>
           </div>
 
-          <Card className="bg-white rounded-[10px] shadow-lg">
+          <Card className="bg-white rounded-[10px] shadow-lg col-span-2">
             <CardHeader>
               <CardTitle className="text-black">
                 Thống kê trạng thái hợp đồng
@@ -451,15 +451,15 @@ export default function ContractDashboard() {
                       cx="50%"
                       cy="50%"
                       labelLine={true}
-                      label={({ name, percent }) =>
-                        `${name} (${(percent * 100).toFixed(1)}%)`
+                      label={({ name, percent, value }) =>
+                        `${name}(${value}) - ${(percent * 100).toFixed(1)}%`
                       }
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
                     >
                       {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                        <Cell key={`cell-${index}`} fill={entry.color}>{entry.value}</Cell>
                       ))}
                     </Pie>
                     <Tooltip />
