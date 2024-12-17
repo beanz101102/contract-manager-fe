@@ -293,7 +293,7 @@ export default function ContractForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-gray-700">
-                            Ng��ời tạo
+                            Người tạo
                           </FormLabel>
                           <FormControl>
                             <Input
