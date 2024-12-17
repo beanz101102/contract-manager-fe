@@ -1,9 +1,9 @@
 "use client"
 
+import { useAuth } from "@/contexts/auth-context"
+import { Building2, FileText, List, User, Users } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context"
-import { Building2, FileText, List, User, UserPlus, Users } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 

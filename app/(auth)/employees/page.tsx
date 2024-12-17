@@ -190,37 +190,37 @@ export default function EmployeeList() {
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
-                  <TableHead className="w-[60px] text-gray-700 font-semibold">
+                  <TableHead className="w-[50px] text-gray-700 font-semibold">
                     STT
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[200px] text-gray-700 font-semibold">
                     Mã nhân viên
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[200px] text-gray-700 font-semibold">
                     Tên nhân viên
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[150px] text-gray-700 font-semibold">
                     Phòng ban
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[150px] text-gray-700 font-semibold">
                     Chức vụ
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[150px] text-gray-700 font-semibold">
                     Ngày sinh
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[150px] text-gray-700 font-semibold">
                     Giới tính
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[150px] text-gray-700 font-semibold">
                     Số CCCD
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[200px] text-gray-700 font-semibold">
                     Số điện thoại
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[200px] text-gray-700 font-semibold">
                     Địa chỉ email
                   </TableHead>
-                  <TableHead className="text-gray-700 font-semibold">
+                  <TableHead className="w-[300px] text-gray-700 font-semibold">
                     Tài khoản và mật khẩu
                   </TableHead>
                   {user?.role === "admin" && (

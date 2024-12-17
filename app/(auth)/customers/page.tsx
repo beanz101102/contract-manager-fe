@@ -145,34 +145,34 @@ export default function CustomerList() {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[60px] text-gray-700 font-semibold">
                   STT
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[150px] text-gray-700 font-semibold">
                   Mã khách hàng
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[200px] text-gray-700 font-semibold">
                   Tên khách hàng
                 </TableHead>
                 <TableHead className="text-gray-700 font-semibold">
                   Ngày sinh
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[100px] text-gray-700 font-semibold">
                   Giới tính
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[150px] text-gray-700 font-semibold">
                   Số CCCD
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[150px] text-gray-700 font-semibold">
                   Số điện thoại
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[200px] text-gray-700 font-semibold">
                   Email
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[250px] text-gray-700 font-semibold">
                   Địa chỉ
                 </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
+                <TableHead className="w-[100px] text-gray-700 font-semibold">
                   Thao tác
                 </TableHead>
               </TableRow>
