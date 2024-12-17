@@ -102,7 +102,7 @@ export default function EditEmployeeInformationForm() {
         phone: user.phoneNumber || "",
         email: user.email || "",
         department: user.department?.departmentName || "",
-        position: user.position || "",
+        position: user.role || "",
         account: user.username || "",
         password: user.passwordHash || "",
       })
