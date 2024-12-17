@@ -102,11 +102,13 @@ function DropdownMenu() {
           </AccordionTrigger>
           <AccordionContent>
             <ul className="space-y-1 px-2">
-              <Link href="/contract/search">
-                <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
-                  Tra cứu hợp đồng
-                </li>
-              </Link>
+              {(user?.role === "admin" || user?.role === "manager") && (
+                <Link href="/contract/search">
+                  <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
+                    Tra cứu hợp đồng
+                  </li>
+                </Link>
+              )}
               <Link href="/contract/personal">
                 <li className="text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md px-4 py-2 transition-colors">
                   Cá nhân quản lý
