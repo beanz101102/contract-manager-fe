@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useAuth } from "@/contexts/auth-context"
-import AppPDF from "@/src/App"
 import { atom, useAtom } from "jotai"
 import { Plus, Trash2 } from "lucide-react"
-import InfiniteScroll from "react-infinite-scroll-component"
 
-import { departmentConfigs, mappingRole } from "@/types/api"
+import { mappingRole } from "@/types/api"
 import { User } from "@/types/auth"
 import { useDepartment } from "@/hooks/useDepartment"
 import { useUsers } from "@/hooks/useUsers"
@@ -32,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { PaginationDemo } from "@/components/Pagination"
 
 const listUsersEmployeesAtom = atom<User[]>([])
 
@@ -39,7 +38,6 @@ export default function EmployeeList() {
   const [searchTerm, setSearchTerm] = useState("")
   const [department, setDepartment] = useState("all")
   const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
-  const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
   const { user } = useAuth()
   const { useListDepartments } = useDepartment()
@@ -73,11 +71,8 @@ export default function EmployeeList() {
   const filteredEmployees = employees?.users || []
 
   useEffect(() => {
-    setHasMore(filteredEmployees?.length >= 10)
-    if (page === 1) {
+    if (filteredEmployees) {
       setListUsersEmployees(filteredEmployees)
-    } else {
-      setListUsersEmployees([...listUsersEmployees, ...filteredEmployees])
     }
   }, [filteredEmployees])
 
@@ -169,179 +164,175 @@ export default function EmployeeList() {
       </div>
 
       <div className="overflow-x-auto">
-        <InfiniteScroll
-          dataLength={listUsersEmployees?.length}
-          next={() => setPage(page + 1)}
-          hasMore={hasMore}
-          loader={null}
-          className="min-w-full"
-        >
-          <div className="min-w-[2000px] w-full">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-gray-50 bg-gray-100">
-                  <TableHead className="w-[50px]">
-                    <Checkbox
-                      checked={
-                        selectedEmployees.length ===
-                          listUsersEmployees?.length &&
-                        listUsersEmployees?.length > 0
-                      }
-                      onCheckedChange={handleSelectAll}
-                    />
+        <div className="min-w-[2000px] w-full">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-gray-50 bg-gray-100">
+                <TableHead className="w-[50px]">
+                  <Checkbox
+                    checked={
+                      selectedEmployees.length === listUsersEmployees?.length &&
+                      listUsersEmployees?.length > 0
+                    }
+                    onCheckedChange={handleSelectAll}
+                  />
+                </TableHead>
+                <TableHead className="w-[60px] text-gray-700 font-semibold">
+                  STT
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Mã nhân viên
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Tên nhân viên
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Phòng ban
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Chức vụ
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Ngày sinh
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Giới tính
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Số CCCD
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Số điện thoại
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Địa chỉ email
+                </TableHead>
+                <TableHead className="text-gray-700 font-semibold">
+                  Tài khoản và mật khẩu
+                </TableHead>
+                {user?.role === "admin" && (
+                  <TableHead className="text-gray-700 font-semibold">
+                    Thao tác
                   </TableHead>
-                  <TableHead className="w-[50px] text-gray-700 font-semibold">
-                    STT
-                  </TableHead>
-                  <TableHead className="w-[200px] text-gray-700 font-semibold">
-                    Mã nhân viên
-                  </TableHead>
-                  <TableHead className="w-[200px] text-gray-700 font-semibold">
-                    Tên nhân viên
-                  </TableHead>
-                  <TableHead className="w-[150px] text-gray-700 font-semibold">
-                    Phòng ban
-                  </TableHead>
-                  <TableHead className="w-[150px] text-gray-700 font-semibold">
-                    Chức vụ
-                  </TableHead>
-                  <TableHead className="w-[150px] text-gray-700 font-semibold">
-                    Ngày sinh
-                  </TableHead>
-                  <TableHead className="w-[150px] text-gray-700 font-semibold">
-                    Giới tính
-                  </TableHead>
-                  <TableHead className="w-[150px] text-gray-700 font-semibold">
-                    Số CCCD
-                  </TableHead>
-                  <TableHead className="w-[200px] text-gray-700 font-semibold">
-                    Số điện thoại
-                  </TableHead>
-                  <TableHead className="w-[200px] text-gray-700 font-semibold">
-                    Địa chỉ email
-                  </TableHead>
-                  <TableHead className="w-[300px] text-gray-700 font-semibold">
-                    Tài khoản và mật khẩu
-                  </TableHead>
-                  {user?.role === "admin" && (
-                    <TableHead className="text-gray-700 font-semibold">
-                      Thao tác
-                    </TableHead>
-                  )}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {listUsersEmployees.length === 0 ? (
-                  <TableRow className="hover:bg-transparent">
-                    <TableCell
-                      colSpan={12}
-                      className="text-center py-12 md:py-16"
-                    >
-                      <div className="flex flex-col items-center gap-3">
-                        {isLoading ? (
-                          <Loading />
-                        ) : (
-                          <>
-                            <NextImage
-                              src="/empty-state.png"
-                              alt="No data"
-                              className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] opacity-40"
-                            />
-                            <p className="text-gray-500 text-sm md:text-base">
-                              Không có dữ liệu nhân viên
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  listUsersEmployees.map((employee, index) => (
-                    <TableRow
-                      key={employee.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedEmployees.includes(employee.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              handleSelectOne(employee.id)
-                            } else {
-                              handleSelectOne(employee.id)
-                            }
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {index + 1}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.code}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.fullName}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee?.department?.departmentName}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {
-                          mappingRole[
-                            employee?.role as keyof typeof mappingRole
-                          ]
-                        }
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.dateOfBirth}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.gender}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.idNumber}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.phoneNumber}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.email}
-                      </TableCell>
-                      <TableCell className="text-gray-700 text-sm md:text-base">
-                        {employee.username}
-                        <br />
-                        *************
-                      </TableCell>
-                      {user?.role === "admin" && (
-                        <TableCell>
-                          <div className="flex gap-2 md:gap-3">
-                            <Link href={`/employees/edit/${employee.id}`}>
-                              <NextImage
-                                src="/edit.png"
-                                alt="edit"
-                                className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
-                              />
-                            </Link>
-                            <div
-                              onClick={() => deleteUser([employee.id])}
-                              className="cursor-pointer"
-                            >
-                              <NextImage
-                                src="/trash.png"
-                                alt="trash"
-                                className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
-                              />
-                            </div>
-                          </div>
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))
                 )}
-              </TableBody>
-            </Table>
-          </div>
-        </InfiniteScroll>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {listUsersEmployees.length === 0 ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell
+                    colSpan={12}
+                    className="text-center py-12 md:py-16"
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      {isLoading ? (
+                        <Loading />
+                      ) : (
+                        <>
+                          <NextImage
+                            src="/empty-state.png"
+                            alt="No data"
+                            className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] opacity-40"
+                          />
+                          <p className="text-gray-500 text-sm md:text-base">
+                            Không có dữ liệu nhân viên
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                listUsersEmployees.map((employee, index) => (
+                  <TableRow
+                    key={employee.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedEmployees.includes(employee.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            handleSelectOne(employee.id)
+                          } else {
+                            handleSelectOne(employee.id)
+                          }
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {(page - 1) * 10 + index + 1}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.code}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.fullName}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee?.department?.departmentName}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {mappingRole[employee?.role as keyof typeof mappingRole]}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.dateOfBirth}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.gender}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.idNumber}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.phoneNumber}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.email}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm md:text-base">
+                      {employee.username}
+                      <br />
+                      *************
+                    </TableCell>
+                    {user?.role === "admin" && (
+                      <TableCell>
+                        <div className="flex gap-2 md:gap-3">
+                          <Link href={`/employees/edit/${employee.id}`}>
+                            <NextImage
+                              src="/edit.png"
+                              alt="edit"
+                              className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
+                            />
+                          </Link>
+                          <div
+                            onClick={() => deleteUser([employee.id])}
+                            className="cursor-pointer"
+                          >
+                            <NextImage
+                              src="/trash.png"
+                              alt="trash"
+                              className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
+                            />
+                          </div>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          {listUsersEmployees?.length > 0 && (
+            <div className="flex justify-center md:justify-end mt-4 w-full md:w-fit md:ml-auto">
+              <PaginationDemo
+                currentPage={page}
+                totalPages={employees?.lastPage ?? 1}
+                onChangePage={setPage}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -1,16 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/dist/client/router"
 import { useAuth } from "@/contexts/auth-context"
-import { TabsList } from "@radix-ui/react-tabs"
 import dayjs from "dayjs"
 import { atom, useAtom } from "jotai"
 import { Check, Download, Info, Pencil } from "lucide-react"
-import toast from "react-hot-toast"
-import InfiniteScroll from "react-infinite-scroll-component"
 
 import { ContractList, mapiContractStatus } from "@/types/api"
+import { downloadFile } from "@/lib/utils"
 import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -22,7 +19,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Loading } from "@/components/ui/loading"
 import NextImage from "@/components/ui/next-img"
 import {
@@ -33,8 +29,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsTrigger } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
 import DetailContract from "@/components/DetailContract"
 import { PaginationDemo } from "@/components/Pagination"
 import EditRequestModal from "@/components/modals/EditRequestModal"
@@ -93,6 +87,25 @@ export default function ContractApproval() {
   const [isOpenEditRequest, setIsOpenEditRequest] = useState(false)
   const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
 
+  const handleDownloadContracts = async () => {
+    if (selectedEmployees.length === 0) return
+
+    // Download files for selected contracts
+    const selectedContracts = contractList.filter((contract) =>
+      selectedEmployees.includes(contract.id)
+    )
+
+    // Download each selected contract's file
+    for (const contract of selectedContracts) {
+      if (contract.pdfFilePath) {
+        await downloadFile(
+          `${process.env.NEXT_PUBLIC_API_URL}${contract.pdfFilePath}`,
+          `Contract-${contract.contractNumber}.pdf`
+        )
+      }
+    }
+  }
+
   return (
     <>
       <div className="bg-white rounded-lg p-4 md:p-6">
@@ -114,16 +127,22 @@ export default function ContractApproval() {
             <Button
               className="flex-1 md:flex-none bg-[#4BC5BE] rounded text-white hover:bg-[#2ea39d]"
               onClick={() => setIsOpen(true)}
+              disabled={selectedEmployees.length === 0}
             >
               <Check className="w-4 h-4" /> Duyệt hợp đồng
             </Button>
             <Button
               className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
               onClick={() => setIsOpenEditRequest(true)}
+              disabled={selectedEmployees.length === 0}
             >
               <Pencil className="w-4 h-4" /> Yêu cầu sửa
             </Button>
-            <Button className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+            <Button
+              className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
+              onClick={handleDownloadContracts}
+              disabled={selectedEmployees.length === 0}
+            >
               <Download className="w-4 h-4" /> Tải
             </Button>
           </div>

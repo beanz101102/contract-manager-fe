@@ -9,6 +9,7 @@ import { Download, Pencil } from "lucide-react"
 import InfiniteScroll from "react-infinite-scroll-component"
 
 import { ContractList, mapiContractStatus } from "@/types/api"
+import { downloadFile } from "@/lib/utils"
 import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -79,6 +80,25 @@ export default function ContractSigning() {
     )
   }
 
+  const handleDownloadContracts = async () => {
+    if (selectedEmployees.length === 0) return
+
+    // Download files for selected contracts
+    const selectedContracts = contractList.filter((contract) =>
+      selectedEmployees.includes(contract.id)
+    )
+
+    // Download each selected contract's file
+    for (const contract of selectedContracts) {
+      if (contract.pdfFilePath) {
+        await downloadFile(
+          `${process.env.NEXT_PUBLIC_API_URL}${contract.pdfFilePath}`,
+          `Contract-${contract.contractNumber}.pdf`
+        )
+      }
+    }
+  }
+
   return (
     <div className="bg-white rounded-lg p-4 md:p-6">
       <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">
@@ -101,10 +121,15 @@ export default function ContractSigning() {
           <Button
             className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
             onClick={() => setIsOpenEditModal(true)}
+            disabled={selectedEmployees.length === 0}
           >
             <Pencil className="w-4 h-4 md:w-5 md:h-5 mr-2" /> Yêu cầu sửa
           </Button>
-          <Button className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]">
+          <Button
+            className="flex-1 md:flex-none bg-[#C1C1C1] rounded text-white hover:bg-[#a1a1a1]"
+            onClick={handleDownloadContracts}
+            disabled={selectedEmployees.length === 0}
+          >
             <Download className="w-4 h-4 md:w-5 md:h-5 mr-2" /> Tải
           </Button>
         </div>
