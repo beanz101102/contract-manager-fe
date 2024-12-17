@@ -87,8 +87,8 @@ export default function ContractDashboard() {
   )
   const { data: customers } = useListUsers(["customer"], 1, 100)
   const { data, isLoading } = useAdvancedStatistics({
-    startTime: date.from.getTime(),
-    endTime: date.to.getTime(),
+    startTime: date?.from?.getTime() ?? undefined,
+    endTime: date?.to?.getTime() ?? undefined,
     status: status === "all" ? undefined : status,
     createdById: creatorId === "all" ? undefined : Number(creatorId),
     customerId: customerId === "all" ? undefined : Number(customerId),
@@ -254,9 +254,17 @@ export default function ContractDashboard() {
                         mode="range"
                         defaultMonth={date.from}
                         selected={{ from: date.from, to: date.to }}
-                        onSelect={(range) =>
-                          setDate({ from: range?.from!, to: range?.to! })
-                        }
+                        onSelect={(range) => {
+                          if (!range?.from || !range?.to) return
+                          // Đặt thời gian kết thúc là 23:59:59
+                          const endDate = new Date(range.to)
+                          endDate.setHours(23, 59, 59, 999)
+                          
+                          setDate({ 
+                            from: range.from,
+                            to: endDate
+                          })
+                        }}
                         numberOfMonths={2}
                       />
                     </PopoverContent>

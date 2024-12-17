@@ -175,7 +175,12 @@ export default function ContractsCustomers() {
                       <Calendar
                         mode="single"
                         selected={endDate}
-                        onSelect={(date) => setEndDate(date as Date)}
+                        onSelect={(date) => {
+                          if (!date) return new Date()
+                          const endDate = new Date(date)
+                          endDate.setHours(23, 59, 59, 999)
+                          setEndDate(endDate)
+                        }}
                         className="rounded-md border"
                       />
                     </PopoverContent>
@@ -268,7 +273,7 @@ export default function ContractsCustomers() {
 
               <div className="text-center space-y-2 py-6 border-b border-gray-100">
                 <h3 className="text-xl font-bold uppercase text-gray-900">
-                  Báo cáo hợp đồng hủy
+                  Báo cáo hợp đồng khách hàng
                 </h3>
                 <p className="text-gray-600">
                   Từ ngày: {dayjs(startDate).format("DD/MM/YYYY")} Đến ngày:{" "}
