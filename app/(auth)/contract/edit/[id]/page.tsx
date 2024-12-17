@@ -109,7 +109,7 @@ export default function EditContractPage() {
   const { data: signersData, isLoading: isLoadingSigners } = useListSigners(
     ["employee"],
     1,
-    10,
+    2000,
     searchSignerTerm,
     null
   )

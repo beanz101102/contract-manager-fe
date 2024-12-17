@@ -75,6 +75,8 @@ export default function ContractDashboard() {
   })
   const [creatorId, setCreatorId] = React.useState<string>("all")
   const [customerId, setCustomerId] = React.useState<string>("all")
+  const [creatorOpen, setCreatorOpen] = React.useState(false)
+  const [creatorSearchTerm, setCreatorSearchTerm] = React.useState("")
 
   const { useAdvancedStatistics } = useContracts()
   const { useListUsers } = useUsers()
@@ -110,7 +112,7 @@ export default function ContractDashboard() {
         color: "#4ade80", // green
       },
       {
-        name: summaryData?.pending_approval !== 0 ? "Chờ duyệt" : "",
+        name: summaryData?.pending_approval !== 0 ? "Ch��� duyệt" : "",
         value: summaryData?.pending_approval ?? 0,
         color: "#facc15", // yellow
       },
@@ -288,25 +290,70 @@ export default function ContractDashboard() {
                   <label className="block text-sm font-medium mb-2">
                     Người tạo
                   </label>
-                  <Select
-                    value={creatorId}
-                    onValueChange={(value) => setCreatorId(value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select creator" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tất cả</SelectItem>
-                      {creators?.users?.map((creator) => (
-                        <SelectItem
-                          key={creator.id}
-                          value={creator.id.toString()}
-                        >
-                          {creator.fullName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover open={creatorOpen} onOpenChange={setCreatorOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between bg-white border-gray-300 text-gray-700"
+                      >
+                        {creatorId === "all"
+                          ? "Tất cả"
+                          : creators?.users?.find(
+                              (creator) => creator.id.toString() === creatorId
+                            )?.fullName || "Chọn người tạo"}
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Tìm kiếm người tạo..."
+                          value={creatorSearchTerm}
+                          onValueChange={setCreatorSearchTerm}
+                          className="h-9"
+                        />
+                        <CommandEmpty>Không tìm thấy người tạo</CommandEmpty>
+                        <CommandList>
+                          <CommandGroup>
+                            <CommandItem
+                              onSelect={() => {
+                                setCreatorId("all")
+                                setCreatorOpen(false)
+                              }}
+                              className="cursor-pointer"
+                            >
+                              {creatorId === "all" && (
+                                <Check className={cn("mr-2 h-4 w-4", "text-green-500")} />
+                              )}
+                              <p className="text-sm text-gray-700">Tất cả</p>
+                            </CommandItem>
+                            {creators?.users && creators.users.length > 0 ? (
+                              creators.users.map((creator) => (
+                                <CommandItem
+                                  key={creator.id}
+                                  onSelect={() => {
+                                    setCreatorId(creator.id.toString())
+                                    setCreatorOpen(false)
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  {creatorId === creator.id.toString() && (
+                                    <Check className={cn("mr-2 h-4 w-4", "text-green-500")} />
+                                  )}
+                                  <p className="text-sm text-gray-700">{creator.fullName}</p>
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <CommandItem className="cursor-not-allowed opacity-50">
+                                Không có người tạo
+                              </CommandItem>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 <div>
