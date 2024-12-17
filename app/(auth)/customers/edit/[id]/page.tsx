@@ -99,7 +99,7 @@ export default function EditCustomerInformationForm() {
 
   const { useUpdateUser } = useUsers()
 
-  const { mutate: updateUser } = useUpdateUser()
+  const { mutate: updateUser } = useUpdateUser(true)
 
   const handleUpdateUser = () => {
     updateUser({

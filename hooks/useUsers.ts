@@ -1,12 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-hot-toast"
 
-import { api } from "@/lib/axios"
-import {
-  EmployeeFormData
-} from "@/types/api"
+import { EmployeeFormData } from "@/types/api"
 import { User } from "@/types/auth"
+import { api } from "@/lib/axios"
 
 export const useUsers = () => {
   const queryClient = useQueryClient()
@@ -70,7 +68,9 @@ export const useUsers = () => {
       onError: (error: any) => {
         const errorMessage = error.response?.data?.message
         if (errorMessage && errorMessage.toLowerCase().includes("duplicate")) {
-          toast.error("Thông tin đã tồn tại trong hệ thống, vui lòng kiểm tra lại thông tin của bạn")
+          toast.error(
+            "Thông tin đã tồn tại trong hệ thống, vui lòng kiểm tra lại thông tin của bạn"
+          )
         } else {
           toast.error(errorMessage)
         }
@@ -79,7 +79,7 @@ export const useUsers = () => {
   }
 
   // Update user
-  const useUpdateUser = () => {
+  const useUpdateUser = (isCustomer: boolean = false) => {
     return useMutation({
       mutationFn: async (payload: EmployeeFormData) => {
         const response = await api.post("/api/user/update", payload)
@@ -88,12 +88,14 @@ export const useUsers = () => {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["users"] })
         toast.success("Cập nhật thông tin thành công")
-        router.push("/employees")
+        router.push(isCustomer ? "/customers" : "/employees")
       },
       onError: (error: any) => {
         const errorMessage = error?.response?.data?.message
         if (errorMessage && errorMessage.toLowerCase().includes("duplicate")) {
-          toast.error("Lỗi trùng thông tin, hãy kiểm tra lại thông tin tạo user")
+          toast.error(
+            "Lỗi trùng thông tin, hãy kiểm tra lại thông tin tạo user"
+          )
         } else {
           toast.error(errorMessage)
         }
