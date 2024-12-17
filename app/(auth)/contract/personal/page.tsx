@@ -8,6 +8,7 @@ import { atom, useAtom } from "jotai"
 import { Download, Plus, Send, Trash2 } from "lucide-react"
 
 import { ContractList, mapiContractStatus2 } from "@/types/api"
+import { downloadFile } from "@/lib/utils"
 import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -108,6 +109,25 @@ export default function IndividualManagement() {
   }
   const [isOpenContractInfo, setIsOpenContractInfo] = useState(false)
 
+  const handleDownloadContracts = async () => {
+    if (selectedEmployees.length === 0) return
+
+    // Download files for selected contracts
+    const selectedContracts = contractList.filter((contract) =>
+      selectedEmployees.includes(contract.id)
+    )
+
+    // Download each selected contract's file
+    for (const contract of selectedContracts) {
+      if (contract.pdfFilePath) {
+        await downloadFile(
+          `${process.env.NEXT_PUBLIC_API_URL}${contract.pdfFilePath}`,
+          `Contract-${contract.contractNumber}.pdf`
+        )
+      }
+    }
+  }
+
   return (
     <div className="p-4 md:p-8 bg-white rounded-xl shadow-sm">
       <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">
@@ -156,16 +176,22 @@ export default function IndividualManagement() {
               })
             }
             className="flex-1 md:flex-none bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            disabled={selectedEmployees.length === 0}
           >
             <Send className="w-4 h-4 mr-2" /> Gửi duyệt
           </Button>
           <Button
             className="flex-1 md:flex-none bg-[#F3949E] hover:bg-[#E07983] rounded-md text-white font-medium px-4 py-2 transition-colors"
             onClick={() => setShowCancelModal(true)}
+            disabled={selectedEmployees.length === 0}
           >
             <Trash2 className="w-4 h-4 mr-2" /> Hủy
           </Button>
-          <Button className="flex-1 md:flex-none bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors">
+          <Button
+            className="flex-1 md:flex-none bg-[#4BC5BE] hover:bg-[#3DA8A2] rounded-md text-white font-medium px-4 py-2 transition-colors"
+            onClick={handleDownloadContracts}
+            disabled={selectedEmployees.length === 0}
+          >
             <Download className="w-4 h-4 mr-2" /> Tải
           </Button>
         </div>
