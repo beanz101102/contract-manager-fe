@@ -176,7 +176,7 @@ export default function EmployeeList() {
           loader={null}
           className="min-w-full"
         >
-          <div className="min-w-[1600px] w-full">
+          <div className="min-w-[2000px] w-full">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-gray-50 bg-gray-100">
