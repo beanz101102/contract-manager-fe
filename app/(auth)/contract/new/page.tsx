@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeft, Plus, Search, Upload, X } from "lucide-react"
+import { Check, ChevronLeft, Plus, Search, Upload, X } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -623,7 +623,12 @@ export default function ContractForm() {
                                               setSelectedApprovalFlow(flow)
                                             }}
                                           >
-                                            <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-1">
+                                              {form.getValues(
+                                                "approvalFlow"
+                                              ) === flow.id.toString() && (
+                                                <Check className="w-4 h-4 text-green-500" />
+                                              )}
                                               <span className="font-medium text-gray-700">
                                                 {flow.name}
                                               </span>

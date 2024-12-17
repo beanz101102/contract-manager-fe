@@ -14,14 +14,13 @@ export const useApprovalFlows = () => {
       queryKey: ["approval-flows", name, user?.id],
       queryFn: async () => {
         const params = new URLSearchParams()
-        if (name) {
-          params.append("name", name)
-        }
-        if (user?.id) {
-          params.append("userId", user.id.toString())
-        }
+
         const response = await api.post<ApprovalFlowsList[]>(
-          `/api/approval_flow?${params}`
+          `/api/approval_flow`,
+          {
+            name,
+            userId: user?.id,
+          }
         )
         return response.data
       },

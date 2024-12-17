@@ -4,7 +4,15 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronLeft, Plus, Search, Upload, X } from "lucide-react"
+import {
+  Check,
+  CheckCircle,
+  ChevronLeft,
+  Plus,
+  Search,
+  Upload,
+  X,
+} from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -169,23 +177,25 @@ export default function EditContractPage() {
       customerId: currentCustomer?.id || 0,
       contractType: "purchase",
       createdById: user?.id || 0,
-      signers: JSON.stringify(selectedSigners.map((signer, idx) => ({userId: signer?.id, order: idx + 1}))),
+      signers: JSON.stringify(
+        selectedSigners.map((signer, idx) => ({
+          userId: signer?.id,
+          order: idx + 1,
+        }))
+      ),
       approvalTemplateId: parseInt(values.approvalFlow),
       note: values.notes,
       file: pdfFile,
     }
 
-    updateContract(
-      { ...payload } as any,
-      {
-        onSuccess: () => {
-          router.push('/contract/personal')
-        },
-        onError: (error) => {
-          console.error('Error updating contract:', error)
-        }
-      }
-    )
+    updateContract({ ...payload } as any, {
+      onSuccess: () => {
+        router.push("/contract/personal")
+      },
+      onError: (error) => {
+        console.error("Error updating contract:", error)
+      },
+    })
   }
 
   function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -576,7 +586,12 @@ export default function EditContractPage() {
                                               )
                                             }}
                                           >
-                                            <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-1">
+                                              {form.getValues(
+                                                "approvalFlow"
+                                              ) === flow.id.toString() && (
+                                                <Check className="w-4 h-4 text-green-500" />
+                                              )}
                                               <span className="font-medium text-gray-700">
                                                 {flow.name}
                                               </span>
