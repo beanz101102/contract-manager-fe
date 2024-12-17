@@ -4,7 +4,13 @@ import * as React from "react"
 import { format } from "date-fns"
 import html2canvas from "html2canvas-pro"
 import jsPDF from "jspdf"
-import { CalendarIcon, Download } from "lucide-react"
+import {
+  CalendarIcon,
+  CarrotIcon,
+  Check,
+  ChevronDown,
+  Download,
+} from "lucide-react"
 import {
   Bar,
   CartesianGrid,
@@ -20,11 +26,20 @@ import {
   YAxis,
 } from "recharts"
 
+import { cn } from "@/lib/utils"
 import { useContracts } from "@/hooks/useContracts"
 import { useUsers } from "@/hooks/useUsers"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
 import { Loading } from "@/components/ui/loading"
 import {
   Popover,
@@ -271,25 +286,77 @@ export default function ContractDashboard() {
                   <label className="block text-sm font-medium mb-2">
                     Khách hàng
                   </label>
-                  <Select
-                    value={customerId}
-                    onValueChange={(value) => setCustomerId(value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select customer" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tất cả</SelectItem>
-                      {customers?.users?.map((customer) => (
-                        <SelectItem
-                          key={customer.id}
-                          value={customer.id.toString()}
-                        >
-                          {customer.fullName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full justify-between bg-white border-gray-300 text-gray-700"
+                      >
+                        {customerId === "all"
+                          ? "Tất cả"
+                          : customers?.users?.find(
+                              (customer) =>
+                                customer.id.toString() === customerId
+                            )?.fullName || "Chọn khách hàng"}
+                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Tìm kiếm khách hàng..."
+                          className="h-9"
+                        />
+                        <CommandEmpty>Không tìm thấy khách hàng</CommandEmpty>
+                        <CommandList>
+                          <CommandGroup>
+                            <CommandItem
+                              onSelect={() => setCustomerId("all")}
+                              className="cursor-pointer"
+                            >
+                              {customerId === "all" && (
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    "text-green-500"
+                                  )}
+                                />
+                              )}
+                              <p className="text-sm text-gray-700">Tất cả</p>
+                            </CommandItem>
+                            {customers?.users && customers.users.length > 0 ? (
+                              customers.users.map((customer) => (
+                                <CommandItem
+                                  key={customer.id}
+                                  onSelect={() =>
+                                    setCustomerId(customer.id.toString())
+                                  }
+                                  className="cursor-pointer"
+                                >
+                                  {customerId === customer.id.toString() && (
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4  w-4",
+                                        "text-green-500"
+                                      )}
+                                    />
+                                  )}
+                                  <p className="text-sm text-gray-700">
+                                    {customer.fullName}
+                                  </p>
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <CommandItem className="cursor-not-allowed opacity-50">
+                                Không có khách hàng
+                              </CommandItem>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
             </div>
