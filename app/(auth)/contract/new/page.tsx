@@ -689,7 +689,7 @@ export default function ContractForm() {
                                             (step: any, index: number) => (
                                               <TableRow key={index}>
                                                 <TableCell className="text-center">
-                                                  {step.stepOrder}
+                                                  {index + 1}
                                                 </TableCell>
                                                 <TableCell>
                                                   {step.department
