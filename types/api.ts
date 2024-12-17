@@ -62,6 +62,7 @@ export interface ApprovalFlow {
   name: string
   steps: ApprovalFlowStep[]
   id: number
+  usageType: "single" | "multiple"
 }
 
 export interface ContractSignature {

@@ -154,9 +154,13 @@ const ApprovalWorkflowModal = ({
     }
 
     if (mode === "edit" && initialData) {
-      updateApprovalFlow({ ...payload, id: initialData.id })
+      updateApprovalFlow({
+        ...payload,
+        id: initialData.id,
+        usageType: "multiple",
+      })
     } else {
-      addApprovalFlow(payload)
+      addApprovalFlow({ ...payload, usageType: "multiple" })
     }
   }
 

@@ -143,16 +143,82 @@ export default function ContractForm() {
     }
   }, [user?.fullName])
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const payload = {
-      contractNumber: values.contractNumber,
-      customerId: currentCustomer?.id || 0,
-      contractType: "purchase",
-      createdById: user?.id || 0,
-      signers: selectedSigners.map((signer) => signer?.id),
-      approvalTemplateId: parseInt(values.approvalFlow),
-      note: values.notes,
-      file: pdfFile,
+  // Import thêm hook để tạo flow mới
+  const { useAddApprovalFlow } = useApprovalFlows()
+  const { mutate: addApprovalFlow } = useAddApprovalFlow()
+
+  // Thêm state để lưu trữ flow gốc
+  const [originalFlow, setOriginalFlow] = useState<any>(null)
+
+  // Sửa lại hàm onSubmit
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Form submitted", values)
+    console.log("Selected flow", selectedApprovalFlow)
+    console.log("Original flow", originalFlow)
+
+    // Kiểm tra xem flow có bị sửa đổi không
+    const isFlowModified =
+      originalFlow && JSON.stringify(selectedApprovalFlow) !== originalFlow
+
+    console.log("Is flow modified?", isFlowModified)
+
+    // Nếu flow bị sửa đổi hoặc là flow mới tạo (không có id)
+    if ((selectedApprovalFlow && !selectedApprovalFlow.id) || isFlowModified) {
+      // Tạo payload cho flow mới
+      const flowPayload = {
+        name: `Flow for contract ${values.contractNumber}`,
+        steps: selectedApprovalFlow.steps.map((step: any) => ({
+          departmentId: step.department?.id,
+          approverId: step.approver?.id,
+          stepOrder: step.stepOrder,
+        })),
+        id: user?.id ?? 0,
+        usageType: "single" as const,
+      }
+
+      // Gọi API tạo flow mới
+      addApprovalFlow(flowPayload, {
+        onSuccess: (newFlow: any) => {
+          const contractPayload = {
+            contractNumber: values.contractNumber,
+            customerId: currentCustomer?.id || 0,
+            contractType: "purchase",
+            createdById: user?.id || 0,
+            signers: JSON.stringify(
+              selectedSigners.map((signer, idx) => ({
+                userId: signer?.id,
+                order: idx + 1,
+              }))
+            ),
+            approvalTemplateId: newFlow?.id,
+            note: values.notes,
+            file: pdfFile,
+          }
+          addContract(contractPayload as any)
+        },
+        onError: (error) => {
+          console.error("Error creating approval flow:", error)
+          alert("Có lỗi xảy ra khi tạo luồng duyệt mới")
+        },
+      })
+    } else {
+      // Nếu không sửa đổi flow, sử dụng flow đã chọn
+      const contractPayload = {
+        contractNumber: values.contractNumber,
+        customerId: currentCustomer?.id || 0,
+        contractType: "purchase",
+        createdById: user?.id || 0,
+        signers: JSON.stringify(
+          selectedSigners.map((signer, idx) => ({
+            userId: signer?.id,
+            order: idx + 1,
+          }))
+        ),
+        approvalTemplateId: parseInt(values.approvalFlow),
+        note: values.notes,
+        file: pdfFile,
+      }
+      addContract(contractPayload as any)
     }
   }
 
@@ -227,7 +293,7 @@ export default function ContractForm() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-gray-700">
-                            Người tạo
+                            Ng��ời tạo
                           </FormLabel>
                           <FormControl>
                             <Input
@@ -550,6 +616,9 @@ export default function ContractForm() {
                                               form.setValue(
                                                 "approvalFlow",
                                                 flow.id.toString()
+                                              )
+                                              setOriginalFlow(
+                                                JSON.stringify(flow)
                                               )
                                               setSelectedApprovalFlow(flow)
                                             }}
@@ -884,30 +953,7 @@ export default function ContractForm() {
                                       return
                                     }
 
-                                    // Nếu có chỉnh sửa luồng duyệt, lưu luồng mới
-                                    if (selectedApprovalFlow) {
-                                      const payload = {
-                                        id: selectedApprovalFlow.id,
-                                        name: selectedApprovalFlow.name,
-                                        steps: selectedApprovalFlow.steps.map(
-                                          (step: any) => ({
-                                            id: step?.id,
-                                            departmentId: step.department?.id,
-                                            approverId: step.approver?.id,
-                                            stepOrder: step.stepOrder,
-                                          })
-                                        ),
-                                      }
-
-                                      updateApprovalFlow(payload, {
-                                        onSuccess: () => {
-                                          // Refresh lại danh sách luồng duyệt nếu cần
-                                          setOpenFlowDialog(false)
-                                        },
-                                      })
-                                    } else {
-                                      setOpenFlowDialog(false)
-                                    }
+                                    setOpenFlowDialog(false)
                                   }}
                                 >
                                   Xác nhận
@@ -944,27 +990,86 @@ export default function ContractForm() {
 
                 {/* Submit Button */}
                 <Button
+                  type="submit"
                   className="w-full"
                   onClick={() => {
-                    // Keep existing submit logic
-                    const payload = {
-                      contractNumber: form.getValues("contractNumber"),
-                      customerId: currentCustomer?.id || 0,
-                      contractType: "purchase",
-                      createdById: user?.id || 0,
-                      signers: JSON.stringify(
-                        selectedSigners.map((signer, idx) => ({
-                          userId: signer?.id,
-                          order: idx + 1,
-                        }))
-                      ),
-                      approvalTemplateId: parseInt(
-                        form.getValues("approvalFlow")
-                      ),
-                      note: form.getValues("notes"),
-                      file: pdfFile,
+                    console.log("Selected flow", selectedApprovalFlow)
+                    console.log("Original flow", originalFlow)
+
+                    // Kiểm tra xem flow có bị sửa đổi không
+                    const isFlowModified =
+                      originalFlow &&
+                      JSON.stringify(selectedApprovalFlow) !== originalFlow
+
+                    console.log("Is flow modified?", isFlowModified)
+
+                    // Nếu flow bị sửa đổi hoặc là flow mới tạo (không có id)
+                    if (
+                      (selectedApprovalFlow && !selectedApprovalFlow.id) ||
+                      isFlowModified
+                    ) {
+                      // Tạo payload cho flow mới
+                      const flowPayload = {
+                        name: `Flow for contract ${form.getValues(
+                          "contractNumber"
+                        )}`,
+                        steps: selectedApprovalFlow.steps.map((step: any) => ({
+                          departmentId: step.department?.id,
+                          approverId: step.approver?.id,
+                          stepOrder: step.stepOrder,
+                        })),
+                        id: user?.id ?? 0,
+                        usageType: "single" as const,
+                      }
+
+                      console.log("flowPayload", flowPayload)
+
+                      // Gọi API tạo flow mới
+                      addApprovalFlow(flowPayload, {
+                        onSuccess: (newFlow: any) => {
+                          const contractPayload = {
+                            contractNumber: form.getValues("contractNumber"),
+                            customerId: currentCustomer?.id || 0,
+                            contractType: "purchase",
+                            createdById: user?.id || 0,
+                            signers: JSON.stringify(
+                              selectedSigners.map((signer, idx) => ({
+                                userId: signer?.id,
+                                order: idx + 1,
+                              }))
+                            ),
+                            approvalTemplateId: newFlow?.id,
+                            note: form.getValues("notes"),
+                            file: pdfFile,
+                          }
+                          addContract(contractPayload as any)
+                        },
+                        onError: (error) => {
+                          console.error("Error creating approval flow:", error)
+                          alert("Có lỗi xảy ra khi tạo luồng duyệt mới")
+                        },
+                      })
+                    } else {
+                      // Nếu không sửa đổi flow, sử dụng flow đã chọn
+                      const contractPayload = {
+                        contractNumber: form.getValues("contractNumber"),
+                        customerId: currentCustomer?.id || 0,
+                        contractType: "purchase",
+                        createdById: user?.id || 0,
+                        signers: JSON.stringify(
+                          selectedSigners.map((signer, idx) => ({
+                            userId: signer?.id,
+                            order: idx + 1,
+                          }))
+                        ),
+                        approvalTemplateId: parseInt(
+                          form.getValues("approvalFlow")
+                        ),
+                        note: form.getValues("notes"),
+                        file: pdfFile,
+                      }
+                      addContract(contractPayload as any)
                     }
-                    addContract(payload as any)
                   }}
                 >
                   Lưu hợp đồng
