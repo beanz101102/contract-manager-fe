@@ -158,7 +158,12 @@ export default function ContractReport() {
                       <Calendar
                         mode="single"
                         selected={endDate}
-                        onSelect={(date) => setEndDate(date as Date)}
+                        onSelect={(date) => {
+                          if (!date) return new Date()
+                          const endDate = new Date(date)
+                          endDate.setHours(23, 59, 59, 999)
+                          setEndDate(endDate)
+                        }}
                         className="rounded-md border"
                       />
                     </PopoverContent>
