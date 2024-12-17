@@ -208,9 +208,10 @@ export default function DepartmentPage() {
             <Button
               variant="destructive"
               disabled={isDeleting}
-              onClick={() =>
+              onClick={() => {
                 deleteDepartment({ id: selectedDepartment?.id || 0 })
-              }
+                setIsDeleteModalOpen(false)
+              }}
               className="bg-red-600 text-white hover:bg-red-700"
             >
               Xóa

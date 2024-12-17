@@ -63,7 +63,7 @@ export const useDepartment = () => {
   const useDeleteDepartment = () => {
     return useMutation({
       mutationFn: async (payload: { id: number }) => {
-        const response = await api.delete(
+        const response = await api.post(
           `/api/department/deleteDepartment`,
           payload
         )
