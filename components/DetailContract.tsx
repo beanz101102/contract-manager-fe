@@ -116,11 +116,19 @@ const DetailContract = ({
                               className={`text-sm px-2 py-1 rounded ${
                                 feedback.tag === "revision_request"
                                   ? "bg-amber-100 text-amber-700"
+                                  : feedback.tag === "approval_request"
+                                  ? "bg-green-100 text-green-700"
+                                  : feedback.tag === "new_contract"
+                                  ? "bg-purple-100 text-purple-700"
                                   : "bg-blue-100 text-blue-700"
                               }`}
                             >
                               {feedback.tag === "revision_request"
                                 ? "Yêu cầu chỉnh sửa"
+                                : feedback.tag === "approval_request"
+                                ? "Phê duyệt hợp đồng"
+                                : feedback.tag === "new_contract"
+                                ? "Hợp đồng mới"
                                 : "Phản hồi"}
                             </div>
                           </div>

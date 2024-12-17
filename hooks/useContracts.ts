@@ -464,7 +464,11 @@ const useCustomerReport = (payload: {
         contractId: number
         name: string
         content: string
-        tag: "revision_request" | "feedback"
+        tag:
+          | "revision_request"
+          | "feedback"
+          | "approval_request"
+          | "new_contract"
       }) => {
         const response = await api.post("/api/contract/add-feedback", payload)
         return response.data
