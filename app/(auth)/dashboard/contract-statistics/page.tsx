@@ -112,7 +112,7 @@ export default function ContractDashboard() {
         color: "#4ade80", // green
       },
       {
-        name: summaryData?.pending_approval !== 0 ? "Ch��� duyệt" : "",
+        name: summaryData?.pending_approval !== 0 ? "Chờ duyệt" : "",
         value: summaryData?.pending_approval ?? 0,
         color: "#facc15", // yellow
       },
