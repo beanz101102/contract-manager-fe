@@ -164,8 +164,7 @@ export default function EmployeeList() {
       </div>
 
       <div className="overflow-x-auto">
-        <div className="min-w-[2000px] w-full">
-          <Table>
+          <Table className="min-w-[2000px] w-full">
             <TableHeader>
               <TableRow className="hover:bg-gray-50 bg-gray-100">
                 <TableHead className="w-[50px]">
@@ -330,9 +329,8 @@ export default function EmployeeList() {
                 totalPages={employees?.lastPage ?? 1}
                 onChangePage={setPage}
               />
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )
