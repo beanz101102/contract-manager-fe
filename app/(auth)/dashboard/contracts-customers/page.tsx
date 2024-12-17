@@ -1,13 +1,12 @@
 "use client"
 
-import { useRef, useState } from "react"
-import Image from "next/image"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import dayjs from "dayjs"
 import html2canvas from "html2canvas-pro"
 import jsPDF from "jspdf"
-import { Download } from "lucide-react"
+import { Download, Search } from "lucide-react"
+import { useRef, useState } from "react"
 
-import { useContracts } from "@/hooks/useContracts"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -24,22 +23,39 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useContracts } from "@/hooks/useContracts"
+import { useUsers } from "@/hooks/useUsers"
+import { useReactToPrint } from 'react-to-print'
 
 export default function ContractsCustomers() {
   const [startDate, setStartDate] = useState<Date>(
     new Date(new Date().getFullYear(), 0, 1)
   )
   const [endDate, setEndDate] = useState<Date>(new Date())
+  const [searchTerm, setSearchTerm] = useState("")
+  const [open, setOpen] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
   const targetRef = useRef<HTMLDivElement>(null)
+  const [imagesLoaded, setImagesLoaded] = useState(false)
+
+  const { useListUsers } = useUsers()
+  const { data: customersData, isLoading } = useListUsers(
+    ["customer"],
+    1,
+    10,
+    searchTerm,
+    null
+  )
+  const customers = customersData?.users || []
 
   const { useCustomerReport } = useContracts()
   const { data } = useCustomerReport({
     startTime: startDate?.getTime() || 0,
     endTime: endDate?.getTime() || 0,
     status: "cancelled",
+    customerId: selectedCustomer?.id,
   })
-  const customers = data || []
-  console.log("datadatadatadatadatadatadata", customers)
+  const reportData = data || []
 
   const generatePDF = async () => {
     const element = targetRef.current
@@ -81,6 +97,31 @@ export default function ContractsCustomers() {
     }
   }
 
+  const handlePrint = useReactToPrint({
+    contentRef: targetRef,
+    documentTitle: 'bao-cao-hop-dong-khach-hang',
+    // pageStyle: `
+    //   @page {
+    //     size: 420mm 297mm;
+    //     margin: 10mm;
+    //     scale: 1;
+    //   }
+    //   @page :even {
+    //     display: none;
+    //   }
+    //   @media print {
+    //     html, body {
+    //       width: 420mm;
+    //       height: 150mm;
+    //     }
+    //     body {
+    //       transform: scale(1);
+    //       transform-origin: top left;
+    //     }
+    //   }
+    // `,
+  });
+
   return (
     <div className="container mx-auto p-4 bg-gray-50/30 min-h-screen">
       <Card className="border-0 shadow-md bg-white">
@@ -88,7 +129,7 @@ export default function ContractsCustomers() {
           <h1 className="text-2xl font-bold text-gray-800">
             Báo cáo hợp đồng khách hàng
           </h1>
-          <Button onClick={generatePDF}>
+          <Button onClick={() => handlePrint()}>
             <Download className="mr-2 h-4 w-4" />
             Xuất báo cáo
           </Button>
@@ -140,15 +181,78 @@ export default function ContractsCustomers() {
                     </PopoverContent>
                   </Popover>
                 </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-gray-700">Khách hàng</span>
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline2"
+                        className="h-10 w-[200px] justify-between bg-white hover:bg-gray-50 border-gray-200 text-left font-normal"
+                        role="combobox"
+                      >
+                        {selectedCustomer
+                          ? selectedCustomer.fullName
+                          : "Chọn khách hàng"}
+                        <Search className="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0 bg-white border border-gray-200 shadow-lg">
+                      <Command className="border-none bg-white">
+                        <CommandInput
+                          placeholder="Tìm kiếm khách hàng..."
+                          value={searchTerm}
+                          onValueChange={setSearchTerm}
+                          className="border-none focus:ring-0"
+                        />
+                        <CommandEmpty className="py-4 text-sm text-gray-500 text-center">
+                          {isLoading ? "Đang tải..." : "Không tìm thấy khách hàng"}
+                        </CommandEmpty>
+                        <CommandList>
+                          <CommandGroup heading="Gợi ý" className="text-sm text-gray-700">
+                              <CommandItem
+                                key={'all customers'}
+                                value={'Toàn bộ'}
+                                className="hover:bg-gray-50 cursor-pointer py-3 px-4"
+                                onSelect={() => {
+                                  setSelectedCustomer(null)
+                                  setOpen(false)
+                                }}
+                              >
+                                <span className="text-gray-700">
+                                  Toàn bộ
+                                </span>
+                              </CommandItem>
+                            {customers?.map((customer: any) => (
+                              <CommandItem
+                                key={customer?.id}
+                                value={customer?.fullName}
+                                className="hover:bg-gray-50 cursor-pointer py-3 px-4"
+                                onSelect={() => {
+                                  setSelectedCustomer(customer)
+                                  setOpen(false)
+                                }}
+                              >
+                                <span className="text-gray-700">
+                                  {customer?.fullName}
+                                </span>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
 
               <div className="flex items-start gap-6 bg-gray-50/50 p-6 rounded-lg">
-                <Image
+                <img
                   src="/img/logo.png"
                   alt="Company Logo"
-                  width={150}
-                  height={150}
-                  className="object-contain"
+                  style={{ width: '150px', height: '60px', objectFit: 'contain' }}
+                  fetchPriority="high"
+                  onLoad={() => setImagesLoaded(true)}
                 />
                 <div className="space-y-2 text-gray-700">
                   <h2 className="text-xl font-semibold text-gray-900">
@@ -198,7 +302,7 @@ export default function ContractsCustomers() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {customers?.map((row, index) => (
+                    {reportData?.map((row, index) => (
                       <TableRow
                         key={row.customerId}
                         className="hover:bg-gray-50 transition-colors"
@@ -228,8 +332,10 @@ export default function ContractsCustomers() {
                   </TableBody>
                 </Table>
               </div>
-
-              <div className="flex justify-between mt-12 px-8">
+              <div className="text-right mt-4 text-gray-600">
+                <p>Hà Nội, Ngày {dayjs().format("D [tháng] M [năm] YYYY")}</p>
+              </div>
+              <div className="flex justify-between mt-4 px-8">
                 <div className="text-center">
                   <p className="font-medium text-gray-800">Người phê duyệt</p>
                   <p className="text-sm text-gray-500">(Ký và ghi rõ họ tên)</p>
@@ -238,10 +344,6 @@ export default function ContractsCustomers() {
                   <p className="font-medium text-gray-800">Người tạo báo cáo</p>
                   <p className="text-sm text-gray-500">(Ký và ghi rõ họ tên)</p>
                 </div>
-              </div>
-
-              <div className="text-right mt-4 text-gray-600">
-                <p>Hà Nội, Ngày {dayjs().format("D [tháng] M [năm] YYYY")}</p>
               </div>
             </div>
           </div>

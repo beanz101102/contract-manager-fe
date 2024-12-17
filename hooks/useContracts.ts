@@ -391,26 +391,33 @@ export const useContracts = () => {
   }
 
   // customer-report
-  const useCustomerReport = (payload: {
-    startTime: number
-    endTime: number
-    status: string
-  }) => {
-    return useQuery({
-      queryKey: ["customer-report", payload],
-      queryFn: async () => {
-        const params = new URLSearchParams({
-          startTime: payload.startTime.toString(),
-          endTime: payload.endTime.toString(),
-          status: payload.status,
-        }).toString()
-        const response = await api.get<{
-          data: { customers: CustomerReport[] }
-        }>(`/api/contract/customer-report?${params}`)
-        return response.data?.data?.customers
-      },
-    })
-  }
+const useCustomerReport = (payload: {
+  startTime: number
+  endTime: number
+  status: string
+  customerId?: number // Thêm customerId vào payload
+}) => {
+  return useQuery({
+    queryKey: ["customer-report", payload],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        startTime: payload.startTime.toString(),
+        endTime: payload.endTime.toString(),
+        status: payload.status,
+      })
+      
+      // Thêm customerId vào params nếu có
+      if (payload.customerId) {
+        params.append("customerId", payload.customerId.toString())
+      }
+
+      const response = await api.get<{
+        data: { customers: CustomerReport[] }
+      }>(`/api/contract/customer-report?${params}`)
+      return response.data?.data?.customers
+    },
+  })
+}
 
   const useAdvancedStatistics = (payload: {
     startTime?: number
