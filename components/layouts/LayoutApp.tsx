@@ -116,81 +116,84 @@ const ContentRight = () => {
   ).length
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-4">
       <Popover>
-        <PopoverTrigger
-          className="relative"
-          onClick={() => markAllAsRead(user?.id ?? 0)}
-        >
-          <Bell
-            size={24}
-            className="text-white hover:text-gray-100 cursor-pointer transition-colors duration-200"
-          />
+        <PopoverTrigger className="relative p-2 hover:bg-white/10 rounded-full transition-all">
+          <Bell size={22} className="text-white" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-medium rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+            <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
               {unreadCount}
             </span>
           )}
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-0 bg-white shadow-lg border border-gray-200 rounded-lg">
-          <div className="p-4 border-b border-gray-200">
-            <h3 className="font-medium text-gray-900">Thông báo</h3>
+        <PopoverContent className="w-[380px] p-0 bg-white shadow-xl border-none rounded-xl">
+          <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="font-semibold text-gray-900">Thông báo</h3>
+            {notifications?.length > 0 && (
+              <button
+                onClick={() => markAllAsRead(user?.id ?? 0)}
+                className="text-xs text-gray-500 hover:text-gray-700"
+              >
+                Đánh dấu đã đọc tất cả
+              </button>
+            )}
           </div>
-          <div className="max-h-[400px] overflow-y-auto">
+          <div className="max-h-[460px] overflow-y-auto">
             {notifications?.length > 0 ? (
               notifications.map((notification: any) => (
                 <div
                   key={notification.id}
-                  className={`p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${
-                    !notification.isRead ? "bg-blue-50" : ""
+                  className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                    !notification.isRead ? "bg-blue-50/60" : ""
                   }`}
                 >
                   <p
-                    className={`text-sm ${
+                    className={`text-sm leading-relaxed ${
                       !notification.isRead
                         ? "font-medium text-gray-900"
-                        : "text-gray-700"
+                        : "text-gray-600"
                     }`}
                   >
                     {notification.message}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-400 mt-1.5">
                     {new Date(notification.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               ))
             ) : (
-              <div className="p-4 text-center text-gray-500">
-                Không có thông báo
+              <div className="py-8 text-center text-gray-500">
+                <p>Không có thông báo</p>
               </div>
             )}
           </div>
         </PopoverContent>
       </Popover>
+
       <Popover>
         <PopoverTrigger>
-          <div className="flex items-center gap-3 text-white bg-white/10 rounded-lg px-4 py-2 hover:bg-white/20 transition-colors duration-200 cursor-pointer">
-            <div className="p-1 bg-white/20 rounded-full">
-              <User size={20} className="text-white" />
+          <div className="flex items-center gap-3 text-white bg-white/10 rounded-xl px-3 py-2 hover:bg-white/20 transition-all">
+            <div className="p-1.5 bg-white/15 rounded-full">
+              <User size={18} className="text-white" />
             </div>
-            <div>
-              <p className="font-medium text-sm">{user?.fullName}</p>
-              <p className="text-xs text-gray-200">{user?.role}</p>
+            <div className="pr-1">
+              <p className="font-medium text-sm leading-tight">
+                {user?.fullName}
+              </p>
+              <p className="text-[11px] text-gray-200/90">{user?.role}</p>
             </div>
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-2 bg-white shadow-lg border border-gray-200 rounded-lg">
+        <PopoverContent className="w-60 p-2 bg-white shadow-xl border-none rounded-xl">
           <div className="flex flex-col space-y-1">
             <button
-              className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200"
-              onClick={() => {
-                router.push("/profile")
-              }}
+              className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => router.push("/profile")}
             >
               Thông tin cá nhân
             </button>
             <button
-              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200"
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               onClick={logout}
             >
               Đăng xuất
