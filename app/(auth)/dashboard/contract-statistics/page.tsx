@@ -81,19 +81,34 @@ export default function ContractDashboard() {
     if (!data) return []
     return [
       {
-        name: "hoàn thành",
+        name: "Hoàn thành",
         value: data?.summary?.byStatus?.completed ?? 0,
-        color: "#4ade80",
+        color: "#4ade80", // green
       },
       {
-        name: "chờ duyệt",
+        name: "Chờ duyệt",
         value: data?.summary?.byStatus?.pending_approval ?? 0,
-        color: "#facc15",
+        color: "#facc15", // yellow
       },
       {
-        name: "Bị hủy",
+        name: "Từ chối",
+        value: data?.summary?.byStatus?.rejected ?? 0,
+        color: "#f43f5e", // rose
+      },
+      {
+        name: "Mới",
+        value: data?.summary?.byStatus?.draft ?? 0,
+        color: "#94a3b8", // slate
+      },
+      {
+        name: "Sẵn sàng ký",
+        value: data?.summary?.byStatus?.ready_to_sign ?? 0,
+        color: "#60a5fa", // blue
+      },
+      {
+        name: "Đã hủy",
         value: data?.summary?.byStatus?.cancelled ?? 0,
-        color: "#f87171",
+        color: "#f87171", // red
       },
     ]
   }, [data])
@@ -345,12 +360,12 @@ export default function ContractDashboard() {
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="contracts" name="Số hợp đồng" fill="#60a5fa" />
-                  <Line
+                  {/* <Line
                     type="monotone"
                     dataKey="completed"
                     name="Số lượng hợp đồng theo tháng"
                     stroke="#2563eb"
-                  />
+                  /> */}
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
