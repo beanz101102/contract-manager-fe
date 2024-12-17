@@ -5,7 +5,6 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { atom, useAtom } from "jotai"
 import { Plus, Trash2 } from "lucide-react"
-import InfiniteScroll from "react-infinite-scroll-component"
 
 import { departmentConfigs } from "@/types/api"
 import { User } from "@/types/auth"
@@ -22,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { PaginationDemo } from "@/components/Pagination"
 
 const listUsersCustomersAtom = atom<User[]>([])
 
@@ -29,14 +29,13 @@ export default function CustomerList() {
   const [searchTerm, setSearchTerm] = useState("")
   const [department, setDepartment] = useState("all")
   const [selectedEmployees, setSelectedEmployees] = useState<number[]>([])
-  const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
   const router = useRouter()
 
   const { useListUsers, useDeleteUser } = useUsers()
   const { data: employees } = useListUsers(
     ["customer"],
-    1,
+    page,
     10,
     searchTerm,
     departmentConfigs?.find((d) => d.label === department)?.value || null
@@ -53,11 +52,8 @@ export default function CustomerList() {
   const filteredEmployees = employees?.users || []
 
   useEffect(() => {
-    setHasMore(filteredEmployees?.length >= 10)
-    if (page === 1) {
+    if (filteredEmployees) {
       setListUsersCustomers(filteredEmployees)
-    } else {
-      setListUsersCustomers([...listUsersCustomers, ...filteredEmployees])
     }
   }, [filteredEmployees])
 
@@ -127,146 +123,142 @@ export default function CustomerList() {
       </div>
 
       <div className="overflow-x-auto">
-        <InfiniteScroll
-          dataLength={listUsersCustomers?.length}
-          next={() => setPage(page + 1)}
-          hasMore={hasMore}
-          loader={null}
-          className="min-w-full"
-        >
-          <Table className="min-w-[2000px] w-full">
-            <TableHeader>
-              <TableRow className="hover:bg-gray-50 bg-gray-100">
-                <TableHead className="w-[50px]">
-                  <Checkbox
-                    checked={
-                      selectedEmployees.length === listUsersCustomers.length
-                    }
-                    onCheckedChange={handleSelectAll}
-                  />
-                </TableHead>
-                <TableHead className="w-[60px] text-gray-700 font-semibold">
-                  STT
-                </TableHead>
-                <TableHead className="w-[150px] text-gray-700 font-semibold">
-                  Mã khách hàng
-                </TableHead>
-                <TableHead className="w-[200px] text-gray-700 font-semibold">
-                  Tên khách hàng
-                </TableHead>
-                <TableHead className="text-gray-700 font-semibold">
-                  Ngày sinh
-                </TableHead>
-                <TableHead className="w-[100px] text-gray-700 font-semibold">
-                  Giới tính
-                </TableHead>
-                <TableHead className="w-[150px] text-gray-700 font-semibold">
-                  Số CCCD
-                </TableHead>
-                <TableHead className="w-[150px] text-gray-700 font-semibold">
-                  Số điện thoại
-                </TableHead>
-                <TableHead className="w-[200px] text-gray-700 font-semibold">
-                  Email
-                </TableHead>
-                <TableHead className="w-[250px] text-gray-700 font-semibold">
-                  Địa chỉ
-                </TableHead>
-                <TableHead className="w-[100px] text-gray-700 font-semibold">
-                  Thao tác
-                </TableHead>
+        <Table className="min-w-[2000px] w-full">
+          <TableHeader>
+            <TableRow className="hover:bg-gray-50 bg-gray-100">
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={
+                    selectedEmployees.length === listUsersCustomers.length
+                  }
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">STT</TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Mã khách hàng
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Tên khách hàng
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Ngày sinh
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Giới tính
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Số CCCD
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Số điện thoại
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Email
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Địa chỉ
+              </TableHead>
+              <TableHead className="text-gray-700 font-semibold">
+                Thao tác
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {listUsersCustomers.length === 0 ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={11} className="text-center py-12 md:py-16">
+                  <div className="flex flex-col items-center gap-3">
+                    <NextImage
+                      src="/empty-state.png"
+                      alt="No data"
+                      className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] opacity-40"
+                    />
+                    <p className="text-gray-500 text-sm md:text-base">
+                      Không có dữ liệu khách hàng
+                    </p>
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {listUsersCustomers.length === 0 ? (
-                <TableRow className="hover:bg-transparent">
-                  <TableCell
-                    colSpan={11}
-                    className="text-center py-12 md:py-16"
-                  >
-                    <div className="flex flex-col items-center gap-3">
-                      <NextImage
-                        src="/empty-state.png"
-                        alt="No data"
-                        className="w-[160px] h-[160px] md:w-[240px] md:h-[240px] opacity-40"
-                      />
-                      <p className="text-gray-500 text-sm md:text-base">
-                        Không có dữ liệu khách hàng
-                      </p>
+            ) : (
+              listUsersCustomers.map((customer, index) => (
+                <TableRow
+                  key={customer.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedEmployees.includes(customer.id)}
+                      onCheckedChange={() => handleSelectOne(customer.id)}
+                    />
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {(page - 1) * 10 + index + 1}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.code}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.fullName}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.dateOfBirth}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.gender}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.idNumber}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.phoneNumber}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.email}
+                  </TableCell>
+                  <TableCell className="text-gray-700 text-sm md:text-base">
+                    {customer.address}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2 md:gap-3 justify-center">
+                      <div
+                        className="cursor-pointer"
+                        onClick={() =>
+                          router.push(`/customers/edit/${customer.id}`)
+                        }
+                      >
+                        <NextImage
+                          src="/edit.png"
+                          alt="edit"
+                          className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                      </div>
+                      <div
+                        onClick={() => deleteUser([customer.id])}
+                        className="cursor-pointer"
+                      >
+                        <NextImage
+                          src="/trash.png"
+                          alt="trash"
+                          className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : (
-                listUsersCustomers.map((customer, index) => (
-                  <TableRow
-                    key={customer.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedEmployees.includes(customer.id)}
-                        onCheckedChange={() => handleSelectOne(customer.id)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {index + 1}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.code}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.fullName}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.dateOfBirth}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.gender}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.idNumber}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.phoneNumber}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.email}
-                    </TableCell>
-                    <TableCell className="text-gray-700 text-sm md:text-base">
-                      {customer.address}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2 md:gap-3 justify-center">
-                        <div
-                          className="cursor-pointer"
-                          onClick={() =>
-                            router.push(`/customers/edit/${customer.id}`)
-                          }
-                        >
-                          <NextImage
-                            src="/edit.png"
-                            alt="edit"
-                            className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
-                          />
-                        </div>
-                        <div
-                          onClick={() => deleteUser([customer.id])}
-                          className="cursor-pointer"
-                        >
-                          <NextImage
-                            src="/trash.png"
-                            alt="trash"
-                            className="w-5 h-5 md:w-6 md:h-6 opacity-80 hover:opacity-100 transition-opacity"
-                          />
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </InfiniteScroll>
+              ))
+            )}
+          </TableBody>
+        </Table>
+        {listUsersCustomers?.length > 0 && (
+          <div className="flex justify-center md:justify-end mt-4 w-full md:w-fit md:ml-auto">
+            <PaginationDemo
+              currentPage={page}
+              totalPages={employees?.lastPage ?? 1}
+              onChangePage={setPage}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
