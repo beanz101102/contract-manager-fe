@@ -549,6 +549,7 @@ export interface AdvancedStatistics {
       draft: number
       completed: number
       pending_approval: number
+      ready_to_sign: number
     }
   }
   byStatus: {
@@ -557,6 +558,7 @@ export interface AdvancedStatistics {
     draft: number
     pending_approval: number
     rejected: number
+    ready_to_sign: number
   }
 
   total: number
