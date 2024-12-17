@@ -220,55 +220,87 @@ export default function ContractDashboard() {
       </div>
       <div ref={targetRef}>
         <div className="grid gap-6 md:grid-cols-3">
-          <div className='col-span-1'>
+          <div className="col-span-1">
             <div className="grid gap-4 mb-6">
               <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Thời gian
-                  </label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline2"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date.from ? (
-                          date.to ? (
-                            <>
-                              {format(date.from, "MM/dd/yyyy")} -{" "}
-                              {format(date.to, "MM/dd/yyyy")}
-                            </>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Từ ngày
+                    </label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline2"
+                          className="w-full justify-start text-left font-normal"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date.from ? (
+                            format(date.from, "dd/MM/yyyy")
                           ) : (
-                            format(date.from, "MM/dd/yyyy")
-                          )
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={date.from}
-                        selected={{ from: date.from, to: date.to }}
-                        onSelect={(range) => {
-                          if (!range?.from || !range?.to) return
-                          // Đặt thời gian kết thúc là 23:59:59
-                          const endDate = new Date(range.to)
-                          endDate.setHours(23, 59, 59, 999)
-                          
-                          setDate({ 
-                            from: range.from,
-                            to: endDate
-                          })
-                        }}
-                        numberOfMonths={2}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                            <span>Chọn ngày</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          initialFocus
+                          mode="single"
+                          selected={date.from}
+                          onSelect={(selectedDate) => {
+                            if (!selectedDate) return
+                            // Đặt thời gian bắt đầu là 00:00:00
+                            const startDate = new Date(selectedDate)
+                            startDate.setHours(0, 0, 0, 0)
+
+                            setDate((prev) => ({
+                              ...prev,
+                              from: startDate,
+                            }))
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Đến ngày
+                    </label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline2"
+                          className="w-full justify-start text-left font-normal"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {date.to ? (
+                            format(date.to, "dd/MM/yyyy")
+                          ) : (
+                            <span>Chọn ngày</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          initialFocus
+                          mode="single"
+                          selected={date.to}
+                          onSelect={(selectedDate) => {
+                            if (!selectedDate) return
+                            // Đặt thời gian kết thúc là 23:59:59
+                            const endDate = new Date(selectedDate)
+                            endDate.setHours(23, 59, 59, 999)
+
+                            setDate((prev) => ({
+                              ...prev,
+                              to: endDate,
+                            }))
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
 
                 <div>
@@ -286,7 +318,9 @@ export default function ContractDashboard() {
                       <SelectItem value="all">Tất cả</SelectItem>
                       <SelectItem value="draft">Mới</SelectItem>
                       <SelectItem value="completed">Đã hoàn thành</SelectItem>
-                      <SelectItem value="pending_approval">Đợi duyệt</SelectItem>
+                      <SelectItem value="pending_approval">
+                        Đợi duyệt
+                      </SelectItem>
                       <SelectItem value="ready_to_sign">Đợi ký</SelectItem>
                       <SelectItem value="rejected">Yêu cầu sửa</SelectItem>
                       <SelectItem value="cancelled">Bị hủy</SelectItem>
@@ -332,7 +366,12 @@ export default function ContractDashboard() {
                               className="cursor-pointer"
                             >
                               {creatorId === "all" && (
-                                <Check className={cn("mr-2 h-4 w-4", "text-green-500")} />
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    "text-green-500"
+                                  )}
+                                />
                               )}
                               <p className="text-sm text-gray-700">Tất cả</p>
                             </CommandItem>
@@ -347,9 +386,16 @@ export default function ContractDashboard() {
                                   className="cursor-pointer"
                                 >
                                   {creatorId === creator.id.toString() && (
-                                    <Check className={cn("mr-2 h-4 w-4", "text-green-500")} />
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        "text-green-500"
+                                      )}
+                                    />
                                   )}
-                                  <p className="text-sm text-gray-700">{creator.fullName}</p>
+                                  <p className="text-sm text-gray-700">
+                                    {creator.fullName}
+                                  </p>
                                 </CommandItem>
                               ))
                             ) : (
@@ -467,7 +513,9 @@ export default function ContractDashboard() {
                       dataKey="value"
                     >
                       {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color}>{entry.value}</Cell>
+                        <Cell key={`cell-${index}`} fill={entry.color}>
+                          {entry.value}
+                        </Cell>
                       ))}
                     </Pie>
                     <Tooltip />
