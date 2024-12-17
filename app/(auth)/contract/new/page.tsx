@@ -95,7 +95,7 @@ export default function ContractForm() {
   const [isOpenCreateFlow, setIsOpenCreateFlow] = useState(false)
   const { useListUsers } = useUsers()
   const { data, isLoading } = useListUsers(
-    ["customer"],
+    ["customer", "employee"],
     1,
     10,
     searchTerm,
@@ -113,7 +113,7 @@ export default function ContractForm() {
   const { data: signersData, isLoading: isLoadingSigners } = useListSigners(
     null,
     1,
-    20,
+    2000,
     searchSignerTerm,
     null
   )
@@ -121,6 +121,7 @@ export default function ContractForm() {
   console.log("signersData", signersData)
   // const potentialSigners = signersData?.users || []
   const potentialSigners = signersData?.users
+  console.log("potentialSigners", potentialSigners)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -727,9 +728,12 @@ export default function ContractForm() {
                                                         <CommandList>
                                                           <CommandGroup heading="Danh sách người duyệt">
                                                             {potentialSigners?.map(
-                                                              (user: User) => (
+                                                              (
+                                                                user: User,
+                                                                index: number
+                                                              ) => (
                                                                 <CommandItem
-                                                                  key={user.id}
+                                                                  key={`${user.id}-${index}`}
                                                                   value={
                                                                     user.fullName
                                                                   }
@@ -866,7 +870,7 @@ export default function ContractForm() {
 
                                                 // For first signer (index 0), only show internal users
                                                 if (
-                                                  selectedSigners.length === 0
+                                                  selectedSigners?.length === 0
                                                 ) {
                                                   return (
                                                     user.role !== "customer"
