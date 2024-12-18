@@ -127,9 +127,8 @@ export default function EditEmployeeInformationForm() {
       department:
         departments?.find((dept) => dept.departmentName === values.department)
           ?.id || 0,
-      position: values.position,
       passwordHash: values.password,
-      role: "employee",
+      role: values.position as "admin" | "employee" | "customer" | undefined,
       id: user?.id,
     })
   }
