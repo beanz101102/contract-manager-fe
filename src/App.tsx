@@ -202,23 +202,42 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
         onChange={uploadImage}
       />
     </>
-  );
+  )
 
   useEffect(() => {
     const handleSaveToServer = async () => {
       try {
-        const file = await newFile(allPageAttachments)
-        setFile(file || null)
+        // Kiểm tra nếu không có attachments
+        const hasNoAttachments =
+          !allPageAttachments ||
+          allPageAttachments.every((page) => page.length === 0)
+
+        // Nếu đang không có file và không có attachments -> không cần set null nữa
+        if (hasNoAttachments && !file) {
+          return
+        }
+
+        // Nếu không có attachments -> set null
+        if (hasNoAttachments) {
+          setFile(null)
+          return
+        }
+
+        // Tạo file mới chỉ khi có attachments
+        const newPdfFile = await newFile(allPageAttachments)
+
+        // Chỉ set file mới nếu khác với file hiện tại
+        if (newPdfFile && (!file || file !== newPdfFile)) {
+          setFile(newPdfFile)
+        }
       } catch (error) {
         console.error("Error saving file:", error)
         setFile(null)
       }
     }
 
-    if (allPageAttachments?.[0]?.length > 0) {
-      handleSaveToServer()
-    }
-  }, [allPageAttachments])
+    handleSaveToServer()
+  }, [allPageAttachments, newFile, setFile, file])
 
   const handleDownloadPdf = () => savePdf(allPageAttachments)
 
@@ -240,7 +259,6 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
 
   const handleAddImage = async (file?: File) => {
     if (file) {
-      // Xử lý file được truyền vào (từ chữ ký có sẵn)
       try {
         const url = await readAsDataURL(file)
         const img = await readAsImage(url as string)
@@ -262,7 +280,6 @@ const AppPDF: React.FC<AppPDFProps> = ({ url, setFile }) => {
         console.log("Failed to load image", error)
       }
     } else {
-      // Mở dialog chọn file khi không có file được truyền vào
       handleImageClick()
     }
   }
