@@ -57,7 +57,12 @@ export const useApprovalFlows = () => {
         onSuccess && onSuccess()
       },
       onError: (error: any) => {
-        toast.error(error?.response?.data?.message)
+        const textError = 'Cannot delete or update a parent row';
+        if (error?.response?.data?.message.includes(textError)) {
+          toast.error("Không thể xóa hoặc cập nhật luồng duyệt đã được sử dụng")
+        } else {
+          toast.error(error?.response?.data?.message)
+        }
       },
     })
   }
