@@ -123,7 +123,7 @@ export default function CustomerList() {
       </div>
 
       <div className="overflow-x-auto">
-        <Table className="min-w-[2000px] w-full">
+        <Table className="min-w-[2400px] w-full">
           <TableHeader>
             <TableRow className="hover:bg-gray-50 bg-gray-100">
               <TableHead className="w-[50px]">
